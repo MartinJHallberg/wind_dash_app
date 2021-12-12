@@ -40,7 +40,7 @@ SET UP GRID MAP
 #shp_grid['Stednavn'].fillna('No name', inplace = True)
 
 # Set url to geojson
-url = 'https://raw.githubusercontent.com/Maud10/DMI_Wind_DashApp/main/assets/Shapefiles/DKN_10KM_epsg4326_filtered.geojson'
+url = 'https://raw.githubusercontent.com/Maud10/DMI_Wind_DashApp/main/assets/DKN_10KM_epsg4326_filtered.geojson'
 geoj_grid = json.loads(requests.get(url).text)
 
 
