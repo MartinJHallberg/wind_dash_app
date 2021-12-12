@@ -700,4 +700,6 @@ def fun_fig_chart(df, AreaName, date_from_str, date_to_str):
 #endregion
 
 
-app.run_server(debug=True)
+
+if __name__ == '__main__':
+    app.run_server(debug=False)
