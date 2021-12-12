@@ -39,8 +39,9 @@ SET UP GRID MAP
 # Rename None to 'No name'
 #shp_grid['Stednavn'].fillna('No name', inplace = True)
 
-with open('assets/Shapefiles/DKN_10KM_epsg4326_filtered.geojson') as geofile:
-    geoj_grid = json.load(geofile)
+# Set url to geojson
+url = 'https://raw.githubusercontent.com/Maud10/DMI_Wind_DashApp/main/assets/Shapefiles/DKN_10KM_epsg4326_filtered.geojson'
+geoj_grid = json.loads(requests.get(url).text)
 
 
 shp_grid = pd.json_normalize(geoj_grid['features'])
