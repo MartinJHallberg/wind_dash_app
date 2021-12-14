@@ -305,7 +305,7 @@ app.layout = html.Div([
                                            style={'color': 'white'}),
 
                                     html.Div('Source code can be found at GitHub'),
-                                    html.A('GitHub', href='https://github.com/Maud10',
+                                    html.A('GitHub', href='https://github.com/Maud10/DMI_Wind_DashApp',
                                            style={'color': 'white'}),
                                     html.Br(),
                                     html.Br(),
@@ -509,7 +509,6 @@ def fun_get_filter_dmi_data(
 
     # Concatenate all
     req_str = dmi_path + str_datetime + str_time_res + str_geo + str_limit + str_api_key
-    # req_str = dmi_path + 'datetime='+ date_from_str + "/" + date_to_str +  '&timeResolution=' + time_res +  '&api-key=' + api_key
     #print(req_str)
 
     ### Get data ###
@@ -609,22 +608,6 @@ def fun_fig_chart(df, AreaName, date_from_str, date_to_str):
     for i, row in df.iterrows():
 
         x_date = row['from_datetime']
-
-        # fig_chart.add_layout_image(
-        #     dict(
-        #         source=Image.open(f"figures/arrow_ene.png"),
-        #         #xref="x",
-        #         #yref="y",
-        #         x=x_date,
-        #         y=12,
-        #         sizex=3000,
-        #         sizey=3000,
-        #         sizing="contain",
-        #         opacity=0.8,
-        #         layer="above"
-        #     )
-        # )
-
 
         ax = dict_dir_coord[row['Wind_CardDir']]['X_cord']
         ay = dict_dir_coord[row['Wind_CardDir']]['Y_cord']
