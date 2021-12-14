@@ -35,12 +35,8 @@ SET UP GRID MAP
 """
 
 ## READ GEOGPRAPHICAL DATA
-#shp_grid = gdp.read_file('Shapefiles/DKN_10KM_epsg4326_filtered.shp')
-# Rename None to 'No name'
-#shp_grid['Stednavn'].fillna('No name', inplace = True)
-
 # Set url to geojson
-url = 'https://raw.githubusercontent.com/Maud10/DMI_Wind_DashApp/main/assets/DKN_10KM_epsg4326_filtered.geojson'
+url = 'https://raw.githubusercontent.com/Maud10/DMI_Wind_DashApp/main/assets/DKN_10KM_epsg4326_filtered_UTF8.geojson'
 geoj_grid = json.loads(requests.get(url).text)
 
 
@@ -49,7 +45,7 @@ shp_grid = pd.json_normalize(geoj_grid['features'])
 shp_grid.rename(columns = {'properties.KN10kmDK':'KN10kmDK',
                           'properties.Stednavn':'Stednavn'}, inplace = True)
 
-
+# Rename None to 'No name'
 shp_grid['Stednavn'].fillna('No name', inplace = True)
 
 
