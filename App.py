@@ -218,7 +218,7 @@ app.layout = html.Div([
         [
             html.Div([
             # Text
-            html.H2("DMI - Weather App"),
+            html.H2("DK Surf Cast"),
             ],
             style= {'width' : '85%'})
         ,
