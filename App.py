@@ -209,9 +209,7 @@ fig_windrose = go.Figure(
 #fig_windrose.show()
 #endregion
 
-#WindDir
 
-#endregion
 # App layout
 app.layout = html.Div([
 
@@ -305,7 +303,7 @@ app.layout = html.Div([
                                            style={'color': 'white'}),
                                     html.Br(),
                                     html.Br(),
-                                    html.Div('Love, hate or life advice can be sent to'),
+                                    html.Div('Life advice can be sent to'),
                                     html.Div('martinjhallberg@gmail.com')
                                 ], style={'height': '100%'}
                                 ),
