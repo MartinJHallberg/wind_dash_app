@@ -36,14 +36,25 @@ SET UP GRID MAP
 
 ## READ GEOGPRAPHICAL DATA
 # Set url to geojson
-url = 'https://raw.githubusercontent.com/Maud10/DMI_Wind_DashApp/main/assets/DKN_10KM_epsg4326_filtered_UTF8.geojson'
-geoj_grid = json.loads(requests.get(url).text)
+#url = 'https://raw.githubusercontent.com/Maud10/DMI_Wind_DashApp/main/assets/DKN_10KM_epsg4326_filtered_UTF8.geojson'
+#geoj_grid = json.loads(requests.get(url).text)
+
+url = "C:/Users/marti/Dokument/Data Science/DMI/DKN_10KM_epsg4326_filtered_wCent.geojson"
+#geoj_grid = json.loads(requests.get(url).text)
+with open(url) as f:
+    geoj_grid = json.load(f)
+
+#print(geoj_grid)
+
 
 
 shp_grid = pd.json_normalize(geoj_grid['features'])
 
+print(shp_grid.columns)
 shp_grid.rename(columns = {'properties.KN10kmDK':'KN10kmDK',
-                          'properties.Stednavn':'Stednavn'}, inplace = True)
+                          'properties.Stednavn':'Stednavn',
+                           'properties.cent_lon': 'cent_lon',
+                           'properties.cent_lat': 'cent_lat'}, inplace = True)
 
 # Rename None to 'No name'
 shp_grid['Stednavn'].fillna('No name', inplace = True)
@@ -64,7 +75,8 @@ shp_grid['Col'] = 'rgba(76,155,232,0.4)'
 # Hover columns
 hover_data_map = np.stack(
     (shp_grid['Stednavn'],
-    shp_grid['Stednavn']), axis = 1)
+    shp_grid['cent_lon'],
+     shp_grid['cent_lat']), axis = 1)
 
 # Figure
 fig_map = go.Figure(
@@ -262,7 +274,7 @@ app.layout = html.Div([
                                                         id='date_picker',
                                                         min_date_allowed=date(2019, 1, 1),
                                                         max_date_allowed=date.today(),
-                                                        date=date.today(),
+                                                        date=date.today() - dt.timedelta(days = 1),
                                                         display_format='YYYY-MM-DD'
                                                     ),
                                                     html.Br(),
@@ -299,7 +311,8 @@ app.layout = html.Div([
                                            style={'color': 'white'}),
 
                                     html.Div('Source code can be found at GitHub'),
-                                    html.A('GitHub', href='https://github.com/Maud10/DMI_Wind_DashApp',
+                                    html.A('GitHub', href='https://github.com/martinjhallberg/DMI_Wind_DashApp',
+                                           target = '_blank',
                                            style={'color': 'white'}),
                                     html.Br(),
                                     html.Br(),
@@ -425,6 +438,8 @@ def update_output(date_value, clk_data):
         # Get DMI data
         cellid = shp_grid['KN10kmDK'].sample(n = 1).values[0]
         cellname = shp_grid.loc[shp_grid['KN10kmDK'] == cellid, 'Stednavn'].values[0]
+        #cell_lon = clk_data['points'][0]['customdata'][1]
+        #cell_lat = clk_data['points'][0]['customdata'][2]
         #print(cellid)
         # Get DMI data
         df, date_from_str = fun_get_filter_dmi_data(
@@ -438,9 +453,11 @@ def update_output(date_value, clk_data):
 
     else:
         # Help prints
-        #print(f'Click data: {clk_data}')
+        print(f'Click data: {clk_data}')
         cellid =clk_data['points'][0]['location']
         cellname = clk_data['points'][0]['customdata'][0]
+        cell_lon = clk_data['points'][0]['customdata'][1]
+        cell_lat = clk_data['points'][0]['customdata'][2]
 
         # Get DMI data
         df, date_from_str = fun_get_filter_dmi_data(
@@ -544,8 +561,58 @@ def fun_get_filter_dmi_data(
     return data , date_from_str
 #endregion
 
+#region DEFINE FUNCTION FOR FORECAST DATA (FCOO)
+# Define function to get data
+def fun_get_fcoo_data(var, lat, lon):
+    # Base string to FCOO
+    fcoo_path = 'https://app.fcoo.dk/metoc/v2/data/timeseries?variables='
 
-#region DEFINE FUNCTION FOR FIGURE
+    # Construct request string
+    req_str = fcoo_path + var + '&lat=' + str(lat) + '&lon=' + str(lon)
+    print(req_str)
+
+    # Collect data
+    data = json.loads(
+        requests.get(req_str).text
+    )
+
+    l_cols = list(data[var].keys())
+
+    if len(l_cols) == 1:
+        df = pd.DataFrame(
+            {'WavePeriod': data[var][l_cols[0]]['data'],
+             'Time': data[var][l_cols[0]]['time']
+             })
+    else:
+        df = pd.DataFrame(
+            {l_cols[0]: data[var][l_cols[0]]['data'],
+             l_cols[1]: data[var][l_cols[1]]['data'],
+             'Time': data[var][l_cols[0]]['time']
+             })
+
+    # Set time as index to simpify join
+    #df.set_index('Time', inplace=True)
+
+
+    df['Time'] = pd.to_datetime(df['Time'])
+    return df
+
+# Define function to calcualate wind direction and magnitude
+def fun_vec_to_dir_mag(df,
+                       u_vec,
+                       v_vec,
+                       var):
+    dir_name = var + 'Dir'
+    mag_name = var + 'Magnitude'
+
+    df[dir_name] = round(np.arctan2(df[u_vec], df[v_vec]) * 180 / np.pi + 180, 0)
+    df[mag_name] = round(np.sqrt(df[u_vec] ** 2 + df[v_vec] ** 2), 1)
+
+    return df
+
+#endregion
+
+#region DEFINE FUNCTION FOR WEATHER FIGURE
 
 def fun_fig_chart(df, AreaName, date_from_str, date_to_str):
     # Create column with cardinal direction
