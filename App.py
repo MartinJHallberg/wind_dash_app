@@ -8,7 +8,7 @@ from plotly.colors import n_colors
 import numpy as np
 import dash
 import dash_bootstrap_components as dbc
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 from dash import dcc, html
 from datetime import date
 
@@ -235,6 +235,17 @@ app.layout = html.Div([
     html.Div(
         [
             html.Div([
+                dbc.Button('About',
+                           id = 'modal-button',
+                           n_clicks=0),
+                dbc.Modal(
+                    [
+                        dbc.ModalHeader(dbc.ModalTitle('DMIWindApp')),
+                        dbc.ModalBody('Data is collected from bla bla bla')
+                    ],
+                    id = 'modal',
+                    is_open= False,
+                ),
             # Text
             html.H2("DK Surf Cast"),
             ],
@@ -247,15 +258,12 @@ app.layout = html.Div([
                 href="https://plotly.com/dash/",
                 style={'width': '20%'}
             ),
-
-        ],
-        )
+        ],)
     ],
         style= {'display': 'flex',
-                'top': '40px',
+                'top': '100px',
                 'left': '2px',
                 'position': 'absolute'}
-       ,
     ),
 
     html.Br(),
@@ -269,7 +277,7 @@ app.layout = html.Div([
                 display_format='YYYY-MM-DD'
             ),
         ],
-        style={'top': '80px',
+        style={'top': '150px',
                'left': '2px',
                'position': 'absolute'}
     ),
@@ -280,7 +288,12 @@ app.layout = html.Div([
                  style = {'color': dict_layout_cols['white']}),
 
        html.Div(
-        [        dcc.Graph(
+        [
+            dcc.Loading(
+                id='loading-1',
+                type='default',
+                children=[
+            dcc.Graph(
             id='bar_chart', figure={},
             config={
                 'displayModeBar': False},
@@ -290,6 +303,7 @@ app.layout = html.Div([
                    # 'display': 'block'
                    },
         )
+                    ]),
             ]
         , style={'height': '30%',
                'width': '100%',
@@ -299,24 +313,59 @@ app.layout = html.Div([
                },
     ),
             #html.Div('test'),
-    html.Div(
+    html.Div([
 
-        dcc.Graph(
-            id='bar_chart_2', figure={},
-            config={
-                'displayModeBar': False},
-            style={'height': '100px',
-                   'width': '90%',
-                   #'float': 'right'
-                   # 'display': 'block'
-                   },
-        ), style={'height': '30%',
-                  'width': '100%',
-                  'right': '0px',
-                  'top': '230px',
-                  'position': 'absolute',
-                  },
+        html.Details(
+            [
+                html.Summary('Show wave forecast'),
+
+                dcc.Graph(
+                    id='bar_chart_2', figure={},
+                    config={
+                        'displayModeBar': False},
+                    style={'height': '150px',
+                           'width': '90%',
+                           # 'float': 'right'
+                           # 'display': 'block'
+                           },
+                ),
+
+            ],style={'height': '300px'}
+
+        )
+        ],style={'height': '50%',
+                 'width': '100%',
+                 'right': '0px',
+                 'top': '230px',
+                 'position': 'absolute',
+                },
+
+
     ),
+            html.Div([
+                        dcc.Loading(
+                            id = 'loading-3',
+                            type = 'default',
+                            children = [
+                                dcc.Graph(
+                            id='bar_chart_3', figure={},
+                            config={
+                                'displayModeBar': False},
+                            style={'height': '150px',
+                                   'width': '90%',
+                                   # 'float': 'right'
+                                   # 'display': 'block'
+                                   },
+                )
+            ]),
+            ], style={'height': '50%',
+                      'width': '100%',
+                      'right': '0px',
+                      'top': '400px',
+                      'position': 'absolute',
+                      },
+
+            ),
         ],style={'height': '100%',
                   'width': '50%',
                   'right': '0px',
@@ -326,199 +375,21 @@ app.layout = html.Div([
                   },
     )
 
-#     # Intialize card for screen
-#     dbc.Card(
-#         dbc.CardBody([
-#
-#
-#     # First row - define input
-#     dbc.Row(
-#         [
-#             dbc.Col(
-#                 [
-#                     dbc.Card([
-#                         dbc.CardBody([
-#
-#                             dbc.Card(
-#                                 [
-#                                     dbc.CardBody(
-#                                         [
-#                                             html.Div(
-#                                                 [
-#                                                     html.H4("Previous date"),
-#                                                     html.Div(
-#                                                         'Choose date and area from the map to display wind conditions'),
-#                                                     html.Br(),
-#                                                     dcc.DatePickerSingle(
-#                                                         id='date_picker_2',
-#                                                         min_date_allowed=date(2019, 1, 1),
-#                                                         max_date_allowed=date.today(),
-#                                                         date=date.today() - dt.timedelta(days = 1),
-#                                                         display_format='YYYY-MM-DD'
-#                                                     ),
-#                                                     html.Br(),
-#                                                     html.Br(),
-#                                                     #html.H4("Forecast date"),
-#                                                     #html.Div('To be implemented...'),
-#                                                     # dcc.DatePickerSingle(
-#                                                     #     id='date_picker',
-#                                                     #     min_date_allowed=date(2019, 1, 1),
-#                                                     #     max_date_allowed=date.today(),
-#                                                     #     date=date.today(),
-#                                                     #     display_format='YYYY-MM-DD'
-#                                                     # )
-#                                                 ], style={'height': '100%'}),
-#                                         ]),
-#                                 ],
-#                                 style={'height': '50%'},
-#                                 color='primary',
-#                             ),
-#
-#                             html.Br(),
-#                             #html.Br(),
-#
-#                             dbc.Card(
-#                                 [
-#                                # dbc.CardHeader('Credits'),
-#
-#                                 dbc.CardBody([
-#
-#                                     html.Div([
-#                                         dcc.Graph(id='map_figure_3', figure=fig_map,
-#                                                   config={
-#                                                       'displayModeBar': False},
-#                                                   style={'width': '100%',
-#                                                          'height': '100%'}),
-#                                         html.Div('Test',
-#                                                  style={'position': 'absolute',
-#                                                         'top': '80px',
-#                                                         'left': '2px'}),
-#
-#                                     ], style={'width': '100%',
-#                                               'height': '100%',
-#                                               'position': 'relative'}
-#                                     ),
-#
-#                                     #html.H4('Credits'),
-#                                     #html.Div('Weather data is collected from DMI Rest API:'),
-#                                     #html.A('DMI', href='https://confluence.govcloud.dk/display/FDAPI',
-#                                     #       target='_blank',
-#                                     #       style={'color': 'white'}),
-#
-#                                     #html.Div('Source code can be found at GitHub'),
-#                                     #html.A('GitHub', href='https://github.com/martinjhallberg/DMI_Wind_DashApp',
-#                                     #       target = '_blank',
-#                                     #       style={'color': 'white'}),
-#                                     #html.Br(),
-#                                     #html.Br(),
-#                                     #html.Div('Life advice can be sent to'),
-#                                     #html.Div('martinjhallberg@gmail.com')
-#                                 ], style={'height': '100%',
-#                                           'padding': '0rem'}
-#                                 ),
-#                                     ],style={'height': '46%'},
-#                                 color = 'rgba(0, 0, 0, 0)'
-#                             )
-#                         ],
-#                         style = {'padding': '0rem'})
-#                     ],
-#                         style = {'height': '100%'},
-#                         color = 'rgba(255,255,255,0'
-#                     )
-#                 ],
-#
-#             width={'size': 3, "offset": 0, 'order': 1}
-#             ),
-#
-#
-#
-#             dbc.Col(
-#                 dbc.Card(
-#
-#                     dbc.CardBody(
-#                         [
-#                         html.Div([
-#                             dcc.Graph(id='map_figure_2', figure=fig_map,
-#                                       config={
-#                                           'displayModeBar': False},
-#                                       style={'width' : '100%',
-#                                              'height': '100%'})
-#                         ],style={'width' : '100%',
-#                                  'height': '40%'}
-#                         ),
-#
-#                         html.Div([
-#
-#                             html.Div(
-#                             dcc.Graph(
-#                                 id='bar_chart_4', figure={},
-#                                 config={
-#                                     'displayModeBar': False},
-#                                 style={'height': '100%',
-#                                        #'display': 'block'
-#                                        },
-#                             ),
-#                                 style={'height': '40%',
-#                                        'width': '85%',
-#                                        #'display': 'block'
-#                                        },
-#                             ),
-#                             html.Div([
-#
-#                                 #html.Div('Wind direction',
-#                                 #        style= {'text-align' : 'center'}),
-#                             dcc.Graph(
-#                                 id='wing_rose', figure=fig_windrose,
-#                                 config={
-#                                     'displayModeBar': False}
-#                             ),
-#                                 ],style={'height': '20%',
-#                                        'width' : '15%',
-#                                         'margin': '7% 0%'
-#                                        #'display': 'block'
-#                                        },
-#                             ),
-#
-#                         ], style = {'display':'flex'},
-#                         ),
-#
-#                         ]
-#                     ),
-#                 style= {'height':'100%'},
-#                 color = dict_layout_cols['bg_blue'],
-#                 outline = False,
-#                 ),
-#                     width={'size': 9 , "offset":0 , 'order': 2},
-#                     ),
-#
-#
-#         ],
-#         #className="g-0", # remove horizontal space between elements
-#     ),
-#
-#
-#
-#
-#
-# ])
-# ,color= dict_layout_cols['bg_blue2']
-# )
 
 
 ],style= {'position': 'relative',
           'height': '100%'},)
 
 
-
+# Figure callback
 @app.callback(
    # Output('output_date_picker', 'children'),
     Output('bar_chart', 'figure'),
     Output('bar_chart_2', 'figure'),
+    Output('bar_chart_3', 'figure'),
     Input('date_picker', 'date'),
-    Input('map_figure', 'clickData')
+    Input('map_figure', 'clickData'),
 )
-
-
 
 
 def update_output(date_value, clk_data):
@@ -573,8 +444,22 @@ def update_output(date_value, clk_data):
 
     #print(string_out)
     #return string_out,\
-    return fig_out, fig_out
 
+
+    return fig_out, fig_out, fig_out
+
+
+
+# Modal callback
+@app.callback(
+    Output("modal", "is_open"),
+    Input("modal-button", "n_clicks"),
+    [State("modal", "is_open")],
+)
+def toggle_modal(n1, is_open):
+    if n1:
+        return not is_open
+    return is_open
 
 #region HELPER FUNCTIONS
 #region DEFINE FUNCTION FOR GETTING DMI DATA
