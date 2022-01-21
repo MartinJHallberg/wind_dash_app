@@ -36,13 +36,13 @@ SET UP GRID MAP
 
 ## READ GEOGPRAPHICAL DATA
 # Set url to geojson
-#url = 'https://raw.githubusercontent.com/Maud10/DMI_Wind_DashApp/main/assets/DKN_10KM_epsg4326_filtered_UTF8.geojson'
-#geoj_grid = json.loads(requests.get(url).text)
+url = 'https://raw.githubusercontent.com/MartinJHallberg/DMI_Wind_DashApp/main/assets/DKN_10KM_epsg4326_filtered_wCent.geojson'
+geoj_grid = json.loads(requests.get(url).text)
 
-url = "C:/Users/marti/Dokument/Data Science/DMI/DKN_10KM_epsg4326_filtered_wCent.geojson"
+#url = "C:/Users/marti/Dokument/Data Science/DMI/DKN_10KM_epsg4326_filtered_wCent.geojson"
 #geoj_grid = json.loads(requests.get(url).text)
-with open(url) as f:
-    geoj_grid = json.load(f)
+#with open(url) as f:
+#    geoj_grid = json.load(f)
 
 #print(geoj_grid)
 
@@ -63,8 +63,8 @@ shp_grid['Stednavn'].fillna('No name', inplace = True)
 
 ## SET UP FIGURE
 # Map center
-dict_cent = {'lon':  10.582594514193142,
-             'lat':55.85925614742615
+dict_cent = {'lon':  13,
+             'lat':55.86
             }
 
 
@@ -229,11 +229,8 @@ app.layout = html.Div([
               config={
                   'displayModeBar': False},
               style={'width': '100%',
-                     'height': '100%'}),
+                     'height': '100'}),
 
-    # Header
-    html.Div(
-        [
             html.Div([
                 dbc.Button('About',
                            id = 'modal-button',
@@ -246,25 +243,19 @@ app.layout = html.Div([
                     id = 'modal',
                     is_open= False,
                 ),
-            # Text
-            html.H2("DK Surf Cast"),
+
+                html.A(
+                    html.Img(src=app.get_asset_url('dash-new-logo.png'),
+                             style={'height': '40px'}),
+                    href="https://plotly.com/dash/",
+                    style={'right': '0px'}
+                ),
             ],
-            style= {'width': '85%'})
-        ,
-        html.Div([
-            html.A(
-                html.Img(src=app.get_asset_url('dash-new-logo.png'),
-                     style={'height': '30px'}),
-                href="https://plotly.com/dash/",
-                style={'width': '20%'}
-            ),
-        ],)
-    ],
-        style= {'display': 'flex',
-                'top': '100px',
-                'left': '2px',
-                'position': 'absolute'}
-    ),
+            style= {'display': 'inline-block'
+                }
+                )
+    ,
+
 
     html.Br(),
     html.Div(
@@ -277,95 +268,131 @@ app.layout = html.Div([
                 display_format='YYYY-MM-DD'
             ),
         ],
-        style={'top': '150px',
-               'left': '2px',
+        style={'top': '10px',
+               'left': '10px',
                'position': 'absolute'}
     ),
 
+
+    # Side panel
     html.Div(
         [
-            html.H4('Weather for: ',
-                 style = {'color': dict_layout_cols['white']}),
 
+            dcc.Loading(
+                 id='loading-1',
+                 type='default',
+                color = 'rgb(246,105,35)',
+                 children=[
+
+
+            html.Br(),
+            html.H3(
+                id = 'area_headline',
+                 style = {'color': dict_layout_cols['white'],
+                          'textAlign': 'center'}),
+
+
+        # Backcast panel
        html.Div(
         [
-            dcc.Loading(
-                id='loading-1',
-                type='default',
-                children=[
+
+           # dcc.Loading(
+           #     id='loading-1',
+           #     type='default',
+           #     children=[
             dcc.Graph(
             id='bar_chart', figure={},
             config={
                 'displayModeBar': False},
-            style={'height': '100%',
-                   'width': '90%',
-                   #'float': 'right',
-                   # 'display': 'block'
+                style={'height': '230px',
+                       'width': '95%',
+                   "display": "block",
+                   "margin-left": "auto",
+                   "margin-right": "auto",
                    },
         )
-                    ]),
+                   #]),
             ]
-        , style={'height': '30%',
-               'width': '100%',
-               'right': '0px',
-               'top': '30px',
-               'position': 'absolute',
-               },
+        , style={'height': '40%',
+               'width': '94%',
+                 "display": "block",
+                 "margin-left": "auto",
+                 "margin-right": "auto",
+                 'backgroundColor': 'rgba(76,155,232,0.3)'
+           }
     ),
-            #html.Div('test'),
-    html.Div([
 
-        html.Details(
-            [
-                html.Summary('Show wave forecast'),
+    html.Br(),
 
-                dcc.Graph(
-                    id='bar_chart_2', figure={},
-                    config={
-                        'displayModeBar': False},
-                    style={'height': '150px',
-                           'width': '90%',
-                           # 'float': 'right'
-                           # 'display': 'block'
-                           },
-                ),
+    # # Forecast panel
+    # html.Div([
+    #
+    #     html.Div([
+    #         #dcc.Loading(
+    #         #    id='loading-2',
+    #         #    type='default',
+    #         #    children=[
+    #                 dcc.Graph(
+    #                     id='bar_chart_2', figure={},
+    #                     config={
+    #                         'displayModeBar': False},
+    #                     style={'height': '200px',
+    #                            'width': '95%',
+    #                            "display": "block",
+    #                            "margin-left": "auto",
+    #                            "margin-right": "auto",
+    #                            },
+    #                 )
+    #           # ]),
+    #     ], style={'height': '50%',
+    #               'width': '100%',
+    #               'right': '0px',
+    #               'top': '0px',
+    #               #'position': 'relative',
+    #               },
+    #
+    #     ),
+    #
+    #     html.Div([
+    #         #dcc.Loading(
+    #         #    id='loading-3',
+    #         #    type='default',
+    #         #    children=[
+    #                 dcc.Graph(
+    #                     id='bar_chart_3', figure={},
+    #                     config={
+    #                         'displayModeBar': False},
+    #                     style={'height': '200px',
+    #                            'width': '95%',
+    #                            "display": "block",
+    #                            "margin-left": "auto",
+    #                            "margin-right": "auto",
+    #                            },
+    #                 )
+    #           #  ]),
+    #     ], style={'height': '50%',
+    #               'width': '100%',
+    #               'right': '0px',
+    #               'top': '0px',
+    #               #'position': 'absolute',
+    #               },
+    #     )
+    #
+    # ],style={'height': '60%',
+    #          'width': '94%',
+    #          "display": "block",
+    #          "margin-left": "auto",
+    #          "margin-right": "auto",
+    #          'backgroundColor': 'rgba(246,105,35,0.3)'
+    #
+    #              #'top': '250px',
+    #              #'position': 'absolute',
+    #             },
+    #
+    #
+    # ),
+                     ]),
 
-            ],style={'height': '300px'}
-
-        )
-        ],style={'height': '50%',
-                 'width': '100%',
-                 'right': '0px',
-                 'top': '230px',
-                 'position': 'absolute',
-                },
-
-
-    ),
-            html.Div([
-                        dcc.Loading(
-                            id = 'loading-3',
-                            type = 'default',
-                            children = [
-                                dcc.Graph(
-                            id='bar_chart_3', figure={},
-                            config={
-                                'displayModeBar': False},
-                            style={'height': '150px',
-                                   'width': '90%',
-                                   # 'float': 'right'
-                                   # 'display': 'block'
-                                   },
-                )
-            ]),
-            ], style={'height': '50%',
-                      'width': '100%',
-                      'right': '0px',
-                      'top': '400px',
-                      'position': 'absolute',
-                      },
-
-            ),
         ],style={'height': '100%',
                   'width': '50%',
                   'right': '0px',
@@ -373,9 +400,7 @@ app.layout = html.Div([
                   'position': 'absolute',
                   'backgroundColor': 'rgba(15,37,55,0.5)'
                   },
-    )
-
-
+    ),
 
 ],style= {'position': 'relative',
           'height': '100%'},)
@@ -385,8 +410,9 @@ app.layout = html.Div([
 @app.callback(
    # Output('output_date_picker', 'children'),
     Output('bar_chart', 'figure'),
-    Output('bar_chart_2', 'figure'),
-    Output('bar_chart_3', 'figure'),
+    #Output('bar_chart_2', 'figure'),
+    #Output('bar_chart_3', 'figure'),
+    Output('area_headline', 'children'),
     Input('date_picker', 'date'),
     Input('map_figure', 'clickData'),
 )
@@ -446,8 +472,8 @@ def update_output(date_value, clk_data):
     #return string_out,\
 
 
-    return fig_out, fig_out, fig_out
-
+    #return fig_out, fig_out, fig_out, cellname
+    return fig_out, cellname
 
 
 # Modal callback
@@ -662,7 +688,7 @@ def fun_fig_chart(df, AreaName, date_from_str, date_to_str):
         #print(ay)
         fig_chart.add_annotation(
             x= x_date,
-            y = row['mean_wind_speed'] + 1,
+            y = row['mean_wind_speed'] + 2,
             ax = ax,
             ay = ay,
             arrowhead=3,
@@ -677,7 +703,7 @@ def fun_fig_chart(df, AreaName, date_from_str, date_to_str):
 
     # Set axes
     h = 285
-    max_y = max(max(df['mean_wind_speed']), max(df['max_wind_speed_3sec'])) + 6  # Find maximun y-value from the two
+    max_y = 30
     min_y = 0
     y_ax_range = dict(range=[min_y, max_y])
 
@@ -692,27 +718,28 @@ def fun_fig_chart(df, AreaName, date_from_str, date_to_str):
         yaxis=y_ax_range,#, yaxis2=y_ax_range
         autosize=True,
         #width=800,
-        height=200,
+        height=230,
         hovermode='x unified',
         hoverlabel=dict(bgcolor='rgba(255,255,255,0.75)',
                           font=dict(color='black')
                           ),
-        margin=dict(l=0, r=20, t=20, b=20),
+        margin=dict(l=0, r=20, t=33, b=40),
         plot_bgcolor = 'rgba(0, 0, 0, 0)',
         paper_bgcolor = 'rgba(0, 0, 0, 0)',
         legend=dict(
             yanchor="top",
-            y=0.99,
+            y=1.15,
             xanchor="left",
             x=0.01,
             bgcolor='rgba(76,155,232,0.4)',
             font = dict(color= dict_layout_cols['white'])
             ),
-        # title = {'text': 'Wind at {}, {} - {}'.format(AreaName, date_from_str[0:10], date_to_str),
-        #          'x': 0.5,
-        #          'y':0.94,
-        #          'font': {'color': dict_layout_cols['white']}
-        #          }
+        title = {'text': 'Wind {} - {}'.format(date_from_str[0:10], date_to_str),
+                 'x': 0.5,
+                 'y':0.95,
+                 'font': {'color': dict_layout_cols['white'],
+                          'size': 15}
+                 }
     )
 
 
