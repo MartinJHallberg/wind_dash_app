@@ -36,13 +36,13 @@ SET UP GRID MAP
 
 ## READ GEOGPRAPHICAL DATA
 # Set url to geojson
-#url = 'https://raw.githubusercontent.com/Maud10/DMI_Wind_DashApp/main/assets/DKN_10KM_epsg4326_filtered_UTF8.geojson'
-#geoj_grid = json.loads(requests.get(url).text)
+url = 'https://raw.githubusercontent.com/MartinJHallberg/DMI_Wind_DashApp/main/assets/DKN_10KM_epsg4326_filtered_wCent.geojson'
+geoj_grid = json.loads(requests.get(url).text)
 
-url = "C:/Users/marti/Dokument/Data Science/DMI/DKN_10KM_epsg4326_filtered_wCent.geojson"
+#url = "C:/Users/marti/Dokument/Data Science/DMI/DKN_10KM_epsg4326_filtered_wCent.geojson"
 #geoj_grid = json.loads(requests.get(url).text)
-with open(url) as f:
-    geoj_grid = json.load(f)
+#with open(url) as f:
+#    geoj_grid = json.load(f)
 
 #print(geoj_grid)
 
