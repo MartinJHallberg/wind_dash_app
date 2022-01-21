@@ -354,7 +354,11 @@ app.layout = html.Div([
                         html.Div([
 
                             html.Div(
-                            dcc.Graph(
+                                [
+                                    dcc.Loading(
+                                        id = 'loading_chart',
+                                        type = 'default',
+                                        children= dcc.Graph(
                                 id='bar_chart', figure={},
                                 config={
                                     'displayModeBar': False},
@@ -362,6 +366,9 @@ app.layout = html.Div([
                                        #'display': 'block'
                                        },
                             ),
+                                    )
+
+                                    ],
                                 style={'height': '40%',
                                        'width': '85%',
                                        #'display': 'block'
@@ -694,7 +701,7 @@ def fun_fig_chart(df, AreaName, date_from_str, date_to_str):
 
     # Set axes
     h = 285
-    max_y = max(max(df['mean_wind_speed']), max(df['max_wind_speed_3sec'])) + 6  # Find maximun y-value from the two
+    max_y = 30
     min_y = 0
     y_ax_range = dict(range=[min_y, max_y])
 
@@ -709,17 +716,17 @@ def fun_fig_chart(df, AreaName, date_from_str, date_to_str):
         yaxis=y_ax_range,#, yaxis2=y_ax_range
         autosize=True,
         #width=800,
-        height=330,
+        height=340,
         hovermode='x unified',
         hoverlabel=dict(bgcolor='rgba(255,255,255,0.75)',
                           font=dict(color='black')
                           ),
-        margin=dict(l=0, r=20, t=20, b=20),
+        margin=dict(l=0, r=20, t=40, b=20),
         plot_bgcolor = 'rgba(0, 0, 0, 0)',
         paper_bgcolor = 'rgba(0, 0, 0, 0)',
         legend=dict(
             yanchor="top",
-            y=0.99,
+            y=1,
             xanchor="left",
             x=0.01,
             bgcolor='rgba(76,155,232,0.4)',
@@ -727,7 +734,7 @@ def fun_fig_chart(df, AreaName, date_from_str, date_to_str):
             ),
         title = {'text': 'Wind at {}, {} - {}'.format(AreaName, date_from_str[0:10], date_to_str),
                  'x': 0.5,
-                 'y':0.94,
+                 'y':0.95,
                  'font': {'color': dict_layout_cols['white']}
                  }
     )
