@@ -296,10 +296,6 @@ app.layout = html.Div([
        html.Div(
         [
 
-           # dcc.Loading(
-           #     id='loading-1',
-           #     type='default',
-           #     children=[
             dcc.Graph(
             id='bar_chart', figure={},
             config={
