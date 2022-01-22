@@ -366,7 +366,7 @@ app.layout = html.Div([
                         ]
                         , style={'height': '40%',
                                  'width': '94%',
-                                 "display": "block",
+                                 "display": "flex",
                                  "margin-left": "auto",
                                  "margin-right": "auto",
                                  'backgroundColor': 'rgba(76,155,232,0.3)'
@@ -374,6 +374,55 @@ app.layout = html.Div([
                     ),
 
                     html.Br(),
+
+                    # Compare buttons
+                    # html.Div([
+                    #
+                    #
+                    #     dbc.Button(
+                    #         'Previous condition',
+                    #         id = 'prev-button',
+                    #         color = 'primary',
+                    #         n_clicks= 0
+                    #     ),
+                    #
+                    #     dbc.Collapse(
+                    #         html.Div([
+                    #
+                    #             dcc.DatePickerSingle(
+                    #                 id='date_picker_prev',
+                    #                 min_date_allowed=date(2019, 1, 1),
+                    #                 max_date_allowed=date.today(),
+                    #                 date=date.today() - dt.timedelta(days=1),
+                    #                 display_format='YYYY-MM-DD'
+                    #             ),
+                    #             dcc.Graph(
+                    #                 id='bar_chart_2', figure={},
+                    #                 config={
+                    #                     'displayModeBar': False},
+                    #                 style={'height': '200px',
+                    #                        'width': '95%',
+                    #                        "display": "block",
+                    #                        "margin-left": "auto",
+                    #                        "margin-right": "auto",
+                    #                        },
+                    #             ),
+                    #
+                    #         ]),
+                    #
+                    #         id='prev-collapse',
+                    #         is_open= True,
+                    #     ),
+                    #
+                    #
+                    # ],
+                    #     style={'height': '60%',
+                    #            'width': '94%',
+                    #            "display": "block",
+                    #            "margin-left": "auto",
+                    #            "margin-right": "auto",
+                    #            }
+                    # ),
 
                     # # Forecast panel
                     # html.Div([
@@ -464,7 +513,7 @@ app.layout = html.Div([
 @app.callback(
     # Output('output_date_picker', 'children'),
     Output('bar_chart', 'figure'),
-    # Output('bar_chart_2', 'figure'),
+    #Output('bar_chart_2', 'figure'),
     # Output('bar_chart_3', 'figure'),
     Output('area_headline', 'children'),
     Input('date_picker', 'date'),
@@ -534,6 +583,18 @@ def toggle_modal(n1, is_open):
     if n1:
         return not is_open
     return is_open
+
+
+# Prev/forc callback
+# @app.callback(
+#     Output("prev-collapse", "is_open"),
+#     Input("prev-button", "n_clicks"),
+#     [State("prev-collapse", "is_open")],
+# )
+# def toggle_modal(n, is_open):
+#     if n:
+#         return not is_open
+#     return is_open
 
 
 # region HELPER FUNCTIONS
