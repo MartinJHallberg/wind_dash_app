@@ -105,7 +105,7 @@ fig_map = go.Figure(
         ),
         autosize=True,
         # width=1000,
-        height=700,
+        #height=700,
         margin=dict(l=0, r=0, t=0, b=0),
         plot_bgcolor='rgba(0, 0, 0, 0)',
         paper_bgcolor='rgba(0, 0, 0, 0)',
@@ -201,7 +201,7 @@ fig_windrose = go.Figure(
     ),
     layout=go.Layout(
         autosize=True,
-        height=80,
+        #height=80,
         # width = 200,
         margin=dict(l=10, r=10, t=0, b=15),
         paper_bgcolor='rgba(255,255,255,0)',
@@ -242,7 +242,7 @@ app.layout = html.Div([
               config={
                   'displayModeBar': False},
               style={'width': '100%',
-                     'height': '100'}),
+                     'height': '100vh'}),
 
     html.Br(),
 
@@ -318,7 +318,7 @@ app.layout = html.Div([
         style={'position': 'absolute',
                'width': '300px',
                'display': 'flex',
-               'bottom': '28px',
+               'bottom': '1.5vh',
                'right': '61%',
                "padding": "1rem 1rem",
                'backgroundColor': fun_col_to_trans(dict_layout_cols['primary'], 0.3),
@@ -367,8 +367,8 @@ app.layout = html.Div([
                                 id='bar_chart', figure={},
                                 config={
                                     'displayModeBar': False},
-                                style={'height': '230px',
-                                       'width': '95%',
+                                style={#'height': '230px',
+                                       'width': '100%',
                                        "display": "block",
                                        "margin-left": "auto",
                                        "margin-right": "auto",
@@ -376,7 +376,7 @@ app.layout = html.Div([
                             )
                             # ]),
                         ]
-                        , style={'height': '300px',
+                        , style={'height': '35vh',
                                  'width': '94%',
                                  "display": "flex",
                                  "margin-left": "auto",
@@ -390,13 +390,65 @@ app.layout = html.Div([
                     html.Div([
 
                         dbc.Button(
+                            'Forecast',
+                            id='forc-button',
+                            # color=dict_layout_cols['bg_blue2'],
+                            n_clicks=0,
+                            size='sm',
+                            style={'background-color': dict_layout_cols['orange'],
+                                   'border-color': dict_layout_cols['orange'],
+                                   'margin-left': '1rem'}
+                        ),
+                        dbc.Button(
                             'Previous condition',
                             id = 'prev-button',
                             color = 'primary',
-                            n_clicks= 0
+                            n_clicks= 0,
+                            size = 'sm',
+
                         ),
+
+                        ],style = {'display': 'flex'}
+                    ),
+
+                    # Collapses
+                    html.Div([
+                        # Forecast panel
+                        dbc.Collapse(
+                            [
+                                html.Div([
+
+                                    dcc.Graph(
+                                        id='bar_chart_3', figure={},
+                                        config={
+                                            'displayModeBar': False},
+                                        style={  # 'height': '200px',
+                                            'width': '100%',
+                                            "display": "block",
+                                            "margin-left": "auto",
+                                            "margin-right": "auto",
+                                        },
+                                    ),
+
+                                ],
+                                    style={'height': '35vh',
+                                           'width': '94%',
+                                           "display": "flex",
+                                           "margin-left": "auto",
+                                           "margin-right": "auto",
+                                           }
+                                ),
+                            ],
+                            id='forc-collapse',
+                            is_open=True,
+
+                            #
+
+                        ),
+
                         # Backcast panel
                         dbc.Collapse(
+                            [
                             html.Div([
 
                                 dcc.DatePickerSingle(
@@ -404,31 +456,47 @@ app.layout = html.Div([
                                     min_date_allowed=date(2019, 1, 1),
                                     max_date_allowed=date.today(),
                                     date=date.today() - dt.timedelta(days=1),
-                                    display_format='YYYY-MM-DD'
+                                    display_format='YYYY-MM-DD',
+                                    day_size = 30,
+                                    #style = {"font-size": "10px"}
                                 ),
+                                ],
+                            style = {"padding": "1rem 1rem"}
+                            ),
+                            html.Div([
 
                                 dcc.Graph(
                                     id='bar_chart_2', figure={},
                                     config={
                                         'displayModeBar': False},
-                                    style={'height': '200px',
-                                           'width': '95%',
+                                    style={#'height': '200px',
+                                           'width': '100%',
                                            "display": "block",
                                            "margin-left": "auto",
                                            "margin-right": "auto",
                                            },
                                 ),
 
-                            ]),
-
+                            ],
+                                style={'height': '35vh',
+                                       'width': '94%',
+                                       "display": "flex",
+                                       "margin-left": "auto",
+                                       "margin-right": "auto",
+                                       }
+                            ),
+                            ],
                             id='prev-collapse',
                             is_open= False,
+
+                            #
+
                         ),
 
 
                     ],
-                        style={'height': '60%',
-                               'width': '94%',
+                        style={'height': '65vh',
+                               'width': '100%',
                                "display": "block",
                                "margin-left": "auto",
                                "margin-right": "auto",
@@ -505,8 +573,8 @@ app.layout = html.Div([
                 ]),
 
         ],
-        style={'height': '700px',
-                  'width': '60%',
+        style={'height': '100vh',
+                  'width': '60vw',
                   'right': '0px',
                   'top': '0px',
                   'position': 'absolute',
@@ -517,15 +585,15 @@ app.layout = html.Div([
     ),
 
 ], style={'position': 'relative',
-          'height': '100%'}, )
+          'height': '100vh'}, )
 
 
-# Figure callback
+# Figure 1 callback
 @app.callback(
     # Output('output_date_picker', 'children'),
     Output('bar_chart', 'figure'),
     Output('bar_chart_2', 'figure'),
-    #Output('bar_chart_3', 'figure'),
+    Output('bar_chart_3', 'figure'),
     Output('area_headline', 'children'),
     Input('date_picker', 'date'),
     Input('map_figure', 'clickData'),
@@ -599,8 +667,9 @@ def update_output(date_value, clk_data):
     # print(string_out)
     # return string_out,\
 
-    return fig_out, fig_out, cellname
+    return fig_out, fig_out, fig_out, cellname
     #return fig_out, cellname
+
 
 
 # Modal callback
@@ -622,6 +691,17 @@ def toggle_modal(n1, is_open):
 )
 def toggle_modal(c1, is_open):
     if c1:
+        return not is_open
+    return is_open
+
+# Backcast collaps callback
+@app.callback(
+    Output("forc-collapse", "is_open"),
+    Input('forc-button', "n_clicks"),
+    [State("forc-collapse", "is_open")],
+)
+def toggle_modal(c2, is_open):
+    if c2:
         return not is_open
     return is_open
 
@@ -947,7 +1027,7 @@ def fun_fig_chart(
         yaxis=y_ax_range,  # , yaxis2=y_ax_range
         autosize=True,
         # width=800,
-        height=h,
+        #height=h,
         hovermode='x unified',
         hoverlabel=dict(bgcolor='rgba(255,255,255,0.75)',
                         font=dict(color='black')
