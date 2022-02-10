@@ -11,6 +11,7 @@ import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output, State
 from dash import dcc, html
 from datetime import date
+from plotly.subplots import make_subplots
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SUPERHERO])
 
@@ -22,8 +23,27 @@ dict_layout_cols = {
     'red': 'rgb(217,83,79)',
     'bg_blue': 'rgb(56, 97, 141)',
     'white': 'rgb(255, 255,255)',
-    'bg_blue2': 'rgb(15,37,55)'
+    'bg_blue2': 'rgb(15,37,55)',
+    'orange': 'rgb(246,105,35)',
+    'transparent': 'rgba(255,255,255,0)'
 }
+# region FUNCTION FOR TRANSPARENT COLORS
+
+def fun_col_to_trans(col, transparency):
+    # Convert transparency to string
+    t_trans = str(transparency)
+
+    # Split text and insert transparency
+    col_out = col.split(')')[0] + ',' + t_trans + ')'
+    # Change color type to include transparency
+    col_out = col_out.replace('rgb', 'rgba')
+
+    return col_out
+
+
+#endregion
+
+
 
 # region Grid Map
 """
@@ -34,13 +54,6 @@ SET UP GRID MAP
 # Set url to geojson
 url = 'https://raw.githubusercontent.com/MartinJHallberg/DMI_Wind_DashApp/main/assets/DKN_10KM_epsg4326_filtered_wCent.geojson'
 geoj_grid = json.loads(requests.get(url).text)
-
-# url = "C:/Users/marti/Dokument/Data Science/DMI/DKN_10KM_epsg4326_filtered_wCent.geojson"
-# geoj_grid = json.loads(requests.get(url).text)
-# with open(url) as f:
-#    geoj_grid = json.load(f)
-
-# print(geoj_grid)
 
 
 shp_grid = pd.json_normalize(geoj_grid['features'])
@@ -62,7 +75,7 @@ dict_cent = {'lon': 13,
 
 # Color columns
 shp_grid['Val'] = 1
-shp_grid['Col'] = 'rgba(76,155,232,0.4)'
+shp_grid['Col'] = fun_col_to_trans(dict_layout_cols['primary'], 0.4)
 
 # Hover columns
 hover_data_map = np.stack(
@@ -144,6 +157,7 @@ def fun_DegToCard(d):
     return card_text
 
 
+
 ## DEFINE COLOR PALETTE
 blues = n_colors('rgb(39, 18, 228)', 'rgb(68, 196, 228)', n_colors=4, colortype='rgb')
 greens = n_colors('rgb(6, 121, 37)', 'rgb(129, 233, 49)', n_colors=4, colortype='rgb')
@@ -158,9 +172,7 @@ cols = blues + greens + yellow + reds
 cols_trans = []
 
 for col in cols:
-    col_out = col.split(')')[0] + ',0.8)'
-    col_out = col_out.replace('rgb', 'rgba')
-    cols_trans.append(col_out)
+    cols_trans.append(fun_col_to_trans(col, 0.8))
 
 # Create dict with directions and colors
 col_pal = dict(zip(dirs, cols))
@@ -307,9 +319,9 @@ app.layout = html.Div([
                'width': '300px',
                'display': 'flex',
                'bottom': '28px',
-               'right': '52%',
+               'right': '61%',
                "padding": "1rem 1rem",
-               'backgroundColor': 'rgba(76,155,232,0.3)',
+               'backgroundColor': fun_col_to_trans(dict_layout_cols['primary'], 0.3),
                }
     ),
 
@@ -321,7 +333,7 @@ app.layout = html.Div([
             dcc.Loading(
                 id='loading-1',
                 type='default',
-                color='rgb(246,105,35)',
+                color=dict_layout_cols['orange'],
                 children=[
 
                     html.Br(),
@@ -330,19 +342,19 @@ app.layout = html.Div([
                         style={'color': dict_layout_cols['white'],
                                'textAlign': 'center'}),
 
-                    html.Div([
-                        dcc.Graph(
-                            id='wing_rose', figure=fig_windrose,
-                            config={
-                                'displayModeBar': False}
-                        )
-                    ],
-                        style={'position': 'absolute',
-                               'top': '15px',
-                               'left': '-290px'},
-                    ),
+                    # html.Div([
+                    #     dcc.Graph(
+                    #         id='wing_rose', figure=fig_windrose,
+                    #         config={
+                    #             'displayModeBar': False}
+                    #     )
+                    # ],
+                    #     style={'position': 'absolute',
+                    #            'top': '15px',
+                    #            'left': '-290px'},
+                    # ),
 
-                    html.Br(),
+                    #html.Br(),
 
 
 
@@ -364,65 +376,64 @@ app.layout = html.Div([
                             )
                             # ]),
                         ]
-                        , style={'height': '40%',
+                        , style={'height': '300px',
                                  'width': '94%',
                                  "display": "flex",
                                  "margin-left": "auto",
                                  "margin-right": "auto",
-                                 'backgroundColor': 'rgba(76,155,232,0.3)'
+                                 'backgroundColor': fun_col_to_trans(dict_layout_cols['bg_blue2'],0.5),
                                  }
                     ),
 
-                    html.Br(),
 
-                    # Compare buttons
-                    # html.Div([
-                    #
-                    #
-                    #     dbc.Button(
-                    #         'Previous condition',
-                    #         id = 'prev-button',
-                    #         color = 'primary',
-                    #         n_clicks= 0
-                    #     ),
-                    #
-                    #     dbc.Collapse(
-                    #         html.Div([
-                    #
-                    #             dcc.DatePickerSingle(
-                    #                 id='date_picker_prev',
-                    #                 min_date_allowed=date(2019, 1, 1),
-                    #                 max_date_allowed=date.today(),
-                    #                 date=date.today() - dt.timedelta(days=1),
-                    #                 display_format='YYYY-MM-DD'
-                    #             ),
-                    #             dcc.Graph(
-                    #                 id='bar_chart_2', figure={},
-                    #                 config={
-                    #                     'displayModeBar': False},
-                    #                 style={'height': '200px',
-                    #                        'width': '95%',
-                    #                        "display": "block",
-                    #                        "margin-left": "auto",
-                    #                        "margin-right": "auto",
-                    #                        },
-                    #             ),
-                    #
-                    #         ]),
-                    #
-                    #         id='prev-collapse',
-                    #         is_open= True,
-                    #     ),
-                    #
-                    #
-                    # ],
-                    #     style={'height': '60%',
-                    #            'width': '94%',
-                    #            "display": "block",
-                    #            "margin-left": "auto",
-                    #            "margin-right": "auto",
-                    #            }
-                    # ),
+                    #Compare buttons
+                    html.Div([
+
+                        dbc.Button(
+                            'Previous condition',
+                            id = 'prev-button',
+                            color = 'primary',
+                            n_clicks= 0
+                        ),
+                        # Backcast panel
+                        dbc.Collapse(
+                            html.Div([
+
+                                dcc.DatePickerSingle(
+                                    id='date_picker_prev',
+                                    min_date_allowed=date(2019, 1, 1),
+                                    max_date_allowed=date.today(),
+                                    date=date.today() - dt.timedelta(days=1),
+                                    display_format='YYYY-MM-DD'
+                                ),
+
+                                dcc.Graph(
+                                    id='bar_chart_2', figure={},
+                                    config={
+                                        'displayModeBar': False},
+                                    style={'height': '200px',
+                                           'width': '95%',
+                                           "display": "block",
+                                           "margin-left": "auto",
+                                           "margin-right": "auto",
+                                           },
+                                ),
+
+                            ]),
+
+                            id='prev-collapse',
+                            is_open= False,
+                        ),
+
+
+                    ],
+                        style={'height': '60%',
+                               'width': '94%',
+                               "display": "block",
+                               "margin-left": "auto",
+                               "margin-right": "auto",
+                               }
+                    ),
 
                     # # Forecast panel
                     # html.Div([
@@ -433,7 +444,7 @@ app.layout = html.Div([
                     #         #    type='default',
                     #         #    children=[
                     #                 dcc.Graph(
-                    #                     id='bar_chart_2', figure={},
+                    #                     id='bar_chart_3', figure={},
                     #                     config={
                     #                         'displayModeBar': False},
                     #                     style={'height': '200px',
@@ -453,30 +464,30 @@ app.layout = html.Div([
                     #
                     #     ),
                     #
-                    #     html.Div([
-                    #         #dcc.Loading(
-                    #         #    id='loading-3',
-                    #         #    type='default',
-                    #         #    children=[
-                    #                 dcc.Graph(
-                    #                     id='bar_chart_3', figure={},
-                    #                     config={
-                    #                         'displayModeBar': False},
-                    #                     style={'height': '200px',
-                    #                            'width': '95%',
-                    #                            "display": "block",
-                    #                            "margin-left": "auto",
-                    #                            "margin-right": "auto",
-                    #                            },
-                    #                 )
-                    #           #  ]),
-                    #     ], style={'height': '50%',
-                    #               'width': '100%',
-                    #               'right': '0px',
-                    #               'top': '0px',
-                    #               #'position': 'absolute',
-                    #               },
-                    #     )
+                    #     # html.Div([
+                    #     #     #dcc.Loading(
+                    #     #     #    id='loading-3',
+                    #     #     #    type='default',
+                    #     #     #    children=[
+                    #     #             dcc.Graph(
+                    #     #                 id='bar_chart_3', figure={},
+                    #     #                 config={
+                    #     #                     'displayModeBar': False},
+                    #     #                 style={'height': '200px',
+                    #     #                        'width': '95%',
+                    #     #                        "display": "block",
+                    #     #                        "margin-left": "auto",
+                    #     #                        "margin-right": "auto",
+                    #     #                        },
+                    #     #             )
+                    #     #       #  ]),
+                    #     # ], style={'height': '50%',
+                    #     #           'width': '100%',
+                    #     #           'right': '0px',
+                    #     #           'top': '0px',
+                    #     #           #'position': 'absolute',
+                    #     #           },
+                    #     # )
                     #
                     # ],style={'height': '60%',
                     #          'width': '94%',
@@ -494,13 +505,13 @@ app.layout = html.Div([
                 ]),
 
         ],
-        style={'height': '97%',
-                  'width': '50%',
+        style={'height': '700px',
+                  'width': '60%',
                   'right': '0px',
                   'top': '0px',
                   'position': 'absolute',
-                  'backgroundColor': 'rgba(15,37,55,0.5)',
-                  'border-color':'rgba(246,105,35,0.5)',
+                  'backgroundColor': fun_col_to_trans(dict_layout_cols['bg_blue2'], 0.5),
+                  'border-color': fun_col_to_trans(dict_layout_cols['orange'], 0.5),
                   'border-left-style': 'solid'
                   },
     ),
@@ -513,8 +524,8 @@ app.layout = html.Div([
 @app.callback(
     # Output('output_date_picker', 'children'),
     Output('bar_chart', 'figure'),
-    #Output('bar_chart_2', 'figure'),
-    # Output('bar_chart_3', 'figure'),
+    Output('bar_chart_2', 'figure'),
+    #Output('bar_chart_3', 'figure'),
     Output('area_headline', 'children'),
     Input('date_picker', 'date'),
     Input('map_figure', 'clickData'),
@@ -539,10 +550,21 @@ def update_output(date_value, clk_data):
             date_to_str=date_to_str
             , cellid=cellid)
 
-        # print(df)
+        print(date_from_str[0:10])
+        print(date_to_str)
+
+        print('Waves at {} - {}'.format(date_from_str[0:10], date_to_str))
 
         # Create figure
-        fig_out = fun_fig_chart(df, cellname, date_from_str, date_to_str)
+        fig_out = fun_fig_chart(
+            df=df,
+            mag_col='mean_wind_speed',
+            dir_col='mean_wind_dir',
+            dt_col='from_datetime',
+            date_from_str=date_from_str,
+            date_to_str=date_to_str,
+            fig_type=1
+        )
 
     else:
         # Help prints
@@ -560,7 +582,15 @@ def update_output(date_value, clk_data):
         # print(df)
 
         # Create figure
-        fig_out = fun_fig_chart(df, cellname, date_from_str, date_to_str)
+        fig_out = fun_fig_chart(
+            df=df,
+            mag_col='mean_wind_speed',
+            dir_col='mean_wind_dir',
+            dt_col='from_datetime',
+            date_from_str=date_from_str,
+            date_to_str=date_to_str,
+            fig_type=1
+        )
 
     string_prefix = 'You have selected: '
     string_suffix = 'Area: '
@@ -569,8 +599,8 @@ def update_output(date_value, clk_data):
     # print(string_out)
     # return string_out,\
 
-    # return fig_out, fig_out, fig_out, cellname
-    return fig_out, cellname
+    return fig_out, fig_out, cellname
+    #return fig_out, cellname
 
 
 # Modal callback
@@ -583,6 +613,18 @@ def toggle_modal(n1, is_open):
     if n1:
         return not is_open
     return is_open
+
+# Backcast collaps callback
+@app.callback(
+    Output("prev-collapse", "is_open"),
+    Input('prev-button', "n_clicks"),
+    [State("prev-collapse", "is_open")],
+)
+def toggle_modal(c1, is_open):
+    if c1:
+        return not is_open
+    return is_open
+
 
 
 # Prev/forc callback
@@ -602,8 +644,7 @@ def toggle_modal(n1, is_open):
 def fun_get_filter_dmi_data(
         date_to_str,  # the last date for which the data is gotten
         cellid,  # id from grid cell
-        obs_values=['mean_wind_speed', 'max_wind_speed_3sec', 'mean_wind_dir'],
-        # which observations from DMI data to keep
+        obs_values=['mean_wind_speed', 'max_wind_speed_3sec', 'mean_wind_dir'], # which observations from DMI data to keep
         no_days=2,  # number of days to get data for
         api_key='604e80dd-9ee9-454b-aea0-12edc1ead8bf',  # api key for DMI API
         stationid='',  # extra parameter, if weather station data
@@ -732,130 +773,239 @@ def fun_vec_to_dir_mag(df,
     return df
 
 
+
+
 # endregion
 
-# region DEFINE FUNCTION FOR WEATHER FIGURE
+# region DEFINE FUNCTION FOR FIGURE
 
-def fun_fig_chart(df, AreaName, date_from_str, date_to_str):
+def fun_fig_chart(
+        df,  # dataframe to be visualized
+        mag_col,  # column containing magnitude values
+        dir_col,  # column containing direction values
+        dt_col,  # column containing datetime values
+        date_from_str,  # start date for period
+        date_to_str,  # end date for period
+        fig_type,  # set figure type for:
+        # backcast wind (1),
+        # forecast wind (2),
+        # forecast wave (3)
+):
+    print(fig_type)
+
     # Create column with cardinal direction
-    df['Wind_CardDir'] = df['mean_wind_dir'].apply(fun_DegToCard)
+    df['Wind_CardDir'] = df[dir_col].apply(fun_DegToCard)
     # Assign color based on cardinal direction
-    df['Wind_Dir_Col'] = df['Wind_CardDir'].map(col_pal)
+    df['Wind_Dir_Col'] = df['Wind_CardDir'].map(col_pal_trans)
+
+    # print(df['Wind_Dir_Col'])
 
     # Hover data
-    hover_data_chart = np.stack(
-        (df['mean_wind_dir'], df['Wind_CardDir'], df['from_datetime'].dt.hour.astype(str) + ':00')
-        , axis=1)
+    hover_data_chart = np.stack((df[dir_col], df['Wind_CardDir'], df[dt_col].dt.hour.astype(str) + ':00'), axis=1)
 
     # Figure
-    fig_chart = go.Figure()
+    if fig_type == 3:
+        fig_chart = make_subplots(specs=[[{"secondary_y": True}]])
+    else:
+        fig_chart = go.Figure()
 
-    # Add first trace
-    fig_chart.add_trace(go.Bar(x=df['from_datetime'], y=df['mean_wind_speed']
-                               , marker=dict(color=df['Wind_Dir_Col'],
-                                             opacity = 0.8),
-                               customdata=hover_data_chart,
-                               hovertemplate=
-                               'Mean wind speed: %{y} m/s' +
-                               '<br>Wind direction: %{customdata[1]} (%{customdata[0]}\xb0)' +
-                               '<br>Time: %{customdata[2]}<extra></extra>',
-                               hoverlabel=dict(
-                                   bgcolor='rgba(255,255,255,0.3)',
-                                   font=dict(color='black')
-                               ),
-                               showlegend=True,
-                               name='Avg. wind speed',
-                               legendrank=2,
-                               ),
-                        # secondary_y=False
-                        )
+    # Add bar trace
+    fig_chart.add_trace(
+        go.Bar(
+            x=df[dt_col],
+            y=df[mag_col],
+            marker=dict(
+                color=dict_layout_cols['primary'],
+                opacity=0.7,
+                # line_color = dict_layout_cols['orange'],
+                line_width=0
+            ),
+            customdata=hover_data_chart,
+            hovertemplate=
+            'Mean wind speed: %{y} m/s' +
+            '<br>Wind direction: %{customdata[1]} (%{customdata[0]}\xb0)' +
+            '<br>Time: %{customdata[2]}<extra></extra>',
+            hoverlabel=dict(
+                bgcolor='rgba(255,255,255,0.3)',
+                font=dict(color='black')
+            ),
+            showlegend=True,
+            name='Avg. wind speed',
+            legendrank=2,
+        ))
 
-    fig_chart.add_trace(go.Scatter(x=df['from_datetime'], y=df['max_wind_speed_3sec'],
-                                   hovertemplate=
-                                   'Max wind speed (3s): %{y} m/s<extra></extra>',
-                                   marker=dict(opacity = 0.8),
-                                   # hoverlabel=dict(
-                                   #     bgcolor='rgba(255,255,255,0.3)',
-                                   #     font=dict(color='black')
-                                   # ),
-                                   showlegend=True,
-                                   name='Max. wind speed',
-                                   legendrank=1
-                                   ),
-                        # secondary_y=True
-                        ),
+    # Set text for figure type
+    if fig_type == 1 or fig_type == 2:
+        # Assign text variable
+        t_fig_type = 'wind'
 
-    # Add wind direction arrows
+        #
+        fig_chart.update_traces(
+            customdata=hover_data_chart,
+            hovertemplate='Mean wind speed: %{y} m/s' +
+                          '<br>Wind direction: %{customdata[1]} (%{customdata[0]}\xb0)' +
+                          '<br>Time: %{customdata[2]}<extra></extra>',
+            name='Avg. {} speed'.format(t_fig_type),
+            legendrank=2
+        )
+
+        h = 285
+
+        title_text = '{} - {}'.format(date_from_str[0:10], date_to_str)
+
+        y_ax_range = dict(range=[0, 30])
+
+        if fig_type == 1:
+            fig_chart.add_trace(go.Scatter(x=df[dt_col],
+                                           y=df['max_wind_speed_3sec'],
+                                           hovertemplate=
+                                           'Max wind speed (3s): %{y} m/s<extra></extra>',
+                                           line=dict(
+                                               # opacity = 0.8,
+                                               color="rgb(255,255,255)",  # dict_layout_cols['bg_blue']
+                                               width=2,
+                                               dash='dash'
+
+                                           ),
+                                           # hoverlabel=dict(
+                                           #     bgcolor='rgba(255,255,255,0.3)',
+                                           #     font=dict(color='black')
+                                           # ),
+                                           showlegend=True,
+                                           name='Max. wind speed',
+                                           legendrank=1
+                                           ),
+                                # secondary_y=True
+                                ),
+
+
+
+    elif fig_type == 3:
+
+        t_fig_type = 'Wave'
+
+        fig_chart.update_traces(
+            customdata=hover_data_chart,
+            hovertemplate='Wave height: %{y} m' +
+                          '<br>Wave direction: %{customdata[1]} (%{customdata[0]}\xb0)' +
+                          '<br>Time: %{customdata[2]}<extra></extra>',
+            name='{} height'.format(t_fig_type),
+            legendrank=2,
+        )
+
+        h = 150
+        title_text = '{} - {}'.format('1','2')#format(date_from_str[0:10], date_to_str),
+
+
+        y_ax_range = dict(range=[0, 5])
+
+
+
+
+    else:
+        hover_text_1 = ''
+        h = ''
+        title_text = ''
+        y_ax_range = ''
+
+    # Add direction arrows
     for i, row in df.iterrows():
-        x_date = row['from_datetime']
+        x_date = row[dt_col]
 
         ax = dict_dir_coord[row['Wind_CardDir']]['X_cord']
         ay = dict_dir_coord[row['Wind_CardDir']]['Y_cord']
 
-        # print(x_date)
-        # print(row['Wind_CardDir'])
-        # print(ax)
-        # print(ay)
         fig_chart.add_annotation(
             x=x_date,
-            y=row['mean_wind_speed'] + 2,
+            y=row[mag_col] + 1,
             ax=ax,
             ay=ay,
             arrowhead=3,
             arrowsize=1.6,
             arrowwidth=1.1,
-            arrowcolor=dict_layout_cols['primary'],
-            # xref="x",
+            arrowcolor=dict_layout_cols['orange'],
+            xref="x",
             yref="y"
         )
 
     # Set axes
-    h = 285
-    max_y = 30
-    min_y = 0
-    y_ax_range = dict(range=[min_y, max_y])
+    y_axes = dict(gridcolor='rgba(255,255,255,0.4)',
+                  color=dict_layout_cols['white'],
+                  gridwidth=0.0001
+                  )
 
-    fig_chart.update_yaxes(gridcolor='rgba(255,255,255,0.4)',
-                           color=dict_layout_cols['white'],
-                           gridwidth=0.0001)
+    x_axes = dict(color=dict_layout_cols['white'],
+                  linewidth=0.1
+                  )
 
-    fig_chart.update_xaxes(color=dict_layout_cols['white'])
+    fig_chart.update_yaxes(y_axes)
+
+    fig_chart.update_xaxes(x_axes)
 
     # Set layout
     fig_chart.update_layout(
         yaxis=y_ax_range,  # , yaxis2=y_ax_range
         autosize=True,
         # width=800,
-        height=230,
+        height=h,
         hovermode='x unified',
         hoverlabel=dict(bgcolor='rgba(255,255,255,0.75)',
                         font=dict(color='black')
                         ),
-        margin=dict(l=0, r=20, t=33, b=40),
+        margin=dict(l=0, r=20, t=20, b=20),
         plot_bgcolor='rgba(0, 0, 0, 0)',
         paper_bgcolor='rgba(0, 0, 0, 0)',
         legend=dict(
             yanchor="top",
-            y=1.15,
+            y=1.02,
             xanchor="left",
             x=0.01,
-            bgcolor='rgba(76,155,232,0.4)',
+            bgcolor=dict_layout_cols['transparent'],
             font=dict(color=dict_layout_cols['white'])
         ),
-        title={'text': 'Wind {} - {}'.format(date_from_str[0:10], date_to_str),
+        title={'text': title_text,
                'x': 0.5,
-               'y': 0.95,
-               'font': {'color': dict_layout_cols['white'],
-                        'size': 15}
+               'y': 0.94,
+               'font': {'color': dict_layout_cols['white']}
                }
     )
 
-    # print(x_date)
+    if fig_type == 3:
+        if df['Sealevel'][0] == -9999:
+            df[mag_col] = 0
+
+            fig_chart = go.Figure()
+
+            fig_chart.add_trace(go.Bar(
+                x=df[dt_col],
+                y=df[mag_col]
+            )
+            )
+
+            fig_chart.update_layout(
+                plot_bgcolor='rgba(0, 0, 0, 0)',
+                paper_bgcolor='rgba(0, 0, 0, 0)',
+                title={'text': 'No wave forecast to display',
+                       'x': 0.5,
+                       'y': 0.94,
+                       'font': {'color': dict_layout_cols['white']}
+                       }
+            )
+
+            fig_chart.update_yaxes(y_axes)
+            fig_chart.update_xaxes(x_axes)
+
+            # print(df.head())
+            return fig_chart
+
+        else:
+            return fig_chart
 
     return fig_chart
 
 
 # endregion
+
 # endregion
 
 
