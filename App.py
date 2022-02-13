@@ -164,7 +164,13 @@ greens = n_colors('rgb(6, 121, 37)', 'rgb(129, 233, 49)', n_colors=4, colortype=
 yellow = n_colors('rgb(218, 233, 10)', 'rgb(233, 166, 10)', n_colors=4, colortype='rgb')
 reds = n_colors('rba(246, 105, 35)', 'rba(179, 0, 0)', n_colors=4, colortype='rgb')
 
-#blues[0] = 'rgba(39.0, 18.0, 228.0,0.6)'
+
+l_wind_bins = [0,3,6,9,12,15,100]
+l_wind_bins_labels = ['0-3', '3-6', '6-9', '9-12','12-15', '+15']
+
+blues = ["rgb(30,62,92)","rgb(93,165,234)","rgb(26,117,205)","rgb(165,205,243)","rgb(201,225,248)","rgb(237,245,252)"]
+
+dict_col_blues = dict(zip(l_wind_bins_labels, blues))
 
 # Append colors
 cols = blues + greens + yellow + reds
@@ -436,6 +442,9 @@ app.layout = html.Div([
                                            "display": "flex",
                                            "margin-left": "auto",
                                            "margin-right": "auto",
+                                           'margin-top': 'auto',
+                                           'border-color': fun_col_to_trans(dict_layout_cols['orange'], 0.5),
+                                           'border-style': 'solid'
                                            }
                                 ),
                             ],
@@ -449,6 +458,7 @@ app.layout = html.Div([
                         # Backcast panel
                         dbc.Collapse(
                             [
+
                             html.Div([
 
                                 dcc.DatePickerSingle(
@@ -488,6 +498,15 @@ app.layout = html.Div([
                             ],
                             id='prev-collapse',
                             is_open= False,
+                            style = {'backgroundColor': fun_col_to_trans(dict_layout_cols['bg_blue2'],0.5),
+                                     'width' :'94%',
+                                     "margin-left": "auto",
+                                     "margin-right": "auto",
+                                     'margin-top': 'auto',
+                                     'border-color': fun_col_to_trans(dict_layout_cols['primary'], 0.5),
+                                     'border-style': 'solid'
+
+                                     }
 
                             #
 
@@ -873,56 +892,67 @@ def fun_fig_chart(
 ):
     print(fig_type)
 
+    # Discetize values in magnitude column
+    df['Col_bin'] = pd.cut(df[mag_col], bins=l_wind_bins, labels=l_wind_bins_labels)
     # Create column with cardinal direction
     df['Wind_CardDir'] = df[dir_col].apply(fun_DegToCard)
-    # Assign color based on cardinal direction
-    df['Wind_Dir_Col'] = df['Wind_CardDir'].map(col_pal_trans)
 
-    # print(df['Wind_Dir_Col'])
+    # Set colorscale
+    colorscale = [[0, dict_col_blues['0-3']],
+                  [0.4, dict_col_blues['6-9']],
+                  [1, dict_col_blues['+15']]]
 
     # Hover data
     hover_data_chart = np.stack((df[dir_col], df['Wind_CardDir'], df[dt_col].dt.hour.astype(str) + ':00'), axis=1)
 
-    # Figure
-    if fig_type == 3:
-        fig_chart = make_subplots(specs=[[{"secondary_y": True}]])
-    else:
-        fig_chart = go.Figure()
-
     # Add bar trace
-    fig_chart.add_trace(
-        go.Bar(
-            x=df[dt_col],
-            y=df[mag_col],
-            marker=dict(
-                color=dict_layout_cols['primary'],
-                opacity=0.7,
-                # line_color = dict_layout_cols['orange'],
-                line_width=0
-            ),
-            customdata=hover_data_chart,
-            hovertemplate=
-            'Mean wind speed: %{y} m/s' +
-            '<br>Wind direction: %{customdata[1]} (%{customdata[0]}\xb0)' +
-            '<br>Time: %{customdata[2]}<extra></extra>',
-            hoverlabel=dict(
-                bgcolor='rgba(255,255,255,0.3)',
-                font=dict(color='black')
-            ),
-            showlegend=True,
-            name='Avg. wind speed',
-            legendrank=2,
-        ))
+    fig_bar_wind = dict(
+        x=df[dt_col],
+        y=df[mag_col],
+        marker=dict(
+
+            color=df[mag_col],
+            colorscale=colorscale,
+            cmin=0,
+            cmax=13,
+            # opacity = 0.7,
+            line_color=dict_layout_cols['orange'],
+            line_width=0
+        ),
+        customdata=hover_data_chart,
+        hovertemplate=
+        'Mean wind speed: %{y} m/s' +
+        '<br>Wind direction: %{customdata[1]} (%{customdata[0]}\xb0)' +
+        '<br>Time: %{customdata[2]}<extra></extra>',
+        hoverlabel=dict(
+            bgcolor='rgba(255,255,255,0.3)',
+            font=dict(color='black')
+        ),
+        showlegend=True,
+        name='Avg. wind speed',
+        legendrank=2,
+    )
 
     # Set text for figure type
     if fig_type == 1 or fig_type == 2:
+        fig_chart = go.Figure()
+
+        fig_chart.add_trace(
+
+            go.Bar(
+                fig_bar_wind
+            )
+        )
+
         # Assign text variable
         t_fig_type = 'wind'
+
+        arr_dist = 1
 
         #
         fig_chart.update_traces(
             customdata=hover_data_chart,
-            hovertemplate='Mean wind speed: %{y} m/s' +
+            hovertemplate='Mean wind speed: %{y}' +
                           '<br>Wind direction: %{customdata[1]} (%{customdata[0]}\xb0)' +
                           '<br>Time: %{customdata[2]}<extra></extra>',
             name='Avg. {} speed'.format(t_fig_type),
@@ -931,38 +961,62 @@ def fun_fig_chart(
 
         h = 285
 
-        title_text = '{} - {}'.format(date_from_str[0:10], date_to_str)
+        title_text = 'Wind {} - {}'.format('1', '2')
+        # format(date_from_str[0:10], date_to_str),
 
         y_ax_range = dict(range=[0, 30])
 
         if fig_type == 1:
-            fig_chart.add_trace(go.Scatter(x=df[dt_col],
-                                           y=df['max_wind_speed_3sec'],
-                                           hovertemplate=
-                                           'Max wind speed (3s): %{y} m/s<extra></extra>',
-                                           line=dict(
-                                               # opacity = 0.8,
-                                               color="rgb(255,255,255)",  # dict_layout_cols['bg_blue']
-                                               width=2,
-                                               dash='dash'
+            fig_line_wind = dict(
+                x=df[dt_col],
+                y=df['max_wind_speed_3sec'],
+                hovertemplate=
+                'Max wind speed (3s): %{y}<extra></extra>',
+                line=dict(
+                    # opacity = 0.8,
+                    color="rgb(255,255,255)",  # dict_layout_cols['bg_blue']
+                    width=2,
+                    dash='dash'
+                ),
+                showlegend=True,
+                name='Max. wind speed',
+                legendrank=1
 
-                                           ),
-                                           # hoverlabel=dict(
-                                           #     bgcolor='rgba(255,255,255,0.3)',
-                                           #     font=dict(color='black')
-                                           # ),
-                                           showlegend=True,
-                                           name='Max. wind speed',
-                                           legendrank=1
-                                           ),
-                                # secondary_y=True
-                                ),
+            )
 
+        fig_chart.add_trace(
+            go.Scatter(
+                fig_line_wind
+            ),
+        ),
 
+    elif fig_type==3:
 
-    elif fig_type == 3:
+        fig_chart = make_subplots(specs=[[{"secondary_y": True}]])
 
         t_fig_type = 'Wave'
+
+        fig_area_wave = dict(
+            x=df[dt_col],
+            y=df[mag_col],
+            fill='tozeroy',
+            line_color=dict_layout_cols['primary'],
+            # marker = dict(
+            #    color = dict_layout_cols['primary'],
+            # ),
+            hoverlabel=dict(
+                bgcolor='rgba(255,255,255,0.3)',
+                font=dict(color='black')
+            ),
+            showlegend=True,
+            legendrank=2,
+        )
+
+        fig_chart.add_trace(
+            go.Scatter(
+                fig_area_wave
+            )
+        )
 
         fig_chart.update_traces(
             customdata=hover_data_chart,
@@ -973,20 +1027,19 @@ def fun_fig_chart(
             legendrank=2,
         )
 
-        h = 150
-        title_text = '{} - {}'.format('1','2')#format(date_from_str[0:10], date_to_str),
+        title_text = 'Waves at {} - {}'.format('1', '2')
+        # format(date_from_str[0:10], date_to_str),
 
+        y_ax_range = dict(range=[0, 4])
 
-        y_ax_range = dict(range=[0, 5])
-
-
-
+        arr_dist = 0.3
 
     else:
         hover_text_1 = ''
         h = ''
         title_text = ''
         y_ax_range = ''
+        arr_dist = ''
 
     # Add direction arrows
     for i, row in df.iterrows():
@@ -997,7 +1050,7 @@ def fun_fig_chart(
 
         fig_chart.add_annotation(
             x=x_date,
-            y=row[mag_col] + 1,
+            y=row[mag_col] + arr_dist,
             ax=ax,
             ay=ay,
             arrowhead=3,
@@ -1011,11 +1064,14 @@ def fun_fig_chart(
     # Set axes
     y_axes = dict(gridcolor='rgba(255,255,255,0.4)',
                   color=dict_layout_cols['white'],
-                  gridwidth=0.0001
+                  gridwidth=0.0001,
+                  showticksuffix='last',
+                  ticksuffix='<br>m/s'
                   )
 
     x_axes = dict(color=dict_layout_cols['white'],
-                  linewidth=0.1
+                  linewidth=0.1,
+                  showgrid=False
                   )
 
     fig_chart.update_yaxes(y_axes)
@@ -1024,10 +1080,11 @@ def fun_fig_chart(
 
     # Set layout
     fig_chart.update_layout(
-        yaxis=y_ax_range,  # , yaxis2=y_ax_range
+        #bargap=0,
+        yaxis=y_ax_range,
         autosize=True,
         # width=800,
-        #height=h,
+        # height=h,
         hovermode='x unified',
         hoverlabel=dict(bgcolor='rgba(255,255,255,0.75)',
                         font=dict(color='black')
@@ -1037,10 +1094,10 @@ def fun_fig_chart(
         paper_bgcolor='rgba(0, 0, 0, 0)',
         legend=dict(
             yanchor="top",
-            y=1.02,
+            y=0.99,
             xanchor="left",
             x=0.01,
-            bgcolor=dict_layout_cols['transparent'],
+            bgcolor='rgba(76,155,232,0.4)',
             font=dict(color=dict_layout_cols['white'])
         ),
         title={'text': title_text,
@@ -1072,8 +1129,8 @@ def fun_fig_chart(
                        }
             )
 
-            fig_chart.update_yaxes(y_axes)
-            fig_chart.update_xaxes(x_axes)
+            # fig_chart.update_yaxes(y_axes)
+            # fig_chart.update_xaxes(x_axes)
 
             # print(df.head())
             return fig_chart
@@ -1081,8 +1138,8 @@ def fun_fig_chart(
         else:
             return fig_chart
 
-    return fig_chart
 
+    return fig_chart
 
 # endregion
 
