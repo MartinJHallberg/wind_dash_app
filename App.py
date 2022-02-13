@@ -244,307 +244,499 @@ fig_windrose = go.Figure(
 # App layout
 app.layout = html.Div([
 
-    dcc.Graph(id='map_figure', figure=fig_map,
-              config={
-                  'displayModeBar': False},
-              style={'width': '100%',
-                     'height': '100vh'}),
+    dbc.Row([
 
-    html.Br(),
-
-    # Date-picker div
-    html.Div(
-        [
-            dcc.DatePickerSingle(
-                id='date_picker',
-                min_date_allowed=date(2019, 1, 1),
-                max_date_allowed=date.today(),
-                date=date.today() - dt.timedelta(days=1),
-                display_format='YYYY-MM-DD'
-            ),
-        ],
-        style={'top': '10px',
-               'left': '10px',
-               'position': 'absolute'}
-    ),
+        dbc.Col([
+            dcc.Graph(id='map_figure', figure=fig_map,
+                      config={
+                          'displayModeBar': False},
+                      style={  # 'width': '80vw',
+                          'height': '60vh',
+                      }),
+        ],width={"size": 8, "offset": 2}
+        )
 
 
-    # About/figure div
-    html.Div([
+    ]),
+    dbc.Row([
+dbc.Col([
 
-        html.Div([
-            dbc.Button('About',
-                       id='modal-button',
-                       n_clicks=0, ),
-            dbc.Modal(
-                [
-                    dbc.ModalHeader(dbc.ModalTitle('DMIWindApp')),
-                    dbc.ModalBody([
                         html.Div([
-                            html.Div(
-                            'Data is collected from DMI Rest API:'
+
+                            dbc.Button(
+                                'Forecast',
+                                id='forc-button',
+                                # color=dict_layout_cols['bg_blue2'],
+                                n_clicks=0,
+                                size='sm',
+                                style={'background-color': dict_layout_cols['orange'],
+                                       'border-color': dict_layout_cols['orange'],
+                                       'margin-left': '1rem'}
                             ),
-                            html.A('DMI', href='https://confluence.govcloud.dk/display/FDAPI',
-                                    target='_blank',
-                                    style={'color': 'white'}),
                             html.Br(),
                             html.Br(),
-                            html.Div('Source code can be found on GitHub:'),
-                            html.A('GitHub', href='https://github.com/martinjhallberg/DMI_Wind_DashApp',
-                                   target='_blank',
-                                   style={'color': 'white'}),
-                            html.Br(),
-                            html.Br(),
-                            html.Div('Life advice can be sent to'),
-                            html.Div('martinjhallberg@gmail.com')
+                            dbc.Button(
+                                'Previous condition (1)',
+                                id = 'prev-button',
+                                color = 'primary',
+                                n_clicks= 0,
+                                size = 'sm',
 
-                            # dbc.ModalBody('Source code')
+                            ),
 
-                    ])
+                            dbc.Button(
+                                'Previous condition (2)',
+                                id='prev-button-2',
+                                color='primary',
+                                n_clicks=0,
+                                size='sm',
 
-                    ]
-                    ),
+                            ),
 
-                ],
-                id='modal',
-                is_open=False,
-            ),
-        ],
-            style={'width': '85%'}),
+                            ],style = {'display': 'flex'}
+                        ),
 
-        html.Div([
-            html.A(
-                html.Img(src=app.get_asset_url('dash-new-logo.png'),
-                         style={'height': '40px'}),
-                href="https://plotly.com/dash/",
-                style={'width': '20%'}
-            ),
-        ]),
-    ],
-        style={'position': 'absolute',
-               'width': '300px',
-               'display': 'flex',
-               'bottom': '1.5vh',
-               'right': '61%',
-               "padding": "1rem 1rem",
-               'backgroundColor': fun_col_to_trans(dict_layout_cols['primary'], 0.3),
-               }
+    html.Div([
+                dcc.DatePickerSingle(
+                    id='date_picker',
+                    min_date_allowed=date(2019, 1, 1),
+                    max_date_allowed=date.today(),
+                    date=date.today() - dt.timedelta(days=1),
+                    display_format='YYYY-MM-DD'
+                ),
+
+        dcc.DatePickerSingle(
+            id='date_picker_prev',
+            min_date_allowed=date(2019, 1, 1),
+            max_date_allowed=date.today(),
+            date=date.today() - dt.timedelta(days=1),
+            display_format='YYYY-MM-DD'
+        ),
+
+
+    ], style={'display': 'flex'}
     ),
 
+    ],width={"size": 8, "offset": 2}
+    )
+    ]),
 
-    # Side panel
-    html.Div(
-        [
+    dbc.Row([
+dbc.Col([
 
+    html.H3(
+        id='area_headline',
+        style={'color': dict_layout_cols['white'],
+               'textAlign': 'center'}),
+], width={"size": 8, "offset": 2}
+)
+    ]),
+    dbc.Row([
+dbc.Col([
 
+    dbc.Collapse(
+        dcc.Loading(
+            id='loading-2',
+            type='default',
+            color=dict_layout_cols['orange'],
+            children=[
 
-                    html.Br(),
-                    html.H3(
-                        id='area_headline',
-                        style={'color': dict_layout_cols['white'],
-                               'textAlign': 'center'}),
-
-                    # html.Div([
-                    #     dcc.Graph(
-                    #         id='wing_rose', figure=fig_windrose,
-                    #         config={
-                    #             'displayModeBar': False}
-                    #     )
-                    # ],
-                    #     style={'position': 'absolute',
-                    #            'top': '15px',
-                    #            'left': '-290px'},
-                    # ),
-
-                    #html.Br(),
-
-
-
-                    # Backcast panel
-            dcc.Loading(
-                id='loading-1',
-                type='default',
-                color=dict_layout_cols['orange'],
-                children=[
-                    html.Div(
-                        [
-
-
-                            dcc.Graph(
-                                id='bar_chart', figure={},
-                                config={
-                                    'displayModeBar': False},
-                                style={#'height': '230px',
-                                       'width': '100%',
-                                       "display": "block",
-                                       "margin-left": "auto",
-                                       "margin-right": "auto",
-                                       },
-                            )
-                            # ]),
-                        ]
-                        , style={'height': '35vh',
-                                 'width': '94%',
-                                 "display": "flex",
-                                 "margin-left": "auto",
-                                 "margin-right": "auto",
-                                 'backgroundColor': fun_col_to_trans(dict_layout_cols['bg_blue2'],0.5),
-                                 }
-                    ),
-                    ]),
-
-
-                    #Compare buttons
-
-                    html.Div([
-
-                        dbc.Button(
-                            'Forecast',
-                            id='forc-button',
-                            # color=dict_layout_cols['bg_blue2'],
-                            n_clicks=0,
-                            size='sm',
-                            style={'background-color': dict_layout_cols['orange'],
-                                   'border-color': dict_layout_cols['orange'],
-                                   'margin-left': '1rem'}
-                        ),
-                        dbc.Button(
-                            'Previous condition',
-                            id = 'prev-button',
-                            color = 'primary',
-                            n_clicks= 0,
-                            size = 'sm',
-
-                        ),
-
-                        ],style = {'display': 'flex'}
-                    ),
-
-            dcc.Loading(
-                id='loading-2',
-                type='default',
-                color=dict_layout_cols['orange'],
-                children=[
-                    # Collapses
-                    html.Div([
-                        # Forecast panel
-                        dbc.Collapse(
-                            [
-                                html.Div([
-
-                                    dcc.Graph(
-                                        id='bar_chart_3', figure={},
-                                        config={
-                                            'displayModeBar': False},
-                                        style={  # 'height': '200px',
-                                            'width': '100%',
-                                            "display": "block",
-                                            "margin-left": "auto",
-                                            "margin-right": "auto",
-                                        },
-                                    ),
-
-                                ],
-                                    style={'height': '35vh',
-                                           'width': '94%',
-                                           "display": "flex",
-                                           "margin-left": "auto",
-                                           "margin-right": "auto",
-                                           'margin-top': 'auto',
-                                           'border-color': fun_col_to_trans(dict_layout_cols['orange'], 0.5),
-                                           'border-style': 'solid'
-                                           }
-                                ),
-                            ],
-                            id='forc-collapse',
-                            is_open=True,
-
-                            #
-
-                        ),
-
-                        # Backcast panel
-                        dbc.Collapse(
-                            [
-
-                            html.Div([
-
-                                dcc.DatePickerSingle(
-                                    id='date_picker_prev',
-                                    min_date_allowed=date(2019, 1, 1),
-                                    max_date_allowed=date.today(),
-                                    date=date.today() - dt.timedelta(days=1),
-                                    display_format='YYYY-MM-DD',
-                                    day_size = 30,
-                                    #style = {"font-size": "10px"}
-                                ),
-                                ],
-                            style = {"padding": "1rem 1rem"}
-                            ),
-                            html.Div([
-
-                                dcc.Graph(
-                                    id='bar_chart_2', figure={},
-                                    config={
-                                        'displayModeBar': False},
-                                    style={#'height': '200px',
-                                           'width': '100%',
-                                           "display": "block",
-                                           "margin-left": "auto",
-                                           "margin-right": "auto",
-                                           },
-                                ),
-
-                            ],
-                                style={'height': '35vh',
-                                       'width': '94%',
-                                       "display": "flex",
-                                       "margin-left": "auto",
-                                       "margin-right": "auto",
-                                       }
-                            ),
-                            ],
-                            id='prev-collapse',
-                            is_open= False,
-                            style = {'backgroundColor': fun_col_to_trans(dict_layout_cols['bg_blue2'],0.5),
-                                     'width' :'94%',
-                                     "margin-left": "auto",
-                                     "margin-right": "auto",
-                                     'margin-top': 'auto',
-                                     'border-color': fun_col_to_trans(dict_layout_cols['primary'], 0.5),
-                                     'border-style': 'solid'
-
-                                     }
-
-                            #
-
-                        ),
-
-
-                    ],
-                        style={'height': '65vh',
+                html.Div([
+                    dcc.Graph(
+                        id='bar_chart_fcoo', figure={},
+                        config={
+                            'displayModeBar': False},
+                        style={'height': '30vh',
                                'width': '100%',
                                "display": "block",
                                "margin-left": "auto",
                                "margin-right": "auto",
-                               }
+                               },
                     ),
-                    ]),
-
-        ],
-        style={'height': '100vh',
-                  'width': '60vw',
-                  'right': '0px',
-                  'top': '0px',
-                  'position': 'absolute',
-                  'backgroundColor': fun_col_to_trans(dict_layout_cols['bg_blue2'], 0.5),
-                  'border-color': fun_col_to_trans(dict_layout_cols['orange'], 0.5),
-                  'border-left-style': 'solid'
-                  },
+                    dcc.Graph(
+                        id='bar_chart_wave', figure={},
+                        config={
+                            'displayModeBar': False},
+                        style={'height': '25vh',
+                               'width': '100%',
+                               "display": "block",
+                               "margin-left": "auto",
+                               "margin-right": "auto",
+                               },
+                    ),
+                ]),
+            ]),
+        id='forc-collapse',
+        is_open=True,
+        style={'backgroundColor': fun_col_to_trans(dict_layout_cols['orange'], 0.1),
+               'border-color': fun_col_to_trans(dict_layout_cols['orange'], 0.5),
+               'border-style': 'solid'
+               #
+               }
     ),
 
-], style={'position': 'relative',
-          'height': '100vh'}, )
+    dbc.Collapse(
+                dcc.Loading(
+                    id='loading-1',
+                    type='default',
+                    color=dict_layout_cols['orange'],
+                    children=[
+
+        html.Div([
+            dcc.Graph(
+                    id='bar_chart', figure={},
+                    config={
+                        'displayModeBar': False},
+                    style={'height': '30vh',
+                           'width': '100%',
+                           "display": "block",
+                           "margin-left": "auto",
+                           "margin-right": "auto",
+                           },
+                ),
+        ]),
+                    ],),
+        id='prev-collapse',
+        is_open= False,
+         style = {'backgroundColor': fun_col_to_trans(dict_layout_cols['primary'],0.1),
+                  'border-color': fun_col_to_trans(dict_layout_cols['primary'], 0.5),
+                  'border-style': 'solid'
+        #
+                  }
+    ),
+
+    dbc.Collapse(
+        dcc.Loading(
+            id='loading-3',
+            type='default',
+            color=dict_layout_cols['orange'],
+            children=[
+
+                html.Div([
+                    dcc.Graph(
+                        id='bar_chart_2', figure={},
+                        config={
+                            'displayModeBar': False},
+                        style={'height': '30vh',
+                               'width': '100%',
+                               "display": "block",
+                               "margin-left": "auto",
+                               "margin-right": "auto",
+                               },
+                    ),
+                ]),
+            ]),
+        id='prev-collapse-2',
+        is_open=False,
+        style={'backgroundColor': fun_col_to_trans(dict_layout_cols['primary'], 0.1),
+               'border-color': fun_col_to_trans(dict_layout_cols['primary'], 0.5),
+               'border-style': 'solid'
+               #
+               }
+    ),
+
+], width={"size": 8, "offset": 2}
+)
+    ])
+
+
+
+    #html.Br(),
+
+    # Date-picker div
+    # html.Div(
+    #     [
+    #         dcc.DatePickerSingle(
+    #             id='date_picker',
+    #             min_date_allowed=date(2019, 1, 1),
+    #             max_date_allowed=date.today(),
+    #             date=date.today() - dt.timedelta(days=1),
+    #             display_format='YYYY-MM-DD'
+    #         ),
+    #     ],
+    #     style={'top': '10px',
+    #            'left': '10px',
+    #            'position': 'absolute'}
+    # ),
+
+
+    # # About/figure div
+    # html.Div([
+    #
+    #     html.Div([
+    #         dbc.Button('About',
+    #                    id='modal-button',
+    #                    n_clicks=0, ),
+    #         dbc.Modal(
+    #             [
+    #                 dbc.ModalHeader(dbc.ModalTitle('DMIWindApp')),
+    #                 dbc.ModalBody([
+    #                     html.Div([
+    #                         html.Div(
+    #                         'Data is collected from DMI Rest API:'
+    #                         ),
+    #                         html.A('DMI', href='https://confluence.govcloud.dk/display/FDAPI',
+    #                                 target='_blank',
+    #                                 style={'color': 'white'}),
+    #                         html.Br(),
+    #                         html.Br(),
+    #                         html.Div('Source code can be found on GitHub:'),
+    #                         html.A('GitHub', href='https://github.com/martinjhallberg/DMI_Wind_DashApp',
+    #                                target='_blank',
+    #                                style={'color': 'white'}),
+    #                         html.Br(),
+    #                         html.Br(),
+    #                         html.Div('Life advice can be sent to'),
+    #                         html.Div('martinjhallberg@gmail.com')
+    #
+    #                         # dbc.ModalBody('Source code')
+    #
+    #                 ])
+    #
+    #                 ]
+    #                 ),
+    #
+    #             ],
+    #             id='modal',
+    #             is_open=False,
+    #         ),
+    #     ],
+    #         style={'width': '85%'}),
+    #
+    #     html.Div([
+    #         html.A(
+    #             html.Img(src=app.get_asset_url('dash-new-logo.png'),
+    #                      style={'height': '40px'}),
+    #             href="https://plotly.com/dash/",
+    #             style={'width': '20%'}
+    #         ),
+    #     ]),
+    # ],
+    #     style={'position': 'absolute',
+    #            'width': '300px',
+    #            'display': 'flex',
+    #            'bottom': '1.5vh',
+    #            'right': '61%',
+    #            "padding": "1rem 1rem",
+    #            'backgroundColor': fun_col_to_trans(dict_layout_cols['primary'], 0.3),
+    #            }
+    # ),
+
+
+    # Side panel
+    # html.Div(
+    #     [
+    #
+    #
+    #
+    #                 html.Br(),
+    #                 html.H3(
+    #                     id='area_headline',
+    #                     style={'color': dict_layout_cols['white'],
+    #                            'textAlign': 'center'}),
+    #
+    #                 # html.Div([
+    #                 #     dcc.Graph(
+    #                 #         id='wing_rose', figure=fig_windrose,
+    #                 #         config={
+    #                 #             'displayModeBar': False}
+    #                 #     )
+    #                 # ],
+    #                 #     style={'position': 'absolute',
+    #                 #            'top': '15px',
+    #                 #            'left': '-290px'},
+    #                 # ),
+    #
+    #                 #html.Br(),
+    #
+    #
+    #
+    #                 # Backcast panel
+    #         dcc.Loading(
+    #             id='loading-1',
+    #             type='default',
+    #             color=dict_layout_cols['orange'],
+    #             children=[
+    #                 html.Div(
+    #                     [
+    #
+    #
+    #                         dcc.Graph(
+    #                             id='bar_chart', figure={},
+    #                             config={
+    #                                 'displayModeBar': False},
+    #                             style={#'height': '230px',
+    #                                    'width': '100%',
+    #                                    "display": "block",
+    #                                    "margin-left": "auto",
+    #                                    "margin-right": "auto",
+    #                                    },
+    #                         )
+    #                         # ]),
+    #                     ]
+    #                     , style={'height': '35vh',
+    #                              'width': '94%',
+    #                              "display": "flex",
+    #                              "margin-left": "auto",
+    #                              "margin-right": "auto",
+    #                              'backgroundColor': fun_col_to_trans(dict_layout_cols['bg_blue2'],0.5),
+    #                              }
+    #                 ),
+    #                 ]),
+    #
+    #
+    #                 #Compare buttons
+    #
+    #                 html.Div([
+    #
+    #                     dbc.Button(
+    #                         'Forecast',
+    #                         id='forc-button',
+    #                         # color=dict_layout_cols['bg_blue2'],
+    #                         n_clicks=0,
+    #                         size='sm',
+    #                         style={'background-color': dict_layout_cols['orange'],
+    #                                'border-color': dict_layout_cols['orange'],
+    #                                'margin-left': '1rem'}
+    #                     ),
+    #                     dbc.Button(
+    #                         'Previous condition',
+    #                         id = 'prev-button',
+    #                         color = 'primary',
+    #                         n_clicks= 0,
+    #                         size = 'sm',
+    #
+    #                     ),
+    #
+    #                     ],style = {'display': 'flex'}
+    #                 ),
+    #
+    #         dcc.Loading(
+    #             id='loading-2',
+    #             type='default',
+    #             color=dict_layout_cols['orange'],
+    #             children=[
+    #                 # Collapses
+    #                 html.Div([
+    #                     # Forecast panel
+    #                     dbc.Collapse(
+    #                         [
+    #                             html.Div([
+    #
+    #                                 dcc.Graph(
+    #                                     id='bar_chart_3', figure={},
+    #                                     config={
+    #                                         'displayModeBar': False},
+    #                                     style={  # 'height': '200px',
+    #                                         'width': '100%',
+    #                                         "display": "block",
+    #                                         "margin-left": "auto",
+    #                                         "margin-right": "auto",
+    #                                     },
+    #                                 ),
+    #
+    #                             ],
+    #                                 style={'height': '35vh',
+    #                                        'width': '94%',
+    #                                        "display": "flex",
+    #                                        "margin-left": "auto",
+    #                                        "margin-right": "auto",
+    #                                        'margin-top': 'auto',
+    #                                        'border-color': fun_col_to_trans(dict_layout_cols['orange'], 0.5),
+    #                                        'border-style': 'solid'
+    #                                        }
+    #                             ),
+    #                         ],
+    #                         id='forc-collapse',
+    #                         is_open=True,
+    #
+    #                         #
+    #
+    #                     ),
+    #
+    #                     # Backcast panel
+    #                     dbc.Collapse(
+    #                         [
+    #
+    #                         html.Div([
+    #
+    #                             dcc.DatePickerSingle(
+    #                                 id='date_picker_prev',
+    #                                 min_date_allowed=date(2019, 1, 1),
+    #                                 max_date_allowed=date.today(),
+    #                                 date=date.today() - dt.timedelta(days=1),
+    #                                 display_format='YYYY-MM-DD',
+    #                                 day_size = 30,
+    #                                 #style = {"font-size": "10px"}
+    #                             ),
+    #                             ],
+    #                         style = {"padding": "1rem 1rem"}
+    #                         ),
+    #                         html.Div([
+    #
+    #                             dcc.Graph(
+    #                                 id='bar_chart_2', figure={},
+    #                                 config={
+    #                                     'displayModeBar': False},
+    #                                 style={#'height': '200px',
+    #                                        'width': '100%',
+    #                                        "display": "block",
+    #                                        "margin-left": "auto",
+    #                                        "margin-right": "auto",
+    #                                        },
+    #                             ),
+    #
+    #                         ],
+    #                             style={'height': '35vh',
+    #                                    'width': '94%',
+    #                                    "display": "flex",
+    #                                    "margin-left": "auto",
+    #                                    "margin-right": "auto",
+    #                                    }
+    #                         ),
+    #                         ],
+    #                         id='prev-collapse',
+    #                         is_open= False,
+    #                         style = {'backgroundColor': fun_col_to_trans(dict_layout_cols['bg_blue2'],0.5),
+    #                                  'width' :'94%',
+    #                                  "margin-left": "auto",
+    #                                  "margin-right": "auto",
+    #                                  'margin-top': 'auto',
+    #                                  'border-color': fun_col_to_trans(dict_layout_cols['primary'], 0.5),
+    #                                  'border-style': 'solid'
+    #
+    #                                  }
+    #
+    #                         #
+    #
+    #                     ),
+    #
+    #
+    #                 ],
+    #                     style={'height': '65vh',
+    #                            'width': '100%',
+    #                            "display": "block",
+    #                            "margin-left": "auto",
+    #                            "margin-right": "auto",
+    #                            }
+    #                 ),
+    #                 ]),
+    #
+    #     ],
+    #     style={'height': '100vh',
+    #               'width': '60vw',
+    #               'right': '0px',
+    #               'top': '0px',
+    #               'position': 'absolute',
+    #               'backgroundColor': fun_col_to_trans(dict_layout_cols['bg_blue2'], 0.5),
+    #               'border-color': fun_col_to_trans(dict_layout_cols['orange'], 0.5),
+    #               'border-left-style': 'solid'
+    #               },
+    # ),
+
+
+], # style = {'width': '50%', 'margin': 'auto'}
+)
 
 
 
@@ -559,6 +751,8 @@ app.layout = html.Div([
     Input('date_picker', 'date'),
     Input('map_figure', 'clickData'),
 )
+
+#region DMI CALLBACKS
 def update_chart_1(date_value, clk_data):
     # Input data
     date_object = date.fromisoformat(date_value)
@@ -710,13 +904,18 @@ def update_chart_2(date_value, clk_data):
     return fig_out
     #return fig_out, cellname
 
-#Figure 3 callback
+#endregion
+
+#region FCOO CALLBACK
 @app.callback(
-    Output('bar_chart_3', 'figure'),
+    Output('bar_chart_fcoo', 'figure'),
+    Output('bar_chart_wave', 'figure'),
     Input('map_figure', 'clickData'),
 )
 def update_chart_3(clk_data):
     # Initialize default chart
+
+
     if clk_data is None:
 
         # Get DMI data
@@ -746,6 +945,16 @@ def update_chart_3(clk_data):
             fig_type=2
         )
 
+        fig_wave_out = fun_fig_chart(
+            df = df_fcoo,
+            mag_col = 'WaveHeight',
+            dir_col = 'WaveDir',
+            dt_col = 'Time_dt',
+            date_from_str = '',
+            date_to_str = '',
+            fig_type = 3
+        )
+
     else:
         cell_lon = clk_data['points'][0]['customdata'][1]
         cell_lat = clk_data['points'][0]['customdata'][2]
@@ -769,11 +978,21 @@ def update_chart_3(clk_data):
             fig_type=2
         )
 
-    # print(string_out)
-    # return string_out,\
 
-    return fig_out
-    #return fig_out, cellname
+        fig_wave_out = fun_fig_chart(
+            df = df_fcoo,
+            mag_col = 'WaveHeight',
+            dir_col = 'WaveDir',
+            dt_col = 'Time_dt',
+            date_from_str = '',
+            date_to_str = '',
+            fig_type = 3
+        )
+
+
+    return fig_out, fig_wave_out
+
+#region
 
 
 #Modal callback
@@ -792,6 +1011,16 @@ def toggle_modal(n1, is_open):
     Output("prev-collapse", "is_open"),
     Input('prev-button', "n_clicks"),
     [State("prev-collapse", "is_open")],
+)
+def toggle_modal(c1, is_open):
+    if c1:
+        return not is_open
+    return is_open
+
+@app.callback(
+    Output("prev-collapse-2", "is_open"),
+    Input('prev-button-2', "n_clicks"),
+    [State("prev-collapse-2", "is_open")],
 )
 def toggle_modal(c1, is_open):
     if c1:
@@ -1076,8 +1305,6 @@ def fun_fig_chart(
             legendrank=2
         )
 
-        h = 285
-
         title_text = 'Wind {} - {}'.format(date_from_str[0:10], date_to_str)
         # format(date_from_str[0:10], date_to_str),
 
@@ -1108,25 +1335,21 @@ def fun_fig_chart(
 
         t_fig_type = 'Wave'
 
-        fig_area_wave = dict(
-            x=df[dt_col],
-            y=df[mag_col],
-            fill='tozeroy',
-            line_color=dict_layout_cols['primary'],
-            # marker = dict(
-            #    color = dict_layout_cols['primary'],
-            # ),
-            hoverlabel=dict(
-                bgcolor='rgba(255,255,255,0.3)',
-                font=dict(color='black')
-            ),
-            showlegend=True,
-            legendrank=2,
-        )
-
         fig_chart.add_trace(
             go.Scatter(
-                fig_area_wave
+                x=df[dt_col],
+                y=df[mag_col],
+                fill='tozeroy',
+                line_color=dict_layout_cols['primary'],
+                # marker = dict(
+                #    color = dict_layout_cols['primary'],
+                # ),
+                hoverlabel=dict(
+                    bgcolor='rgba(255,255,255,0.3)',
+                    font=dict(color='black')
+                ),
+                showlegend=True,
+                legendrank=2,
             )
         )
 
@@ -1138,6 +1361,41 @@ def fun_fig_chart(
             name='{} height'.format(t_fig_type),
             legendrank=2,
         )
+
+        fig_chart.add_trace(go.Scatter(x=df[dt_col],
+                                      y=round(df['WavePeriod'], 1),
+                                      hovertemplate=
+                                      'Wave period<extra></extra>',
+                                      line=dict(
+                                          # opacity = 0.8,
+                                          color=dict_layout_cols['white'],
+                                          width=2,
+                                          dash='dash'
+                                      ),
+                                      showlegend=True,
+                                      name='Wave period',
+                                      legendrank=1
+                                      ),
+                           secondary_y=True
+                           )
+
+        fig_chart.update_yaxes(title_text="Wave height", secondary_y=False,
+                              showticksuffix='last',
+                              ticksuffix=' m',
+                              tickmode='linear',
+                              tick0=1,
+                              dtick=1
+
+                              )
+        fig_chart.update_yaxes(title_text="Wave period", secondary_y=True,
+                              showticksuffix='last',
+                              showgrid=False,
+                              ticksuffix=' s',
+                              range=list([0, 10]),
+                              tickmode='linear',
+                              tick0=2,
+                              dtick=2
+                              )
 
         title_text = 'Waves at {} - {}'.format('1', '2')
         # format(date_from_str[0:10], date_to_str),
