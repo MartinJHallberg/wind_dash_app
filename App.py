@@ -52,7 +52,7 @@ SET UP GRID MAP
 
 ## READ GEOGPRAPHICAL DATA
 # Set url to geojson
-url = 'https://raw.githubusercontent.com/MartinJHallberg/DMI_Wind_DashApp/main/assets/DKN_10KM_epsg4326_filtered_wCent.geojson'
+url = 'https://raw.githubusercontent.com/MartinJHallberg/DMI_Wind_DashApp/version2/assets/DKN_10KM_epsg4326_filtered_wCent.geojson'
 geoj_grid = json.loads(requests.get(url).text)
 
 
@@ -336,11 +336,7 @@ app.layout = html.Div([
     html.Div(
         [
 
-            dcc.Loading(
-                id='loading-1',
-                type='default',
-                color=dict_layout_cols['orange'],
-                children=[
+
 
                     html.Br(),
                     html.H3(
@@ -365,6 +361,11 @@ app.layout = html.Div([
 
 
                     # Backcast panel
+            dcc.Loading(
+                id='loading-1',
+                type='default',
+                color=dict_layout_cols['orange'],
+                children=[
                     html.Div(
                         [
 
@@ -390,9 +391,11 @@ app.layout = html.Div([
                                  'backgroundColor': fun_col_to_trans(dict_layout_cols['bg_blue2'],0.5),
                                  }
                     ),
+                    ]),
 
 
                     #Compare buttons
+
                     html.Div([
 
                         dbc.Button(
@@ -417,6 +420,11 @@ app.layout = html.Div([
                         ],style = {'display': 'flex'}
                     ),
 
+            dcc.Loading(
+                id='loading-2',
+                type='default',
+                color=dict_layout_cols['orange'],
+                children=[
                     # Collapses
                     html.Div([
                         # Forecast panel
@@ -521,75 +529,7 @@ app.layout = html.Div([
                                "margin-right": "auto",
                                }
                     ),
-
-                    # # Forecast panel
-                    # html.Div([
-                    #
-                    #     html.Div([
-                    #         #dcc.Loading(
-                    #         #    id='loading-2',
-                    #         #    type='default',
-                    #         #    children=[
-                    #                 dcc.Graph(
-                    #                     id='bar_chart_3', figure={},
-                    #                     config={
-                    #                         'displayModeBar': False},
-                    #                     style={'height': '200px',
-                    #                            'width': '95%',
-                    #                            "display": "block",
-                    #                            "margin-left": "auto",
-                    #                            "margin-right": "auto",
-                    #                            },
-                    #                 )
-                    #           # ]),
-                    #     ], style={'height': '50%',
-                    #               'width': '100%',
-                    #               'right': '0px',
-                    #               'top': '0px',
-                    #               #'position': 'relative',
-                    #               },
-                    #
-                    #     ),
-                    #
-                    #     # html.Div([
-                    #     #     #dcc.Loading(
-                    #     #     #    id='loading-3',
-                    #     #     #    type='default',
-                    #     #     #    children=[
-                    #     #             dcc.Graph(
-                    #     #                 id='bar_chart_3', figure={},
-                    #     #                 config={
-                    #     #                     'displayModeBar': False},
-                    #     #                 style={'height': '200px',
-                    #     #                        'width': '95%',
-                    #     #                        "display": "block",
-                    #     #                        "margin-left": "auto",
-                    #     #                        "margin-right": "auto",
-                    #     #                        },
-                    #     #             )
-                    #     #       #  ]),
-                    #     # ], style={'height': '50%',
-                    #     #           'width': '100%',
-                    #     #           'right': '0px',
-                    #     #           'top': '0px',
-                    #     #           #'position': 'absolute',
-                    #     #           },
-                    #     # )
-                    #
-                    # ],style={'height': '60%',
-                    #          'width': '94%',
-                    #          "display": "block",
-                    #          "margin-left": "auto",
-                    #          "margin-right": "auto",
-                    #          'backgroundColor': 'rgba(246,105,35,0.3)'
-                    #
-                    #              #'top': '250px',
-                    #              #'position': 'absolute',
-                    #             },
-                    #
-                    #
-                    # ),
-                ]),
+                    ]),
 
         ],
         style={'height': '100vh',
@@ -607,17 +547,19 @@ app.layout = html.Div([
           'height': '100vh'}, )
 
 
+
+# region CALLBACKS
 # Figure 1 callback
 @app.callback(
     # Output('output_date_picker', 'children'),
     Output('bar_chart', 'figure'),
-    Output('bar_chart_2', 'figure'),
-    Output('bar_chart_3', 'figure'),
+    #Output('bar_chart_2', 'figure'),
+    #Output('bar_chart_3', 'figure'),
     Output('area_headline', 'children'),
     Input('date_picker', 'date'),
     Input('map_figure', 'clickData'),
 )
-def update_output(date_value, clk_data):
+def update_chart_1(date_value, clk_data):
     # Input data
     date_object = date.fromisoformat(date_value)
     date_string = date_object.strftime('%Y-%m-%d')
@@ -627,7 +569,86 @@ def update_output(date_value, clk_data):
     if clk_data is None:
         # print('empty')
         # Get DMI data
-        cellid = shp_grid['KN10kmDK'].sample(n=1).values[0]
+        cellid = '10km_622_71'
+        cellname = shp_grid.loc[shp_grid['KN10kmDK'] == cellid, 'Stednavn'].values[0]
+        # cell_lon = clk_data['points'][0]['customdata'][1]
+        # cell_lat = clk_data['points'][0]['customdata'][2]
+
+
+        # Get DMI data
+        df, date_from_str = fun_get_filter_dmi_data(
+            date_to_str=date_to_str
+            , cellid=cellid)
+
+        print(date_from_str[0:10])
+        print(date_to_str)
+
+        print('Waves at {} - {}'.format(date_from_str[0:10], date_to_str))
+
+        # Create figure
+        fig_out = fun_fig_chart(
+            df=df,
+            mag_col='mean_wind_speed',
+            dir_col='mean_wind_dir',
+            dt_col='from_datetime',
+            date_from_str=date_from_str,
+            date_to_str=date_to_str,
+            fig_type=1
+        )
+
+    else:
+        # Help prints
+        print(f'Click data: {clk_data}')
+        cellid = clk_data['points'][0]['location']
+        cellname = clk_data['points'][0]['customdata'][0]
+        cell_lon = clk_data['points'][0]['customdata'][1]
+        cell_lat = clk_data['points'][0]['customdata'][2]
+
+        # Get DMI data
+        df, date_from_str = fun_get_filter_dmi_data(
+            date_to_str=date_to_str
+            , cellid=cellid)
+
+        # print(df)
+
+        # Create figure
+        fig_out = fun_fig_chart(
+            df=df,
+            mag_col='mean_wind_speed',
+            dir_col='mean_wind_dir',
+            dt_col='from_datetime',
+            date_from_str=date_from_str,
+            date_to_str=date_to_str,
+            fig_type=1
+        )
+
+    string_prefix = 'You have selected: '
+    string_suffix = 'Area: '
+    string_out = string_prefix + date_string + string_suffix + cellname + ' CellID: ' + cellid
+
+    # print(string_out)
+    # return string_out,\
+
+    return fig_out, cellname
+    #return fig_out, cellname
+
+# Figure 2 callback
+@app.callback(
+    Output('bar_chart_2', 'figure'),
+    Input('date_picker_prev', 'date'),
+    Input('map_figure', 'clickData'),
+)
+def update_chart_2(date_value, clk_data):
+    # Input data
+    date_object = date.fromisoformat(date_value)
+    date_string = date_object.strftime('%Y-%m-%d')
+    date_to_str = date_string
+
+    # Initialize default chart
+    if clk_data is None:
+        # print('empty')
+        # Get DMI data
+        cellid = '10km_622_71'
         cellname = shp_grid.loc[shp_grid['KN10kmDK'] == cellid, 'Stednavn'].values[0]
         # cell_lon = clk_data['points'][0]['customdata'][1]
         # cell_lat = clk_data['points'][0]['customdata'][2]
@@ -686,12 +707,76 @@ def update_output(date_value, clk_data):
     # print(string_out)
     # return string_out,\
 
-    return fig_out, fig_out, fig_out, cellname
+    return fig_out
+    #return fig_out, cellname
+
+#Figure 3 callback
+@app.callback(
+    Output('bar_chart_3', 'figure'),
+    Input('map_figure', 'clickData'),
+)
+def update_chart_3(clk_data):
+    # Initialize default chart
+    if clk_data is None:
+
+        # Get DMI data
+        cellid = '10km_622_71'
+        dict_fcoo = shp_grid[['KN10kmDK', 'cent_lat', 'cent_lon']].set_index('KN10kmDK').to_dict(orient='index')
+
+        lat = dict_fcoo[cellid]['cent_lat']
+        lon = dict_fcoo[cellid]['cent_lon']
+        print(lat)
+        print(lon)
+        # Get DMI data
+
+        df_fcoo = fun_append_fcoo_dfs(lat=lat, lon=lon)
+
+        fun_vec_to_dir_mag(df_fcoo, 'UGRD', 'VGRD', 'Wind', 'Speed')
+
+        fun_vec_to_dir_mag(df_fcoo, 'u', 'v', 'Wave', 'Height')
+
+        # Create figure
+        fig_out = fun_fig_chart(
+            df=df_fcoo,
+            mag_col='WindSpeed',
+            dir_col='WindDir',
+            dt_col='Time_dt',
+            date_from_str='',
+            date_to_str='',
+            fig_type=2
+        )
+
+    else:
+        cell_lon = clk_data['points'][0]['customdata'][1]
+        cell_lat = clk_data['points'][0]['customdata'][2]
+        # print(cellid)
+
+
+        df_fcoo = fun_append_fcoo_dfs(lat=cell_lat, lon=cell_lon)
+
+        fun_vec_to_dir_mag(df_fcoo, 'UGRD', 'VGRD', 'Wind', 'Speed')
+
+        fun_vec_to_dir_mag(df_fcoo, 'u', 'v', 'Wave', 'Height')
+
+        # Create figure
+        fig_out = fun_fig_chart(
+            df=df_fcoo,
+            mag_col='WindSpeed',
+            dir_col='WindDir',
+            dt_col='Time_dt',
+            date_from_str='',
+            date_to_str='',
+            fig_type=2
+        )
+
+    # print(string_out)
+    # return string_out,\
+
+    return fig_out
     #return fig_out, cellname
 
 
-
-# Modal callback
+#Modal callback
 @app.callback(
     Output("modal", "is_open"),
     Input("modal-button", "n_clicks"),
@@ -736,6 +821,10 @@ def toggle_modal(c2, is_open):
 #     if n:
 #         return not is_open
 #     return is_open
+
+# endregion
+
+
 
 
 # region HELPER FUNCTIONS
@@ -836,12 +925,13 @@ def fun_get_fcoo_data(var, lat, lon):
     data = json.loads(
         requests.get(req_str).text
     )
+    print('Data collected')
 
     l_cols = list(data[var].keys())
 
     if len(l_cols) == 1:
         df = pd.DataFrame(
-            {'WavePeriod': data[var][l_cols[0]]['data'],
+            {var: data[var][l_cols[0]]['data'],
              'Time': data[var][l_cols[0]]['time']
              })
     else:
@@ -851,27 +941,54 @@ def fun_get_fcoo_data(var, lat, lon):
              'Time': data[var][l_cols[0]]['time']
              })
 
-    # Set time as index to simpify join
-    # df.set_index('Time', inplace=True)
-
-    df['Time'] = pd.to_datetime(df['Time'])
+    # return  pd.json_normalize(data['UGRD'])
     return df
 
 
-# Define function to calcualate wind direction and magnitude
-def fun_vec_to_dir_mag(df,
-                       u_vec,
-                       v_vec,
-                       var):
+def fun_append_fcoo_dfs(
+        lat,
+        lon,
+        variables=['Wind', 'Sealevel', 'WaveHeight2D', 'WavePeriod']
+
+):
+    l_dfs = []
+
+    for i, var in enumerate(variables):
+
+        df = fun_get_fcoo_data(var, lat=lat, lon=lon)
+
+        # print('Data collected for {} collected'.format(var))
+
+        # For first data frame, do nothing, join followingly
+        if i == 0:
+            dfs = df
+        else:
+            dfs = dfs.merge(df, on='Time')
+        # l_dfs.append(df)
+        print('Data frame appended')
+
+    # Creaet date time column
+    dfs['Time_dt'] = pd.to_datetime(dfs['Time'])
+
+    # Floor data frame to first hour of day
+
+    return dfs
+
+
+def fun_vec_to_dir_mag(
+        df,
+        u_vec,
+        v_vec,
+        var,
+        mag
+):
     dir_name = var + 'Dir'
-    mag_name = var + 'Magnitude'
+    speed_name = var + mag
 
     df[dir_name] = round(np.arctan2(df[u_vec], df[v_vec]) * 180 / np.pi + 180, 0)
-    df[mag_name] = round(np.sqrt(df[u_vec] ** 2 + df[v_vec] ** 2), 1)
+    df[speed_name] = round(np.sqrt(df[u_vec] ** 2 + df[v_vec] ** 2), 1)
 
-    return df
-
-
+    # return df
 
 
 # endregion
@@ -921,7 +1038,7 @@ def fun_fig_chart(
         ),
         customdata=hover_data_chart,
         hovertemplate=
-        'Mean wind speed: %{y} m/s' +
+        'Avg. wind: %{y} m/s' +
         '<br>Wind direction: %{customdata[1]} (%{customdata[0]}\xb0)' +
         '<br>Time: %{customdata[2]}<extra></extra>',
         hoverlabel=dict(
@@ -952,7 +1069,7 @@ def fun_fig_chart(
         #
         fig_chart.update_traces(
             customdata=hover_data_chart,
-            hovertemplate='Mean wind speed: %{y}' +
+            hovertemplate='Avg. wind: %{y}' +
                           '<br>Wind direction: %{customdata[1]} (%{customdata[0]}\xb0)' +
                           '<br>Time: %{customdata[2]}<extra></extra>',
             name='Avg. {} speed'.format(t_fig_type),
@@ -961,34 +1078,29 @@ def fun_fig_chart(
 
         h = 285
 
-        title_text = 'Wind {} - {}'.format('1', '2')
+        title_text = 'Wind {} - {}'.format(date_from_str[0:10], date_to_str)
         # format(date_from_str[0:10], date_to_str),
 
         y_ax_range = dict(range=[0, 30])
 
         if fig_type == 1:
-            fig_line_wind = dict(
-                x=df[dt_col],
-                y=df['max_wind_speed_3sec'],
-                hovertemplate=
-                'Max wind speed (3s): %{y}<extra></extra>',
-                line=dict(
-                    # opacity = 0.8,
-                    color="rgb(255,255,255)",  # dict_layout_cols['bg_blue']
-                    width=2,
-                    dash='dash'
+            fig_chart.add_trace(
+                go.Scatter(
+                    x=df[dt_col],
+                    y=df['max_wind_speed_3sec'],
+                    hovertemplate=
+                    'Max wind speed (3s): %{y}<extra></extra>',
+                    line=dict(
+                        # opacity = 0.8,
+                        color="rgb(255,255,255)",  # dict_layout_cols['bg_blue']
+                        width=2,
+                        dash='dash'
+                    ),
+                    showlegend=True,
+                    name='Max. wind speed',
+                    legendrank=1
                 ),
-                showlegend=True,
-                name='Max. wind speed',
-                legendrank=1
-
-            )
-
-        fig_chart.add_trace(
-            go.Scatter(
-                fig_line_wind
             ),
-        ),
 
     elif fig_type==3:
 
