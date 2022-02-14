@@ -432,7 +432,7 @@ html.Div([
                                 id='bar_chart_fcoo', figure={},
                                 config={
                                     'displayModeBar': False},
-                                style={'height': '30vh',
+                                style={'height': '35vh',
                                        'width': '100%',
                                        "display": "block",
                                        "margin-left": "auto",
@@ -443,7 +443,7 @@ html.Div([
                                 id='bar_chart_wave', figure={},
                                 config={
                                     'displayModeBar': False},
-                                style={'height': '25vh',
+                                style={'height': '35vh',
                                        'width': '100%',
                                        "display": "block",
                                        "margin-left": "auto",
@@ -473,7 +473,7 @@ html.Div([
                                 id='bar_chart', figure={},
                                 config={
                                     'displayModeBar': False},
-                                style={'height': '30vh',
+                                style={'height': '35vh',
                                        'width': '100%',
                                        "display": "block",
                                        "margin-left": "auto",
@@ -503,7 +503,7 @@ html.Div([
                                 id='bar_chart_2', figure={},
                                 config={
                                     'displayModeBar': False},
-                                style={'height': '30vh',
+                                style={'height': '35vh',
                                        'width': '100%',
                                        "display": "block",
                                        "margin-left": "auto",
@@ -1538,10 +1538,10 @@ def fun_fig_chart(
         paper_bgcolor='rgba(0, 0, 0, 0)',
         legend=dict(
             yanchor="top",
-            y=0.99,
+            y=1,
             xanchor="left",
             x=0.01,
-            bgcolor='rgba(76,155,232,0.4)',
+            bgcolor=dict_layout_cols['transparent'],
             font=dict(color=dict_layout_cols['white'])
         ),
         title={'text': title_text,
@@ -1573,8 +1573,7 @@ def fun_fig_chart(
                        }
             )
 
-            # fig_chart.update_yaxes(y_axes)
-            # fig_chart.update_xaxes(x_axes)
+
 
             # print(df.head())
             return fig_chart
