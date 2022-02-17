@@ -1,5 +1,5 @@
 .DateInput, .DateInput_1 {
-    border-radius: 4px 0 0 4px !important;
+    border-radius: 0 0 0 0 !important;
 }
 
 .DateInput_input, .DateInput_input_1 {
@@ -9,6 +9,6 @@
 }
 
 .SingleDatePickerInput__withBorder {
-    border-radius: 4px 0 0 4px;
+    border-radius: 0 0 0 0;
     border: 1px solid #ccc !important;
 }

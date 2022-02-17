@@ -250,11 +250,51 @@ app.layout = dbc.Container([
             dbc.Card([
 
                 dbc.CardBody([
+                        html.Div([
+                            dbc.Button('About',
+                                       id='modal-button',
+                                       n_clicks=0, ),
+                            dbc.Modal(
+                                [
+                                    dbc.ModalHeader(dbc.ModalTitle('DMIWindApp')),
+                                    dbc.ModalBody([
+                                        html.Div([
+                                            html.Div(
+                                            'Data is collected from DMI Rest API:'
+                                            ),
+                                            html.A('DMI', href='https://confluence.govcloud.dk/display/FDAPI',
+                                                    target='_blank',
+                                                    style={'color': 'white'}),
+                                            html.Br(),
+                                            html.Br(),
+                                            html.Div('Source code can be found on GitHub:'),
+                                            html.A('GitHub', href='https://github.com/martinjhallberg/DMI_Wind_DashApp',
+                                                   target='_blank',
+                                                   style={'color': 'white'}),
+                                            html.Br(),
+                                            html.Br(),
+                                            html.Div('Life advice can be sent to'),
+                                            html.Div('martinjhallberg@gmail.com')
 
-                    html.H2(
-                        'Surfcast',
-                        className='card-title'
-                    ),
+                                            # dbc.ModalBody('Source code')
+
+                                    ])
+
+                                    ]
+                                    ),
+
+                                ],
+                                id='modal',
+                                is_open=False,
+                            ),
+                        ],
+                        #    style={'width': '85%'}
+                        ),
+
+                    # html.H2(
+                    #     'Surfcast',
+                    #     className='card-title'
+                    # ),
                     html.A(
                         html.Img(src=app.get_asset_url('dash-new-logo.png'),
                                  style={'height': '40px',
@@ -343,13 +383,13 @@ app.layout = dbc.Container([
             # ),
             # dbc.Col([
                     html.Div(
-            dcc.DatePickerSingle(
-                id='date_picker',
-                min_date_allowed=date(2019, 1, 1),
-                max_date_allowed=date.today(),
-                date=date.today() - dt.timedelta(days=1),
-                display_format='YYYY-MM-DD'
-            ),
+            # dcc.DatePickerSingle(
+            #     id='date_picker',
+            #     min_date_allowed=date(2019, 1, 1),
+            #     max_date_allowed=date.today(),
+            #     date=date.today() - dt.timedelta(days=1),
+            #     display_format='YYYY-MM-DD'
+            # ),
                     ),
 
 ],style = {'width':'33.3%',
@@ -371,6 +411,81 @@ html.Div([
                 size='me',
             ),
     ),
+
+            # ],style = {'display': 'flex'}
+            # ),
+    html.Div(
+            # dcc.DatePickerSingle(
+            #     id='date_picker_prev',
+            #     min_date_allowed=date(2019, 1, 1),
+            #     max_date_allowed=date.today(),
+            #     date=date.today() - dt.timedelta(days=1),
+            #     display_format='YYYY-MM-DD'
+            # ),
+    ),
+    ],style = {'width':'33.3%',
+   'justify-content':'center',
+   'align-items':'center',
+   'display':'flex'}
+                ),
+],style = {'display':'flex',
+           'justify-content':'center',
+           'align-items':'center'}
+                ),
+],width={"size": 8, "offset": 0}
+                ),
+
+       # ], width={"size": 8, "offset": 2},
+       # )
+    ],className= 'g-0',
+        justify="center"
+    ),
+#html.Br(),
+    dbc.Row([
+        #dbc.Col([
+
+            #html.Div([
+
+                dbc.Col([
+
+                html.Div([
+
+                html.Div(
+
+                    style= {'width':'33.3%',
+                            'justify-content':'center',
+                            #'align-items':'center',
+                            'display':'flex'}
+                ),
+                html.Div([
+
+
+            # ], width={"size": 2, "offset": 2},
+            #    style={'margin-left': 'auto',
+            #           'margin-right': 'auto'}
+            # ),
+            # dbc.Col([
+                    html.Div(
+            dcc.DatePickerSingle(
+                id='date_picker',
+                min_date_allowed=date(2019, 1, 1),
+                max_date_allowed=date.today(),
+                date=date.today() - dt.timedelta(days=1),
+                display_format='YYYY-MM-DD'
+            ),
+                    ),
+
+],style = {'width':'33.3%',
+   'justify-content':'center',
+   'align-items':'center',
+   'display':'flex'}
+                )
+                    ,
+
+
+html.Div([
+            # dbc.Col([
+
 
             # ],style = {'display': 'flex'}
             # ),
@@ -401,6 +516,7 @@ html.Div([
         justify="center"
     ),
 
+html.Br(),
     dbc.Row([
         dbc.Col([
 
@@ -437,6 +553,9 @@ html.Div([
                                        "display": "block",
                                        "margin-left": "auto",
                                        "margin-right": "auto",
+                                       'border-bottom-style': 'dashed',
+                                       'border-bottom-width': '3px',
+                                       'border-color': fun_col_to_trans(dict_layout_cols['orange'],0.5)
                                        },
                             ),
                             dcc.Graph(
@@ -1383,6 +1502,7 @@ def fun_fig_chart(
         # format(date_from_str[0:10], date_to_str),
 
         y_ax_range = dict(range=[0, 30])
+        chart_margin = dict(l=40, r=40, t=20, b=20)
 
         if fig_type == 1:
             fig_chart.add_trace(
@@ -1402,6 +1522,7 @@ def fun_fig_chart(
                     legendrank=1
                 ),
             ),
+
 
     elif fig_type == 3:
 
@@ -1453,7 +1574,9 @@ def fun_fig_chart(
                             secondary_y=True
                             )
 
-        fig_chart.update_yaxes(title_text="Wave height", secondary_y=False,
+        fig_chart.update_yaxes(title_text="Wave height",
+                               secondary_y=False,
+                               title_font_size = 12,
                                showticksuffix='last',
                                ticksuffix=' m',
                                tickmode='linear',
@@ -1461,7 +1584,9 @@ def fun_fig_chart(
                                dtick=1
 
                                )
-        fig_chart.update_yaxes(title_text="Wave period", secondary_y=True,
+        fig_chart.update_yaxes(title_text="Wave period",
+                               secondary_y=True,
+                               title_font_size=12,
                                showticksuffix='last',
                                showgrid=False,
                                ticksuffix=' s',
@@ -1471,6 +1596,9 @@ def fun_fig_chart(
                                dtick=2
                                )
 
+
+        chart_margin = dict(l=0, r=0, t=20, b=20)
+
         title_text = 'Waves at {} - {}'.format('1', '2')
         # format(date_from_str[0:10], date_to_str),
 
@@ -1479,11 +1607,11 @@ def fun_fig_chart(
         arr_dist = 0.3
 
     else:
-        hover_text_1 = ''
-        h = ''
+
         title_text = ''
         y_ax_range = ''
         arr_dist = ''
+        chart_margin = ''
 
     # Add direction arrows
     for i, row in df.iterrows():
@@ -1533,7 +1661,7 @@ def fun_fig_chart(
         hoverlabel=dict(bgcolor='rgba(255,255,255,0.75)',
                         font=dict(color='black')
                         ),
-        margin=dict(l=0, r=20, t=20, b=20),
+        margin=chart_margin,
         plot_bgcolor='rgba(0, 0, 0, 0)',
         paper_bgcolor='rgba(0, 0, 0, 0)',
         legend=dict(
