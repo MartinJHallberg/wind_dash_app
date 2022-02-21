@@ -548,7 +548,7 @@ html.Br(),
                                 id='bar_chart_fcoo', figure={},
                                 config={
                                     'displayModeBar': False},
-                                style={'height': '35vh',
+                                style={'height': '70vh',
                                        'width': '100%',
                                        "display": "block",
                                        "margin-left": "auto",
@@ -558,17 +558,17 @@ html.Br(),
                                        'border-color': fun_col_to_trans(dict_layout_cols['orange'],0.5)
                                        },
                             ),
-                            dcc.Graph(
-                                id='bar_chart_wave', figure={},
-                                config={
-                                    'displayModeBar': False},
-                                style={'height': '35vh',
-                                       'width': '100%',
-                                       "display": "block",
-                                       "margin-left": "auto",
-                                       "margin-right": "auto",
-                                       },
-                            ),
+                            # dcc.Graph(
+                            #     id='bar_chart_wave', figure={},
+                            #     config={
+                            #         'displayModeBar': False},
+                            #     style={'height': '35vh',
+                            #            'width': '100%',
+                            #            "display": "block",
+                            #            "margin-left": "auto",
+                            #            "margin-right": "auto",
+                            #            },
+                            # ),
                         ]),
                     ]),
                 id='forc-collapse',
@@ -973,14 +973,20 @@ def update_chart_1(date_value, clk_data):
         print('Waves at {} - {}'.format(date_from_str[0:10], date_to_str))
 
         # Create figure
-        fig_out = fun_fig_chart(
+        fig_out = fun_wind_bar_chart(
             df=df,
             mag_col='mean_wind_speed',
             dir_col='mean_wind_dir',
             dt_col='from_datetime',
-            date_from_str=date_from_str,
-            date_to_str=date_to_str,
-            fig_type=1
+            date_from_str='',
+            date_to_str=''
+        )
+
+        # fig_dmi.show()
+        fig_out = fun_max_wind_chart(
+            df=df,
+            dt_col='from_datetime',
+            fig=fig_out
         )
 
     else:
@@ -999,14 +1005,20 @@ def update_chart_1(date_value, clk_data):
         # print(df)
 
         # Create figure
-        fig_out = fun_fig_chart(
+        fig_out = fun_wind_bar_chart(
             df=df,
             mag_col='mean_wind_speed',
             dir_col='mean_wind_dir',
             dt_col='from_datetime',
-            date_from_str=date_from_str,
-            date_to_str=date_to_str,
-            fig_type=1
+            date_from_str='',
+            date_to_str=''
+        )
+
+        # fig_dmi.show()
+        fig_out = fun_max_wind_chart(
+            df=df,
+            dt_col='from_datetime',
+            fig=fig_out
         )
 
     string_prefix = 'You have selected: '
@@ -1052,14 +1064,21 @@ def update_chart_2(date_value, clk_data):
         print('Waves at {} - {}'.format(date_from_str[0:10], date_to_str))
 
         # Create figure
-        fig_out = fun_fig_chart(
+        # Create figure
+        fig_out = fun_wind_bar_chart(
             df=df,
             mag_col='mean_wind_speed',
             dir_col='mean_wind_dir',
             dt_col='from_datetime',
-            date_from_str=date_from_str,
-            date_to_str=date_to_str,
-            fig_type=1
+            date_from_str='',
+            date_to_str=''
+        )
+
+        # fig_dmi.show()
+        fig_out = fun_max_wind_chart(
+            df=df,
+            dt_col='from_datetime',
+            fig=fig_out
         )
 
     else:
@@ -1078,14 +1097,20 @@ def update_chart_2(date_value, clk_data):
         # print(df)
 
         # Create figure
-        fig_out = fun_fig_chart(
+        fig_out = fun_wind_bar_chart(
             df=df,
             mag_col='mean_wind_speed',
             dir_col='mean_wind_dir',
             dt_col='from_datetime',
-            date_from_str=date_from_str,
-            date_to_str=date_to_str,
-            fig_type=1
+            date_from_str='',
+            date_to_str=''
+        )
+
+        # fig_dmi.show()
+        fig_out = fun_max_wind_chart(
+            df=df,
+            dt_col='from_datetime',
+            fig=fig_out
         )
 
     string_prefix = 'You have selected: '
@@ -1104,7 +1129,7 @@ def update_chart_2(date_value, clk_data):
 # region FCOO CALLBACK
 @app.callback(
     Output('bar_chart_fcoo', 'figure'),
-    Output('bar_chart_wave', 'figure'),
+    #Output('bar_chart_wave', 'figure'),
     Input('map_figure', 'clickData'),
 )
 def update_chart_3(clk_data):
@@ -1112,7 +1137,7 @@ def update_chart_3(clk_data):
 
     if clk_data is None:
 
-        # Get DMI data
+        # Get data
         cellid = '10km_622_71'
         dict_fcoo = shp_grid[['KN10kmDK', 'cent_lat', 'cent_lon']].set_index('KN10kmDK').to_dict(orient='index')
 
@@ -1129,24 +1154,30 @@ def update_chart_3(clk_data):
         fun_vec_to_dir_mag(df_fcoo, 'u', 'v', 'Wave', 'Height')
 
         # Create figure
-        fig_out = fun_fig_chart(
+        fig_wind_fcoo = fun_wind_bar_chart(
             df=df_fcoo,
             mag_col='WindSpeed',
             dir_col='WindDir',
             dt_col='Time_dt',
             date_from_str='',
             date_to_str='',
-            fig_type=2
         )
 
-        fig_wave_out = fun_fig_chart(
+        fig_wind_fcoo.set_subplots(2, 1,
+                                   horizontal_spacing=1,
+                                   # vertical_spacing=0.9,
+                                   specs=[
+                                       [{"secondary_y": False}],
+                                       [{"secondary_y": True}]])
+
+        fig_out = fun_wave_chart(
             df=df_fcoo,
             mag_col='WaveHeight',
             dir_col='WaveDir',
             dt_col='Time_dt',
             date_from_str='',
             date_to_str='',
-            fig_type=3
+            fig=fig_wind_fcoo
         )
 
     else:
@@ -1161,27 +1192,33 @@ def update_chart_3(clk_data):
         fun_vec_to_dir_mag(df_fcoo, 'u', 'v', 'Wave', 'Height')
 
         # Create figure
-        fig_out = fun_fig_chart(
+        fig_wind_fcoo = fun_wind_bar_chart(
             df=df_fcoo,
             mag_col='WindSpeed',
             dir_col='WindDir',
             dt_col='Time_dt',
             date_from_str='',
             date_to_str='',
-            fig_type=2
         )
 
-        fig_wave_out = fun_fig_chart(
+        fig_wind_fcoo.set_subplots(2, 1,
+                                   horizontal_spacing=1,
+                                   # vertical_spacing=0.9,
+                                   specs=[
+                                       [{"secondary_y": False}],
+                                       [{"secondary_y": True}]])
+
+        fig_out = fun_wave_chart(
             df=df_fcoo,
             mag_col='WaveHeight',
             dir_col='WaveDir',
             dt_col='Time_dt',
             date_from_str='',
             date_to_str='',
-            fig_type=3
+            fig=fig_wind_fcoo
         )
 
-    return fig_out, fig_wave_out
+    return fig_out
 
 
 # region
@@ -1415,6 +1452,350 @@ def fun_vec_to_dir_mag(
 
 # endregion
 
+
+# region FIGURE FUNCTIONS
+# Set colorscale
+colorscale = [[0, dict_col_blues['0-3']],
+              [0.4, dict_col_blues['6-9']],
+              [1, dict_col_blues['+15']]]
+
+# Set axes
+y_axes = dict(gridcolor='rgba(255,255,255,0.4)',
+              color=dict_layout_cols['white'],
+              gridwidth=0.0001,
+              showticksuffix='last',
+              ticksuffix=' m/s'
+              )
+
+x_axes = dict(color=dict_layout_cols['white'],
+              linewidth=0.1,
+              showgrid=False
+              )
+
+
+def fun_wind_bar_chart(df,  # dataframe to be visualized
+                       mag_col,  # column containing magnitude values
+                       dir_col,  # column containing direction values
+                       dt_col,  # column containing datetime values
+                       date_from_str,  # start date for period
+                       date_to_str,  # end date for period
+                       ):
+    # Discetize values in magnitude column
+    df['Col_bin'] = pd.cut(df[mag_col], bins=l_wind_bins, labels=l_wind_bins_labels)
+    # Create column with cardinal direction
+    df['Wind_CardDir'] = df[dir_col].apply(fun_DegToCard)
+
+    # Hover data
+    hover_data_chart = np.stack((df[dir_col], df['Wind_CardDir'], df[dt_col].dt.hour.astype(str) + ':00'), axis=1)
+
+    fig_chart = go.Figure()
+
+    fig_chart.add_trace(
+
+        go.Bar(
+            x=df[dt_col],
+            y=df[mag_col],
+            marker=dict(
+
+                color=df[mag_col],
+                colorscale=colorscale,
+                cmin=0,
+                cmax=13,
+                # opacity = 0.7,
+                line_color=dict_layout_cols['orange'],
+                line_width=0
+            ),
+            customdata=hover_data_chart,
+            hovertemplate=
+            'Avg. wind: %{y}' +
+            '<br>Wind direction: %{customdata[1]} (%{customdata[0]}\xb0)' +
+            '<br>Time: %{customdata[2]}<extra></extra>',
+            hoverlabel=dict(
+                bgcolor='rgba(255,255,255,0.3)',
+                font=dict(color='black')
+            ),
+            showlegend=True,
+            name='Avg. wind speed',
+            legendrank=2,
+        )
+    )
+
+    # Assign text variable
+    t_fig_type = 'wind'
+
+    arr_dist = 1
+
+    #
+    # fig_chart.update_traces(
+    #    customdata=hover_data_chart,
+    #    hovertemplate='Avg. wind: %{y}' +
+    #                  '<br>Wind direction: %{customdata[1]} (%{customdata[0]}\xb0)' +
+    #                  '<br>Time: %{customdata[2]}<extra></extra>',
+    #    name='Avg. {} speed'.format(t_fig_type),
+    #    legendrank=2
+    # )
+
+    title_text = 'Wind {} - {}'.format(date_from_str[0:10], date_to_str)
+    # format(date_from_str[0:10], date_to_str),
+
+    y_ax_range = dict(range=[0, 30])
+    chart_margin = dict(l=40, r=40, t=20, b=20)
+
+    # Add direction arrows
+    for i, row in df.iterrows():
+        x_date = row[dt_col]
+
+        ax = dict_dir_coord[row['Wind_CardDir']]['X_cord']
+        ay = dict_dir_coord[row['Wind_CardDir']]['Y_cord']
+
+        fig_chart.add_annotation(
+            x=x_date,
+            y=row[mag_col] + arr_dist,
+            ax=ax,
+            ay=ay,
+            arrowhead=3,
+            arrowsize=1.6,
+            arrowwidth=1.1,
+            arrowcolor=dict_layout_cols['orange'],
+            xref="x",
+            yref="y"
+        )
+
+    fig_chart.update_yaxes(y_axes)
+
+    fig_chart.update_xaxes(x_axes)
+
+    # Set layout
+    fig_chart.update_layout(
+        bargap=0.5,
+        yaxis=y_ax_range,
+        autosize=True,
+        # width=800,
+        # height=h,
+        hovermode='x unified',
+        hoverlabel=dict(bgcolor='rgba(255,255,255,0.75)',
+                        font=dict(color='black')
+                        ),
+        margin=chart_margin,
+        plot_bgcolor=dict_layout_cols['transparent'],
+        paper_bgcolor=dict_layout_cols['transparent'],
+        legend=dict(
+            yanchor="top",
+            y=1,
+            xanchor="left",
+            x=0.01,
+            bgcolor=dict_layout_cols['transparent'],
+            font=dict(color=dict_layout_cols['white'])
+        ),
+        title={'text': title_text,
+               'x': 0.5,
+               'y': 0.94,
+               'font': {'color': dict_layout_cols['white']}
+               }
+    )
+
+    return fig_chart
+
+
+
+def fun_max_wind_chart(
+    fig, # base figure
+    df, # dataframe
+    dt_col # datetime column
+):
+    fig.add_trace(
+         go.Scatter(
+        x=df[dt_col],
+        y=df['max_wind_speed_3sec'],
+        hovertemplate=
+        'Max wind speed (3s): %{y}<extra></extra>',
+        line=dict(
+            # opacity = 0.8,
+            color="rgb(255,255,255)",  # dict_layout_cols['bg_blue']
+            width=2,
+            dash='dash'
+        ),
+        showlegend=True,
+        name='Max. wind speed',
+        legendrank=1
+    )
+    )
+    return fig
+
+
+def fun_wave_chart(
+        df,  # dataframe to be visualized
+        mag_col,  # column containing magnitude values
+        dir_col,  # column containing direction values
+        dt_col,  # column containing datetime values
+        date_from_str,  # start date for period
+        date_to_str,  # end date for period
+        fig  # figure with subplots
+):
+    t_fig_type = 'Wave'
+
+    # fig_chart = make_subplots(specs=[[{"secondary_y": True}]])
+    # Hover data
+    hover_data_chart = np.stack((df[dir_col], df['Wind_CardDir'], df[dt_col].dt.hour.astype(str) + ':00'), axis=1)
+
+    # fig_chart.add_trace(
+
+    fig.add_trace(
+        go.Scatter(
+            x=df[dt_col],
+            y=df[mag_col],
+            fill='tozeroy',
+            line_color=dict_layout_cols['primary'],
+            # marker = dict(
+            #    color = dict_layout_cols['primary'],
+            # ),
+            hoverlabel=dict(
+                bgcolor='rgba(255,255,255,0.3)',
+                font=dict(color='black')
+            ),
+            showlegend=True,
+            legendrank=2,
+        ),
+        row=2,
+        col=1
+    )
+
+    fig.update_traces(
+        customdata=hover_data_chart,
+        hovertemplate='Wave height: %{y}' +
+                      '<br>Wave direction: %{customdata[1]} (%{customdata[0]}\xb0)' +
+                      '<br>Time: %{customdata[2]}<extra></extra>',
+        name='{} height'.format(t_fig_type),
+        legendrank=2,
+        row=2,
+        col=1
+    )
+
+    fig.add_trace(
+        go.Scatter(x=df[dt_col],
+                   y=round(df['WavePeriod'], 1),
+                   hovertemplate=
+                   'Wave period: %{y}<extra></extra>',
+                   line=dict(
+                       # opacity = 0.8,
+                       color=dict_layout_cols['white'],
+                       width=2,
+                       dash='dash'
+                   ),
+                   showlegend=True,
+                   name='Wave period',
+                   legendrank=1
+                   ),
+        secondary_y=True,
+        row=2,
+        col=1
+    )
+
+    fig.update_yaxes(title_text="Wave height",
+                     secondary_y=False,
+                     title_font_size=12,
+                     showticksuffix='last',
+                     showgrid=False,
+                     ticksuffix=' m',
+                     range=list([0, 4]),
+                     tickmode='linear',
+                     tick0=1,
+                     dtick=1,
+                     gridcolor='rgba(255,255,255,0.4)',
+                     color=dict_layout_cols['white'],
+                     gridwidth=0.0001,
+                     row=2,
+                     col=1
+                     )
+    fig.update_yaxes(title_text="Wave period",
+                     secondary_y=True,
+                     title_font_size=12,
+                     showticksuffix='last',
+                     showgrid=False,
+                     ticksuffix=' s',
+                     range=list([0, 10]),
+                     tickmode='linear',
+                     tick0=2,
+                     dtick=2,
+                     gridcolor='rgba(255,255,255,0.4)',
+                     color=dict_layout_cols['white'],
+                     gridwidth=0.0001,
+                     row=2,
+                     col=1
+                     )
+
+    # fig_chart.show()
+
+    chart_margin = dict(l=0, r=0, t=20, b=20)
+
+    title_text = 'Waves at {} - {}'.format('1', '2')
+    # format(date_from_str[0:10], date_to_str),
+
+    y_ax_range = dict(range=[0, 4])
+
+    arr_dist = 0.3
+
+    # Add direction arrows
+    for i, row in df.iterrows():
+        x_date = row[dt_col]
+
+        ax = dict_dir_coord[row['Wind_CardDir']]['X_cord']
+        ay = dict_dir_coord[row['Wind_CardDir']]['Y_cord']
+
+        fig.add_annotation(
+            x=x_date,
+            y=row[mag_col] + arr_dist,
+            ax=ax,
+            ay=ay,
+            arrowhead=3,
+            arrowsize=1.6,
+            arrowwidth=1.1,
+            arrowcolor=dict_layout_cols['orange'],
+            xref="x",
+            yref="y",
+            row=2,
+            col=1
+        )
+
+    fig.update_xaxes(x_axes)
+
+    fig.update_layout(
+        bargap=0.5,
+        # yaxis=y_ax_range,
+        autosize=True,
+        # width=800,
+        # height=h,
+        hovermode='x unified',
+        hoverlabel=dict(bgcolor='rgba(255,255,255,0.75)',
+                        font=dict(color='black')
+                        ),
+        # margin=chart_margin,
+        plot_bgcolor=dict_layout_cols['transparent'],
+        paper_bgcolor=dict_layout_cols['transparent'],
+        legend=dict(
+            yanchor="top",
+            y=1,
+            xanchor="left",
+            x=0.01,
+            bgcolor=dict_layout_cols['transparent'],
+            font=dict(color=dict_layout_cols['white'])
+        ),
+        title={'text': "",
+               'x': 0.5,
+               'y': 0.94,
+               'font': {'color': dict_layout_cols['white']}
+               },
+        # row = 2,
+        # col = 1
+    )
+
+    # fig_chart.update_yaxes(y_axes)
+
+    return fig
+
+
+#endregion
+
 # region DEFINE FUNCTION FOR FIGURE
 
 def fun_fig_chart(
@@ -1460,7 +1841,7 @@ def fun_fig_chart(
         ),
         customdata=hover_data_chart,
         hovertemplate=
-        'Avg. wind: %{y} m/s' +
+        'Avg. wind: %{y}' +
         '<br>Wind direction: %{customdata[1]} (%{customdata[0]}\xb0)' +
         '<br>Time: %{customdata[2]}<extra></extra>',
         hoverlabel=dict(
