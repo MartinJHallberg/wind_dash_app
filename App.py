@@ -69,8 +69,8 @@ shp_grid['Stednavn'].fillna('No name', inplace=True)
 
 ## SET UP FIGURE
 # Map center
-dict_cent = {'lon': 13,
-             'lat': 55.86
+dict_cent = {'lon': 10.52,
+             'lat': 55.89
              }
 
 # Color columns
@@ -100,7 +100,7 @@ fig_map = go.Figure(
         mapbox=dict(
             accesstoken='pk.eyJ1IjoibWFqaGFsIiwiYSI6ImNrd3F3MmgyYTBxc3oydWxja3ZwNnB1enIifQ.XQ6h4h4UsdD_9y2WsOUbcw',
             center=dict_cent,
-            zoom=7,
+            zoom=6.75,
             style="dark"
         ),
         autosize=True,
@@ -607,7 +607,8 @@ app.layout = dbc.Container([
                        }
             ),
 
-        ], width={"size": 8, "offset": 2}
+        ], width={"size": 8, "offset": 2},
+
         ),
 
     ])
