@@ -12,8 +12,16 @@ from dash.dependencies import Input, Output, State
 from dash import dcc, html
 from datetime import date
 from plotly.subplots import make_subplots
+from dotenv import load_dotenv
+import os
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SUPERHERO])
+
+
+# API keys
+load_dotenv()
+dmi_api = os.getenv("dmi_key")
+mapbox_api = os.getenv("mapbox_key")
 
 # Set up colors
 dict_layout_cols = {
@@ -98,7 +106,7 @@ fig_map = go.Figure(
     ),
     layout=go.Layout(
         mapbox=dict(
-            accesstoken='pk.eyJ1IjoibWFqaGFsIiwiYSI6ImNrd3F3MmgyYTBxc3oydWxja3ZwNnB1enIifQ.XQ6h4h4UsdD_9y2WsOUbcw',
+            accesstoken=mapbox_api,
             center=dict_cent,
             zoom=6.75,
             style="dark"
@@ -119,7 +127,8 @@ fig_map = go.Figure(
 #     mapbox_zoom = 7, #Zoom in scale
 #     mapbox_center = dict_cent)
 
-fig_map.update_traces(marker_line_width=0.3)
+fig_map.update_traces(marker_line_width=0.01,
+                      marker_line_color = fun_col_to_trans(dict_layout_cols['primary'],0.1))
 
 # fig_map.show()
 # endregion
@@ -899,7 +908,7 @@ def fun_get_filter_dmi_data(
         obs_values=['mean_wind_speed', 'max_wind_speed_3sec', 'mean_wind_dir'],
         # which observations from DMI data to keep
         no_days=2,  # number of days to get data for
-        api_key='604e80dd-9ee9-454b-aea0-12edc1ead8bf',  # api key for DMI API
+        api_key=dmi_api,  # api key for DMI API
         stationid='',  # extra parameter, if weather station data
         # is used instead of grid data
         limit=10000  # max number of observations to get
