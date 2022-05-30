@@ -1,5 +1,132 @@
+/* VARIABLES
+----------------------------------
+*/
+:root{
+--primary: rgb(76,155,232);
+--bg_blue: rgb(56, 97, 141);
+}
+
+/* BODY AND MAIN
+---------------------------------
+*/
+body {
+background: var(--bg_blue);
+}
+
+.div-main {
+padding-top: 1em
+}
+
+/* NAVIGATION MENU
+ ----------------------------------
+ */
+
+.nav-menu {
+display: flex;
+justify-content: center;
+background: white;
+padding-top: 0.7em;
+padding-bottom: 0.7em;
+}
+
+
+.nav-header {
+    text-align: center;
+    padding-left: 1.5em;
+}
+
+
+.container-nav {
+  display: flex;
+  justify-content: space-around;
+  width: 90%;
+  align-items: center;
+}
+
+.but-about {
+    border-radius: 12px;
+    height: 2.5em;
+    background: None;
+    color: var(--primary);
+    font-weight: bold;
+    border: 3px solid var(--primary);
+}
+
+.img-logo {
+height: 2em;
+}
+
+
+
+/* MAP SECTION
+ ----------------------------------
+ */
+
+.section-map {
+    margin-top: 2.5em;
+    display:flex;
+    justify-content: center;
+}
+
+.container-map {
+    text-align: center;
+    width: 90%;
+    justify-content: center;
+    margin: auto;
+}
+
+.div-map {
+    background: grey;
+    height: 50vh;
+    width: 100%;
+    border-radius: 1em;
+    }
+
+
+/* BUTTON MENU
+ ----------------------------------
+ */
+
+
+ .section-buttons {
+    margin-top: 1em;
+    display: flex;
+    justify-content: center;
+
+ }
+
+  .container-buttons {
+    display:flex;
+    justify-content: center;
+    width: 90%;
+
+ }
+
+ .div-forc-but {
+    margin: auto;
+    display: flex;
+    justify-content: center;
+    align-items: top;
+ }
+
+ .div-back-but {
+     margin: auto;
+ }
+
+ .but-forc {
+    border-radius: 12px;
+ }
+
+ .but-prev-1 {
+    border-radius: 12px;
+    margin-left: 0.5em;
+ }
+
+
+
+
 .DateInput, .DateInput_1 {
-    border-radius: 0 0 0 0 !important;
+    border-radius: 10px !important;
 }
 
 .DateInput_input, .DateInput_input_1 {
@@ -9,6 +136,7 @@
 }
 
 .SingleDatePickerInput__withBorder {
-    border-radius: 0 0 0 0;
+    border-radius: 10px;
     border: 1px solid #ccc !important;
 }
+
