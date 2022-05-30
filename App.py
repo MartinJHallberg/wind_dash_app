@@ -398,13 +398,7 @@ app.layout = dbc.Container([
                 html.Div([
 
                     html.Div(
-                        dcc.DatePickerSingle(
-                            id='date_picker',
-                            min_date_allowed=date(2019, 1, 1),
-                            max_date_allowed=date.today(),
-                            date=date.today() - dt.timedelta(days=1),
-                            display_format='YYYY-MM-DD'
-                        ),
+
                     ),
 
                 ], style={'width': '33.3%',
