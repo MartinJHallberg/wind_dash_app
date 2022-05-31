@@ -33,6 +33,9 @@ padding-bottom: 0.7em;
 .nav-header {
     text-align: center;
     padding-left: 1.5em;
+    color: black;
+    font-size: 30px;
+
 }
 
 
@@ -45,7 +48,9 @@ padding-bottom: 0.7em;
 
 .but-about {
     border-radius: 12px;
-    height: 2.5em;
+    height: 4em;
+    width: 5.5em;
+    font-size: 40px;
     background: None;
     color: var(--primary);
     font-weight: bold;
@@ -53,7 +58,7 @@ padding-bottom: 0.7em;
 }
 
 .img-logo {
-height: 2em;
+height: 6em;
 }
 
 
@@ -97,20 +102,23 @@ height: 2em;
 
   .container-buttons {
     display:flex;
-    justify-content: center;
     width: 90%;
-
  }
 
  .div-forc-but {
-    margin: auto;
+    width: 50%;
     display: flex;
     justify-content: center;
-    align-items: top;
+    align-items: flex-start;
  }
 
  .div-back-but {
-     margin: auto;
+     width: 50%;
+     display: flex;
+     flex-direction: column;
+     justify-content: center;
+     align-items: center;
+
  }
 
  .but-forc {
@@ -119,9 +127,8 @@ height: 2em;
 
  .but-prev-1 {
     border-radius: 12px;
-    margin-left: 0.5em;
+    margin-bottom: 1em;
  }
-
 
 
 
