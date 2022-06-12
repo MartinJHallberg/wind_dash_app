@@ -86,6 +86,12 @@ height: 6em;
     width: 100%;
     border-radius: 1em;
     }
+.fig-map {
+    height: 50vh;
+    width: 100%;
+    border-radius: 1em;
+    overflow: hidden;
+    }
 
 
 /* BUTTON MENU
