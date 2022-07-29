@@ -38,7 +38,6 @@ dict_layout_cols = {
 
 
 # region FUNCTION FOR TRANSPARENT COLORS
-
 def fun_col_to_trans(col, transparency):
     # Convert transparency to string
     t_trans = str(transparency)

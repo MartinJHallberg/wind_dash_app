@@ -82,12 +82,12 @@ height: 6em;
 
 .div-map {
     background: grey;
-    height: 50vh;
+    height: 40vh;
     width: 100%;
     border-radius: 1em;
     }
 .fig-map {
-    height: 50vh;
+    height: inherit;
     width: 100%;
     border-radius: 1em;
     overflow: hidden;
@@ -106,7 +106,7 @@ height: 6em;
 
  }
 
-  .container-buttons {
+ .container-buttons {
     display:flex;
     width: 90%;
  }
@@ -127,24 +127,32 @@ height: 6em;
 
  }
 
- .but-forc {
+ .but-forc, .but-prev-1 {
     border-radius: 12px;
+    height: 7em;
+    width: 11em;
  }
 
- .but-prev-1 {
-    border-radius: 12px;
-    margin-bottom: 1em;
+ .but-forc-text, .but-prev-1-text {
+    word-break: break-word;
+    font-size: 25px;
  }
 
 
+ .date-prev-1 {
+    margin-top: 1em;
+ }
 
 .DateInput, .DateInput_1 {
     border-radius: 10px !important;
+    width: 11em;
 }
 
 .DateInput_input, .DateInput_input_1 {
-    Height: 34px !important;
-    Width: 100% !important;
+    font-size: 25px;
+    text-align: center;
+    height: 50px !important;
+    width: 100% !important;
     border-radius: inherit;
 }
 
