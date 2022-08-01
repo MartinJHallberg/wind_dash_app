@@ -108,7 +108,7 @@ height: 6em;
 
  .container-buttons {
     display:flex;
-    width: 90%;
+    width: 70%;
  }
 
  .div-forc-but {
@@ -161,3 +161,25 @@ height: 6em;
     border: 1px solid #ccc !important;
 }
 
+
+.CalendarDay, .CalendarDay_1 {
+    font-size: 30px;
+    width: 50px !important;
+    height: 50px !important;
+    }
+
+
+.DayPicker_transitionContainer, .DayPicker_transitionContainer_1, .DayPicker_transitionContainer__horizontal, .DayPicker_transitionContainer__horizontal_2 {
+    width: 390px !important;
+    height: 390px !important;
+    }
+
+.DayPicker_focusRegion, .DayPicker_focusRegion_1 {
+    width: 390px !important;
+    height: 390px !important;
+    }
+
+.DayPicker_weekHeader_li, .DayPicker_weekHeader_li_1 {
+    font-size: 25px;
+    padding: 4px 20px;
+    }
