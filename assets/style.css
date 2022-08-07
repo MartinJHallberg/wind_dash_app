@@ -138,7 +138,9 @@ height: 6em;
     font-size: 25px;
  }
 
-
+/* BUTTON MENU
+ ----------------------------------
+ */
  .date-prev-1 {
     margin-top: 1em;
  }
@@ -162,6 +164,10 @@ height: 6em;
 }
 
 
+
+
+
+
 .CalendarDay, .CalendarDay_1 {
     font-size: 30px;
     width: 50px !important;
@@ -169,7 +175,19 @@ height: 6em;
     }
 
 
+
+
 .DayPicker_transitionContainer, .DayPicker_transitionContainer_1, .DayPicker_transitionContainer__horizontal, .DayPicker_transitionContainer__horizontal_2 {
+    width: 390px !important;
+    height: 390px !important;
+    }
+
+.SingleDatePicker_picker, .SingleDatePicker_picker_1, .SingleDatePicker_picker__directionLeft, .SingleDatePicker_picker__directionLeft_2 {
+    width: 390px !important;
+    height: 390px !important;
+    }
+
+.DayPicker DayPicker_1, .DayPicker__horizontal, .DayPicker__horizontal_2, .DayPicker__withBorder, .DayPicker__withBorder_3 {
     width: 390px !important;
     height: 390px !important;
     }
@@ -179,7 +197,41 @@ height: 6em;
     height: 390px !important;
     }
 
-.DayPicker_weekHeader_li, .DayPicker_weekHeader_li_1 {
+.DayPicker_weekHeader, .DayPicker_weekHeader_1 {
+    width: 390px !important;
+    }
+
+.CalendarMonth_caption, .CalendarMonth_caption_1 {
     font-size: 25px;
-    padding: 4px 20px;
+    padding: 15px 0px;
+    }
+
+.CalendarMonth_table, .CalendarMonth_table_1 {
+    margin-top: 50px;
+    }
+
+.DayPicker_weekHeader_li, .DayPicker_weekHeader_li_1 {
+    font-size: 30px;
+    margin: 0px 5px;
+    }
+
+.DayPickerNavigation_button {
+    height: 40px,
+    width: 40px
+    }
+
+/*
+.SingleDatePicker_picker, .SingleDatePicker_picker_1, .SingleDatePicker_picker__directionLeft, .SingleDatePicker_picker__directionLeft_2 {
+    width: 390px !important;
+    }
+
+.DayPicker DayPicker_1, .DayPicker__horizontal, .DayPicker__horizontal_2, .DayPicker__withBorder, .DayPicker__withBorder_3 {
+    width: 340px !important;
+    }
+
+*/
+
+
+.mantine-DatePicker-month mantine-jeg5ko {
+    font-size: 25px;
     }
