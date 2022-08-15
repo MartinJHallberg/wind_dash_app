@@ -216,8 +216,8 @@ height: 6em;
     }
 
 .DayPickerNavigation_button {
-    height: 40px,
-    width: 40px
+    height: 40px;
+    width: 40px;
     }
 
 /*
@@ -232,6 +232,6 @@ height: 6em;
 */
 
 
-.mantine-DatePicker-month mantine-jeg5ko {
-    font-size: 25px;
+.mantine-DatePicker-calendarBase mantine-170azaf {
+    border: 10px solid red !important;
     }
