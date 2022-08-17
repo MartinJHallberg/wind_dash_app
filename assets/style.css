@@ -58,7 +58,7 @@ padding-bottom: 0.7em;
 }
 
 .img-logo {
-height: 6em;
+height: 5em;
 }
 
 
@@ -234,4 +234,16 @@ height: 6em;
 
 .mantine-DatePicker-calendarBase mantine-170azaf {
     border: 10px solid red !important;
+    }
+
+
+/* FORECAST FIGURE
+ ----------------------------------
+ */
+
+ .container-forecast {
+    width: 90vw;
+    height: 40vh;
+    border-type: solid;
+    border-color: white;
     }
