@@ -575,6 +575,7 @@ app.layout = dbc.Container([
     Input('date_picker', 'date'),
     Input('map_figure', 'clickData'),
 )
+
 # region DMI CALLBACKS
 def update_chart_1(date_value, clk_data):
     # Input data
@@ -1015,9 +1016,7 @@ def fun_get_fcoo_data(var, lat, lon):
 def fun_append_fcoo_dfs(
         lat,
         lon,
-        variables=['Wind', 'Sealevel', 'WaveHeight2D', 'WavePeriod']
-
-):
+        variables=['Wind', 'Sealevel', 'WaveHeight2D', 'WavePeriod']):
     l_dfs = []
 
     for i, var in enumerate(variables):

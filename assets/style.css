@@ -22,11 +22,11 @@ padding-top: 1em
  */
 
 .nav-menu {
-display: flex;
-justify-content: center;
-background: white;
-padding-top: 0.7em;
-padding-bottom: 0.7em;
+    display: flex;
+    justify-content: center;
+    background: white;
+    padding-top: 0.7em;
+    padding-bottom: 0.7em;
 }
 
 
@@ -237,13 +237,18 @@ height: 5em;
     }
 
 
-/* FORECAST FIGURE
+/* FORECAST
  ----------------------------------
  */
+
+.section-forecast {
+    margin-top: 2.5em;
+    display:flex;
+    justify-content: center;
+}
 
  .container-forecast {
     width: 90vw;
     height: 40vh;
-    border-type: solid;
-    border-color: white;
+    background: white;
     }
