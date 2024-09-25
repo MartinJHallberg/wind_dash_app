@@ -1,11 +1,8 @@
 # Import packages
 import requests
-import json
-import pandas as pd
-import datetime as dt
+
 import plotly.graph_objects as go
 from plotly.colors import n_colors
-import numpy as np
 import dash
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output, State
@@ -14,6 +11,10 @@ from datetime import date
 from plotly.subplots import make_subplots
 from dotenv import load_dotenv
 import os
+import numpy as np
+import pandas as pd
+import datetime as dt
+import json
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SUPERHERO])
 

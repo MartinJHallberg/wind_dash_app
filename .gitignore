@@ -1,3 +1,5 @@
-vnev/
+venv/
 TestCode.py
 .env
+test_file.py
+data/
