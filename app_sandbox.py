@@ -11,7 +11,10 @@ import pandas as pd
 import app_graph_functions as graphs
 import datetime as dt
 
-app = Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
+app = Dash(
+    external_stylesheets=[dbc.themes.BOOTSTRAP],
+    prevent_initial_callbacks=True
+)
 
 mapbox_api = os.getenv("mapbox_key")
 # Figure DMI observational

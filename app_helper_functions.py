@@ -4,21 +4,6 @@ import requests
 import numpy as np
 import datetime as dt
 
-def dict_layout_cols():
-    dict_cols = {
-    'primary': 'rgb(76,155,232)',
-    'green': 'rgb(92,184,92)',
-    'yellow': 'rgb(255,193,7)',
-    'red': 'rgb(217,83,79)',
-    'bg_blue': 'rgb(56, 97, 141)',
-    'white': 'rgb(255, 255,255)',
-    'bg_blue2': 'rgb(15,37,55)',
-    'orange': 'rgb(246,105,35)',
-    'transparent': 'rgba(255,255,255,0)'
-    }
-
-    return dict_cols
-
 def get_map(
         dk_grid_url = 'https://raw.githubusercontent.com/MartinJHallberg/DMI_Wind_DashApp/version2/assets/DKN_10KM_epsg4326_filtered_wCent.geojson',
 ):
@@ -40,8 +25,8 @@ def get_map(
     shp_grid['Stednavn'].fillna('No name', inplace=True)
 
     # Color columns
-    shp_grid['Val'] = 1
-    shp_grid['Col'] = fun_col_to_trans(dict_layout_cols()['primary'], 0.4)
+    # shp_grid['Val'] = 1
+    # shp_grid['Col'] = fun_col_to_trans(dict_layout_cols()['primary'], 0.4)
 
     # Hover columns
     hover_data_map = np.stack(
