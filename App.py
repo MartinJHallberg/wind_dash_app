@@ -66,7 +66,6 @@ geoj_grid = json.loads(requests.get(url).text)
 
 shp_grid = pd.json_normalize(geoj_grid['features'])
 
-print(shp_grid.columns)
 shp_grid.rename(columns={'properties.KN10kmDK': 'KN10kmDK',
                          'properties.Stednavn': 'Stednavn',
                          'properties.cent_lon': 'cent_lon',
@@ -208,9 +207,9 @@ app.layout = dbc.Container([
 
                 dbc.CardBody([
                     html.Div([
-                        dbc.Button('About',
-                                   id='modal-button',
-                                   n_clicks=0, ),
+                        # dbc.Button('About',
+                        #            id='modal-button',
+                        #            n_clicks=0, ),
                         dbc.Modal(
                             [
                                 dbc.ModalHeader(dbc.ModalTitle('DMIWindApp')),
@@ -253,13 +252,8 @@ app.layout = dbc.Container([
                             is_open=False,
                         ),
                     ],
-                        #    style={'width': '85%'}
-                    ),
 
-                    # html.H2(
-                    #     'Surfcast',
-                    #     className='card-title'
-                    # ),
+                    ),
                     html.A(
                         html.Img(src=app.get_asset_url('dash-new-logo.png'),
                                  style={'height': '40px',
