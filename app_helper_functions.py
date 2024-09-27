@@ -24,10 +24,6 @@ def get_map(
     # Rename None to 'No name'
     shp_grid['Stednavn'].fillna('No name', inplace=True)
 
-    # Color columns
-    # shp_grid['Val'] = 1
-    # shp_grid['Col'] = fun_col_to_trans(dict_layout_cols()['primary'], 0.4)
-
     # Hover columns
     hover_data_map = np.stack(
         (
@@ -40,19 +36,6 @@ def get_map(
     
     return geoj_grid, shp_grid, hover_data_map
     
-
-
-def fun_col_to_trans(col, transparency):
-    # Convert transparency to string
-    t_trans = str(transparency)
-
-    # Split text and insert transparency
-    col_out = col.split(')')[0] + ',' + t_trans + ')'
-    # Change color type to include transparency
-    col_out = col_out.replace('rgb', 'rgba')
-
-    return col_out
-
 def filter_dmi_obs_data(
         dmi_obs,
         cell_id,

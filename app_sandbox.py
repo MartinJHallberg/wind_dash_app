@@ -1,6 +1,7 @@
 import plotly.graph_objects as go
 from dash import dcc, html, Dash
 import dash_bootstrap_components as dbc
+from dash_bootstrap_templates import load_figure_template
 from dash.dependencies import Input, Output, State
 from datetime import date
 from plotly.subplots import make_subplots
@@ -12,9 +13,11 @@ import app_graph_functions as graphs
 import datetime as dt
 
 app = Dash(
-    external_stylesheets=[dbc.themes.BOOTSTRAP],
+    external_stylesheets=[dbc.themes.MORPH],
     prevent_initial_callbacks=True
 )
+
+load_figure_template("MORPH")
 
 mapbox_api = os.getenv("mapbox_key")
 # Figure DMI observational
@@ -22,7 +25,12 @@ dmi_obs = pd.read_csv("data/parse_data_test.csv", usecols=[
     "cellId", "from", "parameterId", "value"
 ])
 
-header_app = dbc.Col(html.H1("Header"), width="auto")
+header_app = dbc.Col(
+    html.H1("Header"),
+    style={
+        "background-color" : "#2196f3",
+    }
+    )
 
 
 fig_map = graphs.create_map_chart(mapbox_api)
@@ -35,11 +43,11 @@ map_app = dbc.Col(
             config={
                 'displayModeBar': False},
             style={
-                'height': '60vh',
+                'height': '50vh',
                 }
             ),
     ],
-    width="auto",
+    width=8,
 )
 
 chart_dmi_obs = graphs.create_dmi_obs_chart(
@@ -52,9 +60,11 @@ chart_obs_app = dbc.Col(
     [
         dcc.Graph(
             id="chart_obs",
-            figure=chart_dmi_obs
-            )
-    ]
+            figure=chart_dmi_obs,
+        ),
+    ],
+    class_name="card",
+    width=8
 )
 
 date_picker_app = dbc.Col(
@@ -69,7 +79,7 @@ date_picker_app = dbc.Col(
         width="auto"
 )
 
-app.layout = dbc.Container(
+app.layout = html.Div(
     [
         dbc.Row(
             header_app,
@@ -90,7 +100,7 @@ app.layout = dbc.Container(
 
         dbc.Row(
             chart_obs_app,
-            justify="center"
+            justify="center",
             ),
     ]
 )

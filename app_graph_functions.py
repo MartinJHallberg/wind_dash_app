@@ -50,14 +50,14 @@ def create_map_chart(
             showscale=False,
             customdata=dk_grid_hover,
             hovertemplate='%{customdata[0]}<extra></extra>',
-            #colorbar={'outlinecolor': dict_layout_cols['primary']}
+            #colorbar={'outlinecolor': dict_layout_cols()['primary']}
         ),
         layout=go.Layout(
             mapbox=dict(
                 accesstoken=mapbox_api,
                 center=dict_cent,
-                zoom=6.75,
-                style="dark"
+                zoom=5.5,
+                style="dark",
             ),
             autosize=True,
             margin=dict(l=0, r=0, t=0, b=0),
@@ -106,12 +106,12 @@ def create_dmi_obs_chart(
     chart_dmi_obs.update_xaxes(x_axes)
 
     chart_dmi_obs.update_layout(
-        yaxis=dict(range=[0, 30]),
-        autosize=True,
-        bargap=0.5,
-        margin=dict(l=40, r=40, t=20, b=20),
-        plot_bgcolor=dict_layout_cols()["transparent"],
-        paper_bgcolor=dict_layout_cols()["transparent"]
+         yaxis=dict(range=[0, 30]),
+    #     autosize=True,
+    #     bargap=0.5,
+         margin=dict(l=40, r=40, t=10, b=20),
+    #     plot_bgcolor=dict_layout_cols()["transparent"],
+         paper_bgcolor=dict_layout_cols()["transparent"]
     )
 
     return chart_dmi_obs
