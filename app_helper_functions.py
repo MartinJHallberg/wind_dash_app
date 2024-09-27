@@ -20,7 +20,7 @@ def dict_layout_cols():
     return dict_cols
 
 def get_map(
-        dk_grid_url = 'https://raw.githubusercontent.com/MartinJHallberg/DMI_Wind_DashApp/version2/assets/DKN_10KM_epsg4326_filtered_wCent.geojson'
+        dk_grid_url = 'https://raw.githubusercontent.com/MartinJHallberg/DMI_Wind_DashApp/version2/assets/DKN_10KM_epsg4326_filtered_wCent.geojson',
 ):
     geoj_grid = json.loads(requests.get(dk_grid_url).text)
 
