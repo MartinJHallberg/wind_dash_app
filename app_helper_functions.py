@@ -72,7 +72,7 @@ def filter_dmi_obs_data(
         dmi_obs,
         cell_id,
         obs_date,
-        #n_days_interval
+        n_extra_days=1
 ):
 
     dmi_obs = dmi_obs.loc[dmi_obs["cellId"] == cell_id]
@@ -84,7 +84,12 @@ def filter_dmi_obs_data(
     dmi_obs['from'] = pd.to_datetime(dmi_obs['from'].str.replace('\+00:00', "", regex=False))
     dmi_obs['date'] = dmi_obs['from'].dt.date
 
-    dmi_obs_filtered = dmi_obs.loc[dmi_obs["date"] == dt.datetime.strptime(obs_date, "%Y-%m-%d").date()]
+    obs_date = dt.datetime.strptime(obs_date, "%Y-%m-%d").date()
+
+    dmi_obs_filtered = dmi_obs.loc[
+        (dmi_obs["date"] == obs_date) |
+        (dmi_obs["date"] == obs_date - dt.timedelta(days=n_extra_days))
+        ]
 
     return dmi_obs_filtered
 

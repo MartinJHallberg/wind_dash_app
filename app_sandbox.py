@@ -9,6 +9,7 @@ from app_helper_functions import get_map, filter_dmi_obs_data
 import os
 import pandas as pd
 import app_graph_functions as graphs
+import datetime as dt
 
 app = Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
 
@@ -84,10 +85,16 @@ chart_obs_app = dbc.Col(
     ]
 )
 
-map_click_info = dbc.Col(
-    [
-        html.Div(id="map_cell_id"),
-    ]
+date_picker_app = dbc.Col(
+    dcc.DatePickerSingle(
+            id='date_picker',
+            min_date_allowed=date(2019, 1, 1),
+            max_date_allowed=date.today(),
+            first_day_of_week=1,
+            date=date(2023, 1, 2),
+            display_format='YYYY-MM-DD'
+            ),
+        width="auto"
 )
 
 app.layout = dbc.Container(
@@ -104,12 +111,13 @@ app.layout = dbc.Container(
         ),
 
         dbc.Row(
-            chart_obs_app,
-            justify="center"
-            ),
+            date_picker_app,
+            justify="center",
+
+        ),
 
         dbc.Row(
-            map_click_info,
+            chart_obs_app,
             justify="center"
             ),
     ]
@@ -118,17 +126,20 @@ app.layout = dbc.Container(
 
 @app.callback(
     Output('chart_obs', 'figure'),
-    Input('map_figure', 'clickData')
+    Input('map_figure', 'clickData'),
+    Input('date_picker', 'date')
 )
 
-def update_dmi_obs_chart(input_value):
+def update_dmi_obs_chart(click_data, date):
 
-    cell_id = input_value["points"][0]["location"]
+    print(date)
+
+    cell_id = click_data["points"][0]["location"]
 
     chart = graphs.create_dmi_obs_chart(
         dmi_obs,
         cell_id,
-        "2023-01-02",
+        date,
     )
 
     return chart
