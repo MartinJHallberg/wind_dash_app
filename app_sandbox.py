@@ -5,15 +5,18 @@ from dash.dependencies import Input, Output, State
 from datetime import date
 from plotly.subplots import make_subplots
 from dotenv import load_dotenv
-from graph_functions import get_map, filter_dmi_obs_data
+from app_helper_functions import get_map, filter_dmi_obs_data
 import os
 import pandas as pd
-import datetime as dt
+import app_graph_functions as graphs
 
 app = Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
 
 mapbox_api = os.getenv("mapbox_key")
-
+# Figure DMI observational
+dmi_obs = pd.read_csv("data/parse_data_test.csv", usecols=[
+    "cellId", "from", "parameterId", "value"
+])
 
 header_app = dbc.Col(html.H1("Header"), width="auto")
 
@@ -66,27 +69,11 @@ map_app = dbc.Col(
     width="auto",
 )
 
-
-# Figure DMI observational
-dmi_obs = pd.read_csv("data/parse_data_test.csv", usecols=[
-    "cellId", "from", "parameterId", "value"
-])
-
-dmi_obs_filtered = filter_dmi_obs_data(
+chart_dmi_obs = graphs.create_dmi_obs_chart(
     dmi_obs,
-    cell_id = "10km_622_71",
-    obs_date = "2023-01-02",
+    "10km_622_71",
+    "2023-01-02",
 )
-
-chart_dmi_obs = go.Figure()
-
-chart_dmi_obs.add_trace(
-    go.Bar(
-        x=dmi_obs_filtered["from"],
-        y=dmi_obs_filtered["mean_wind_speed"],
-    )
-)
-
 
 chart_obs_app = dbc.Col(
     [
@@ -130,13 +117,27 @@ app.layout = dbc.Container(
 
 
 @app.callback(
-    Output('map_cell_id', 'children'),
+    Output('chart_obs', 'figure'),
     Input('map_figure', 'clickData')
 )
 
-def update_click_data(input_value):
-    print(input_value)
-    return f"Click data: {input_value}"
+def update_dmi_obs_chart(input_value):
+
+    cell_id = input_value["points"][0]["location"]
+
+    chart = graphs.create_dmi_obs_chart(
+        dmi_obs,
+        cell_id,
+        "2023-01-02",
+    )
+
+    return chart
+
+
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
