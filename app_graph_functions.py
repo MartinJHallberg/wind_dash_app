@@ -94,8 +94,8 @@ df_wind_dir_col = pd.DataFrame({'Direction': dirs,
                                )
 
 # Calculate coordinates for angles
-df_wind_dir_col['Y_cord'] = -round(np.cos(np.deg2rad(df_wind_dir_col['Degree'])), 2) * 12
-df_wind_dir_col['X_cord'] = round(np.sin(np.deg2rad(df_wind_dir_col['Degree'])), 2) * 12
+df_wind_dir_col['Y_cord'] = -round(np.cos(np.deg2rad(df_wind_dir_col['Degree'])), 2)
+df_wind_dir_col['X_cord'] = round(np.sin(np.deg2rad(df_wind_dir_col['Degree'])), 2)
 dict_dir_coord = df_wind_dir_col[['Direction', 'X_cord', 'Y_cord']].set_index('Direction').to_dict('index')
 
 
@@ -155,19 +155,23 @@ def create_dmi_obs_chart(
          paper_bgcolor=dict_layout_cols()["transparent"]
     )
 
-
-
     for i, row in dmi_obs_filtered.iterrows():
-        x_date = row["from"]
+        x_scale = 25 # minutes in graph
+        y_diff = 1 # m/s in graph
+    
+        x = row["from"]
+        y = row["mean_wind_speed"]
 
-        ax = dict_dir_coord[row["mean_wind_direction_cardinal"]]['X_cord']*2
-        ay = dict_dir_coord[row["mean_wind_direction_cardinal"]]['Y_cord']*2
+        x_diff = dict_dir_coord[row["mean_wind_direction_cardinal"]]['X_cord']*x_scale
+        y_diff = dict_dir_coord[row["mean_wind_direction_cardinal"]]['Y_cord']*y_diff
 
         chart_dmi_obs.add_annotation(
-            x=x_date,
-            y=row["mean_wind_speed"],
-            ax=ax,
-            ay=ay,
+            x=x + pd.Timedelta(minutes=-x_diff),
+            y=y + 1 + y_diff,
+            ax=x + pd.Timedelta(minutes=x_diff),
+            axref="x",
+            ay=y + 1 - y_diff,
+            ayref="y",
             arrowhead=3,
             arrowsize=1.5,
             arrowwidth=1.1,
@@ -178,4 +182,43 @@ def create_dmi_obs_chart(
             # col=1
         )
 
+
     return chart_dmi_obs
+
+
+# def add_direction_arrows(
+#         df,
+#         chart,
+#         n_minutes=30,
+#         y_extra=1.15
+#         ):
+
+#     for i, row in df[:0].iterrows():
+
+#         l = 20
+    
+#         x = row["from"]
+#         y = row["mean_wind_speed"]
+
+#         ax = dict_dir_coord[row["mean_wind_direction_cardinal"]]['X_cord']*l
+#         ay = dict_dir_coord[row["mean_wind_direction_cardinal"]]['Y_cord']*l
+
+#         x_top = l*ax/2
+#         y_top = l*ay/2
+
+#         chart.add_annotation(
+#             x=x,
+#             y=y,
+#             ax=ax,
+#             ay=ay,
+#             arrowhead=3,
+#             arrowsize=1.5,
+#             arrowwidth=1.1,
+#             arrowcolor=dict_layout_cols()['orange'],
+#             xref="x",
+#             yref="y",
+#             # row=2,
+#             # col=1
+#         )
+
+#     return chart
