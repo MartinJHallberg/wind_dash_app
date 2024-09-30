@@ -1,5 +1,7 @@
 from app_helper_functions import filter_dmi_obs_data, get_map
 import plotly.graph_objects as go
+import numpy as np
+import pandas as pd
 
 def dict_layout_cols():
     dict_cols = {
@@ -70,6 +72,33 @@ def create_map_chart(
     return fig_map
 
 
+def degrees_to_cardinal_directions(d):
+
+    card = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW']
+
+    ix = round(d / (360. / len(card)))
+    
+    card_text = card[ix % len(card)]
+    
+    return card_text
+
+bins = np.arange(start=0, stop=360, step=22.5)
+# Create list of directions
+dirs = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW']
+
+# Create data frame
+df_wind_dir_col = pd.DataFrame({'Direction': dirs,
+                                'Degree': bins,
+                                'Radius': np.repeat(100, len(dirs))
+                                }
+                               )
+
+# Calculate coordinates for angles
+df_wind_dir_col['Y_cord'] = -round(np.cos(np.deg2rad(df_wind_dir_col['Degree'])), 2) * 12
+df_wind_dir_col['X_cord'] = round(np.sin(np.deg2rad(df_wind_dir_col['Degree'])), 2) * 12
+dict_dir_coord = df_wind_dir_col[['Direction', 'X_cord', 'Y_cord']].set_index('Direction').to_dict('index')
+
+
 def create_dmi_obs_chart(
         dmi_data,
         cell_id,
@@ -113,5 +142,28 @@ def create_dmi_obs_chart(
     #     plot_bgcolor=dict_layout_cols()["transparent"],
          paper_bgcolor=dict_layout_cols()["transparent"]
     )
+
+    dmi_obs_filtered["mean_wind_direction_cardinal"] = dmi_obs_filtered["mean_wind_dir"].apply(degrees_to_cardinal_directions)
+
+    for i, row in dmi_obs_filtered.iterrows():
+        x_date = row["from"]
+
+        ax = dict_dir_coord[row["mean_wind_direction_cardinal"]]['X_cord']
+        ay = dict_dir_coord[row["mean_wind_direction_cardinal"]]['Y_cord']
+
+        chart_dmi_obs.add_annotation(
+            x=x_date,
+            y=row["mean_wind_speed"] + 4,
+            ax=ax,
+            ay=ay,
+            arrowhead=3,
+            arrowsize=1.6,
+            arrowwidth=1.1,
+            arrowcolor=dict_layout_cols()['orange'],
+            xref="x",
+            yref="y",
+            # row=2,
+            # col=1
+        )
 
     return chart_dmi_obs
