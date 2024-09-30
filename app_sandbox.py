@@ -16,23 +16,30 @@ app = Dash(
     external_stylesheets=[dbc.themes.MORPH],
     prevent_initial_callbacks=True
 )
-
 load_figure_template("MORPH")
 
+######## READ BASE DATA ######################
 mapbox_api = os.getenv("mapbox_key")
-# Figure DMI observational
+
+
 dmi_obs = pd.read_csv("data/parse_data_test.csv", usecols=[
     "cellId", "from", "parameterId", "value"
 ])
 
+##############################################
+
+
+######## SET UP DASH COMPONENTS
+
+# HEADER
 header_app = dbc.Col(
     html.H1("Header"),
     style={
         "background-color" : "#2196f3",
     }
-    )
+)
 
-
+# MAP
 fig_map = graphs.create_map_chart(mapbox_api)
 
 map_app = dbc.Col(
@@ -50,6 +57,7 @@ map_app = dbc.Col(
     width=8,
 )
 
+# OBSERVATIONAL CHART
 chart_dmi_obs = graphs.create_dmi_obs_chart(
     dmi_obs,
     "10km_622_71",
@@ -67,6 +75,7 @@ chart_obs_app = dbc.Col(
     width=8
 )
 
+# DATE PICKER
 date_picker_app = dbc.Col(
     dcc.DatePickerSingle(
             id='date_picker',
@@ -78,7 +87,11 @@ date_picker_app = dbc.Col(
             ),
         width="auto"
 )
+#####################################################
 
+
+
+########### APP LAYOUT ##############################
 app.layout = html.Div(
     [
         dbc.Row(
@@ -104,8 +117,10 @@ app.layout = html.Div(
             ),
     ]
 )
+#########################################################
 
 
+############ CALLBAKCKS #################################
 @app.callback(
     Output('chart_obs', 'figure'),
     Input('map_figure', 'clickData'),
@@ -126,9 +141,7 @@ def update_dmi_obs_chart(click_data, date):
 
     return chart
 
-
-
-
+###########################################################
 
 if __name__ == '__main__':
     app.run(debug=True)
