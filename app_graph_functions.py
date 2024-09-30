@@ -113,10 +113,22 @@ def create_dmi_obs_chart(
 
     chart_dmi_obs = go.Figure()
 
+    dmi_obs_filtered["mean_wind_direction_cardinal"] = dmi_obs_filtered["mean_wind_dir"].apply(degrees_to_cardinal_directions)
+    hover_data_chart = np.stack((dmi_obs_filtered["mean_wind_dir"], dmi_obs_filtered["mean_wind_direction_cardinal"], dmi_obs_filtered["from"].dt.hour.astype(str) + ':00'), axis=1)
+
     chart_dmi_obs.add_trace(
         go.Bar(
             x=dmi_obs_filtered["from"],
             y=dmi_obs_filtered["mean_wind_speed"],
+            customdata=hover_data_chart,
+            hovertemplate=
+            'Avg. wind: %{y}' +
+            '<br>Wind direction: %{customdata[1]} (%{customdata[0]}\xb0)' +
+            '<br>Time: %{customdata[2]}<extra></extra>',
+            hoverlabel=dict(
+                bgcolor='rgba(255,255,255,0.3)',
+                font=dict(color='black')
+            ),
         )
     )
 
@@ -143,21 +155,21 @@ def create_dmi_obs_chart(
          paper_bgcolor=dict_layout_cols()["transparent"]
     )
 
-    dmi_obs_filtered["mean_wind_direction_cardinal"] = dmi_obs_filtered["mean_wind_dir"].apply(degrees_to_cardinal_directions)
+
 
     for i, row in dmi_obs_filtered.iterrows():
         x_date = row["from"]
 
-        ax = dict_dir_coord[row["mean_wind_direction_cardinal"]]['X_cord']
-        ay = dict_dir_coord[row["mean_wind_direction_cardinal"]]['Y_cord']
+        ax = dict_dir_coord[row["mean_wind_direction_cardinal"]]['X_cord']*2
+        ay = dict_dir_coord[row["mean_wind_direction_cardinal"]]['Y_cord']*2
 
         chart_dmi_obs.add_annotation(
             x=x_date,
-            y=row["mean_wind_speed"] + 4,
+            y=row["mean_wind_speed"],
             ax=ax,
             ay=ay,
             arrowhead=3,
-            arrowsize=1.6,
+            arrowsize=1.5,
             arrowwidth=1.1,
             arrowcolor=dict_layout_cols()['orange'],
             xref="x",
