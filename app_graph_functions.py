@@ -155,22 +155,40 @@ def create_dmi_obs_chart(
          paper_bgcolor=dict_layout_cols()["transparent"]
     )
 
-    for i, row in dmi_obs_filtered.iterrows():
-        x_scale = 25 # minutes in graph
-        y_diff = 1 # m/s in graph
+    chart_dmi_obs = add_direction_arrows(
+        dmi_obs_filtered,
+        chart_dmi_obs,
+        x_scale=25,
+        y_scale=1,
+        y_distance=1
+    )
+
+
+    return chart_dmi_obs
+
+
+def add_direction_arrows(
+    df,
+    chart,
+    x_scale,
+    y_scale,
+    y_distance
+):
+
+    for i, row in df.iterrows():
     
         x = row["from"]
         y = row["mean_wind_speed"]
 
         x_diff = dict_dir_coord[row["mean_wind_direction_cardinal"]]['X_cord']*x_scale
-        y_diff = dict_dir_coord[row["mean_wind_direction_cardinal"]]['Y_cord']*y_diff
+        y_diff = dict_dir_coord[row["mean_wind_direction_cardinal"]]['Y_cord']*y_scale
 
-        chart_dmi_obs.add_annotation(
+        chart.add_annotation(
             x=x + pd.Timedelta(minutes=-x_diff),
-            y=y + 1 + y_diff,
+            y=y + y_distance + y_diff,
             ax=x + pd.Timedelta(minutes=x_diff),
             axref="x",
-            ay=y + 1 - y_diff,
+            ay=y + y_distance - y_diff,
             ayref="y",
             arrowhead=3,
             arrowsize=1.5,
@@ -182,43 +200,4 @@ def create_dmi_obs_chart(
             # col=1
         )
 
-
-    return chart_dmi_obs
-
-
-# def add_direction_arrows(
-#         df,
-#         chart,
-#         n_minutes=30,
-#         y_extra=1.15
-#         ):
-
-#     for i, row in df[:0].iterrows():
-
-#         l = 20
-    
-#         x = row["from"]
-#         y = row["mean_wind_speed"]
-
-#         ax = dict_dir_coord[row["mean_wind_direction_cardinal"]]['X_cord']*l
-#         ay = dict_dir_coord[row["mean_wind_direction_cardinal"]]['Y_cord']*l
-
-#         x_top = l*ax/2
-#         y_top = l*ay/2
-
-#         chart.add_annotation(
-#             x=x,
-#             y=y,
-#             ax=ax,
-#             ay=ay,
-#             arrowhead=3,
-#             arrowsize=1.5,
-#             arrowwidth=1.1,
-#             arrowcolor=dict_layout_cols()['orange'],
-#             xref="x",
-#             yref="y",
-#             # row=2,
-#             # col=1
-#         )
-
-#     return chart
+    return chart
