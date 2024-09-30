@@ -91,6 +91,12 @@ date_picker_app = dbc.Col(
             ),
         width="auto"
 )
+
+text_app = dbc.Col(
+    html.Div(
+        id="text_output"
+    )
+)
 #####################################################
 
 
@@ -117,6 +123,11 @@ app.layout = html.Div(
 
         dbc.Row(
             chart_obs_app,
+            justify="center",
+            ),
+        
+        dbc.Row(
+            text_app,
             justify="center",
             ),
     ]
@@ -148,6 +159,16 @@ def update_dmi_obs_chart(click_data, date):
     )
 
     return chart
+
+
+@app.callback(
+    Output('text_output', 'children'),
+    Input('chart_obs', 'clickData'),
+)
+
+def test_chart_click(click_data):
+
+    return f"Click output:{click_data}"
 
 ###########################################################
 

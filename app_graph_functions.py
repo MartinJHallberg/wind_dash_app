@@ -135,6 +135,10 @@ def create_obs_chart(
         chart
     )
 
+    chart.update_layout(
+        clickmode = "event+select"
+    )
+
     return chart
 
 def create_mean_wind_speed_chart(
@@ -165,13 +169,9 @@ def create_mean_wind_speed_chart(
             y=df["mean_wind_speed"],
             customdata=hover_data_chart,
             hovertemplate=
-            'Avg. wind: %{y}' +
-            '<br>Wind direction: %{customdata[1]} (%{customdata[0]}\xb0)' +
-            '<br>Time: %{customdata[2]}<extra></extra>',
-            hoverlabel=dict(
-                bgcolor='rgba(255,255,255,0.3)',
-                font=dict(color='black')
-            ),
+            'Mean wind: %{y}' +
+            '<br>Wind direction: %{customdata[1]} (%{customdata[0]}\xb0)',
+            name="Mean wind speed [m/s]"
         )
     )
 
@@ -190,12 +190,17 @@ def create_mean_wind_speed_chart(
     chart.update_xaxes(x_axes)
 
     chart.update_layout(
-         yaxis=dict(range=[0, y_max]),
+        yaxis=dict(range=[0, y_max]),
     #     autosize=True,
     #     bargap=0.5,
-         margin=dict(l=40, r=40, t=10, b=20),
-    #     plot_bgcolor=dict_layout_cols()["transparent"],
-         paper_bgcolor=dict_layout_cols()["transparent"]
+        margin=dict(l=40, r=40, t=10, b=20),
+#     plot_bgcolor=dict_layout_cols()["transparent"],
+        paper_bgcolor=dict_layout_cols()["transparent"],
+        hovermode='x unified',
+        hoverlabel=dict(
+            bgcolor=fun_col_to_trans(dict_layout_cols()['white'],0.75),
+            font=dict(color='black')
+        ),
     )
 
     return chart
@@ -260,7 +265,7 @@ def add_max_wind_chart(
                 dash='dash'
             ),
             showlegend=True,
-            name='Max. wind speed',
+            name='Max wind speed',
             legendrank=1
         )
     )
