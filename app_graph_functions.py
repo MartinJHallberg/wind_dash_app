@@ -20,12 +20,11 @@ def dict_layout_cols():
 
 
 def fun_col_to_trans(col, transparency):
-    # Convert transparency to string
+
     t_trans = str(transparency)
 
-    # Split text and insert transparency
     col_out = col.split(')')[0] + ',' + t_trans + ')'
-    # Change color type to include transparency
+
     col_out = col_out.replace('rgb', 'rgba')
 
     return col_out
@@ -71,32 +70,40 @@ def create_map_chart(
 
     return fig_map
 
+cardinal_directions = [
+    'N',
+    'NNE',
+    'NE',
+    'ENE',
+    'E',
+    'ESE',
+    'SE',
+    'SSE',
+    'S',
+    'SSW',
+    'SW',
+    'WSW',
+    'W',
+    'WNW',
+    'NW',
+    'NNW'
+]
 
-def degrees_to_cardinal_directions(d):
 
-    card = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW']
+def degrees_to_cardinal_directions(degrees):
 
-    ix = round(d / (360. / len(card)))
+    ix = round(degrees / (360. / len(cardinal_directions)))
     
-    card_text = card[ix % len(card)]
+    card_text = cardinal_directions[ix % len(cardinal_directions)]
     
     return card_text
 
-bins = np.arange(start=0, stop=360, step=22.5)
-# Create list of directions
-dirs = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW']
+def get_angle_coordinate_from_degree(degree):
 
-# Create data frame
-df_wind_dir_col = pd.DataFrame({'Direction': dirs,
-                                'Degree': bins,
-                                'Radius': np.repeat(100, len(dirs))
-                                }
-                               )
+    y_cord = -round(np.cos(np.deg2rad(degree)), 2)
+    x_cord = round(np.sin(np.deg2rad(degree)), 2)
 
-# Calculate coordinates for angles
-df_wind_dir_col['Y_cord'] = -round(np.cos(np.deg2rad(df_wind_dir_col['Degree'])), 2)
-df_wind_dir_col['X_cord'] = round(np.sin(np.deg2rad(df_wind_dir_col['Degree'])), 2)
-dict_dir_coord = df_wind_dir_col[['Direction', 'X_cord', 'Y_cord']].set_index('Direction').to_dict('index')
+    return x_cord, y_cord
 
 
 def create_dmi_obs_chart(
@@ -114,7 +121,14 @@ def create_dmi_obs_chart(
     chart_dmi_obs = go.Figure()
 
     dmi_obs_filtered["mean_wind_direction_cardinal"] = dmi_obs_filtered["mean_wind_dir"].apply(degrees_to_cardinal_directions)
-    hover_data_chart = np.stack((dmi_obs_filtered["mean_wind_dir"], dmi_obs_filtered["mean_wind_direction_cardinal"], dmi_obs_filtered["from"].dt.hour.astype(str) + ':00'), axis=1)
+    hover_data_chart = np.stack(
+        (
+            dmi_obs_filtered["mean_wind_dir"],
+            dmi_obs_filtered["mean_wind_direction_cardinal"],
+            dmi_obs_filtered["from"].dt.hour.astype(str) + ':00'
+        ),
+        axis=1
+    )
 
     chart_dmi_obs.add_trace(
         go.Bar(
@@ -180,8 +194,9 @@ def add_direction_arrows(
         x = row["from"]
         y = row["mean_wind_speed"]
 
-        x_diff = dict_dir_coord[row["mean_wind_direction_cardinal"]]['X_cord']*x_scale
-        y_diff = dict_dir_coord[row["mean_wind_direction_cardinal"]]['Y_cord']*y_scale
+        x_diff, y_diff = get_angle_coordinate_from_degree(row["mean_wind_dir"])
+        x_diff = x_diff * x_scale
+        y_diff = y_diff * y_scale
 
         chart.add_annotation(
             x=x + pd.Timedelta(minutes=-x_diff),
@@ -190,7 +205,7 @@ def add_direction_arrows(
             axref="x",
             ay=y + y_distance - y_diff,
             ayref="y",
-            arrowhead=3,
+            arrowhead=2,
             arrowsize=1.5,
             arrowwidth=1.1,
             arrowcolor=dict_layout_cols()['orange'],

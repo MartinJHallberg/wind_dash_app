@@ -3,7 +3,6 @@ from dash import dcc, html, Dash
 import dash_bootstrap_components as dbc
 from dash_bootstrap_templates import load_figure_template
 from dash.dependencies import Input, Output, State
-from datetime import date
 from plotly.subplots import make_subplots
 from dotenv import load_dotenv
 from app_helper_functions import get_map
@@ -12,11 +11,16 @@ import pandas as pd
 import app_graph_functions as graphs
 import datetime as dt
 
+
+######## INITIALIZE APP ####################
 app = Dash(
     external_stylesheets=[dbc.themes.MORPH],
     prevent_initial_callbacks=True
 )
 load_figure_template("MORPH")
+
+start_cell_id="10km_622_71"
+start_date="2023-01-02"
 
 ######## READ BASE DATA ######################
 mapbox_api = os.getenv("mapbox_key")
@@ -60,8 +64,8 @@ map_app = dbc.Col(
 # OBSERVATIONAL CHART
 chart_dmi_obs = graphs.create_dmi_obs_chart(
     dmi_obs,
-    "10km_622_71",
-    "2023-01-02",
+    start_cell_id,
+    start_date,
 )
 
 chart_obs_app = dbc.Col(
@@ -79,10 +83,10 @@ chart_obs_app = dbc.Col(
 date_picker_app = dbc.Col(
     dcc.DatePickerSingle(
             id='date_picker',
-            min_date_allowed=date(2019, 1, 1),
-            max_date_allowed=date.today(),
+            min_date_allowed=dt.date(2019, 1, 1),
+            max_date_allowed=dt.date.today(),
             first_day_of_week=1,
-            date=date(2023, 1, 2),
+            date=dt.date.fromisoformat(start_date),
             display_format='YYYY-MM-DD'
             ),
         width="auto"
@@ -129,9 +133,13 @@ app.layout = html.Div(
 
 def update_dmi_obs_chart(click_data, date):
 
-    print(date)
+    #print(date)
 
-    cell_id = click_data["points"][0]["location"]
+    if click_data is None:
+        cell_id = start_cell_id
+    
+    else:
+        cell_id = click_data["points"][0]["location"]
 
     chart = graphs.create_dmi_obs_chart(
         dmi_obs,
