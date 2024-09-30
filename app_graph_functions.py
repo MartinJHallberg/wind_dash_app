@@ -106,7 +106,7 @@ def get_angle_coordinate_from_degree(degree):
     return x_cord, y_cord
 
 
-def create_dmi_obs_chart(
+def create_obs_chart(
         dmi_data,
         cell_id,
         obs_date
@@ -118,22 +118,51 @@ def create_dmi_obs_chart(
         obs_date = obs_date
     )
 
-    chart_dmi_obs = go.Figure()
+    chart = create_mean_wind_speed_chart(dmi_obs_filtered)
 
-    dmi_obs_filtered["mean_wind_direction_cardinal"] = dmi_obs_filtered["mean_wind_dir"].apply(degrees_to_cardinal_directions)
+    chart = add_direction_arrows(
+        dmi_obs_filtered,
+        chart,
+        y_column="mean_wind_speed",
+        dir_column="mean_wind_dir",
+        x_scale=25,
+        y_scale=1,
+        y_distance=1
+    )
+
+    chart = add_max_wind_chart(
+        dmi_obs_filtered,
+        chart
+    )
+
+    return chart
+
+def create_mean_wind_speed_chart(
+        df,
+):
+    y_max= df["mean_wind_speed"].max()
+
+    if y_max> 19:
+        y_max= 30
+    else:
+        y_max= 20
+        
+    chart = go.Figure()
+
+    df["mean_wind_direction_cardinal"] = df["mean_wind_dir"].apply(degrees_to_cardinal_directions)
     hover_data_chart = np.stack(
         (
-            dmi_obs_filtered["mean_wind_dir"],
-            dmi_obs_filtered["mean_wind_direction_cardinal"],
-            dmi_obs_filtered["from"].dt.hour.astype(str) + ':00'
+            df["mean_wind_dir"],
+            df["mean_wind_direction_cardinal"],
+            df["from"].dt.hour.astype(str) + ':00'
         ),
         axis=1
     )
 
-    chart_dmi_obs.add_trace(
+    chart.add_trace(
         go.Bar(
-            x=dmi_obs_filtered["from"],
-            y=dmi_obs_filtered["mean_wind_speed"],
+            x=df["from"],
+            y=df["mean_wind_speed"],
             customdata=hover_data_chart,
             hovertemplate=
             'Avg. wind: %{y}' +
@@ -149,7 +178,7 @@ def create_dmi_obs_chart(
     y_axes = dict(
         gridwidth=0.0001,
         showticksuffix='last',
-        ticksuffix=' m/s'
+        ticksuffix=' m/s',
     )
     
     x_axes = dict(
@@ -157,11 +186,11 @@ def create_dmi_obs_chart(
         showgrid=False
     )
 
-    chart_dmi_obs.update_yaxes(y_axes)
-    chart_dmi_obs.update_xaxes(x_axes)
+    chart.update_yaxes(y_axes)
+    chart.update_xaxes(x_axes)
 
-    chart_dmi_obs.update_layout(
-         yaxis=dict(range=[0, 30]),
+    chart.update_layout(
+         yaxis=dict(range=[0, y_max]),
     #     autosize=True,
     #     bargap=0.5,
          margin=dict(l=40, r=40, t=10, b=20),
@@ -169,32 +198,25 @@ def create_dmi_obs_chart(
          paper_bgcolor=dict_layout_cols()["transparent"]
     )
 
-    chart_dmi_obs = add_direction_arrows(
-        dmi_obs_filtered,
-        chart_dmi_obs,
-        x_scale=25,
-        y_scale=1,
-        y_distance=1
-    )
-
-
-    return chart_dmi_obs
+    return chart
 
 
 def add_direction_arrows(
     df,
     chart,
+    y_column,
+    dir_column,
     x_scale,
     y_scale,
-    y_distance
+    y_distance,
 ):
 
     for i, row in df.iterrows():
     
         x = row["from"]
-        y = row["mean_wind_speed"]
+        y = row[y_column]
 
-        x_diff, y_diff = get_angle_coordinate_from_degree(row["mean_wind_dir"])
+        x_diff, y_diff = get_angle_coordinate_from_degree(row[dir_column])
         x_diff = x_diff * x_scale
         y_diff = y_diff * y_scale
 
@@ -214,5 +236,33 @@ def add_direction_arrows(
             # row=2,
             # col=1
         )
+
+    return chart
+
+def add_max_wind_chart(
+    df,
+    chart=None
+):
+    
+    if not chart:
+        chart = go.Figure()
+    
+    chart.add_trace(
+        go.Scatter(
+            x=df["from"],
+            y=df['max_wind_speed_3sec'],
+            hovertemplate=
+            'Max wind speed (3s): %{y}<extra></extra>',
+            line=dict(
+                # opacity = 0.8,
+                #color="rgb(255,255,255)",  # dict_layout_cols['bg_blue']
+                width=2,
+                dash='dash'
+            ),
+            showlegend=True,
+            name='Max. wind speed',
+            legendrank=1
+        )
+    )
 
     return chart

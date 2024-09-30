@@ -62,7 +62,7 @@ map_app = dbc.Col(
 )
 
 # OBSERVATIONAL CHART
-chart_dmi_obs = graphs.create_dmi_obs_chart(
+chart_dmi_obs = graphs.create_obs_chart(
     dmi_obs,
     start_cell_id,
     start_date,
@@ -141,7 +141,7 @@ def update_dmi_obs_chart(click_data, date):
     else:
         cell_id = click_data["points"][0]["location"]
 
-    chart = graphs.create_dmi_obs_chart(
+    chart = graphs.create_obs_chart(
         dmi_obs,
         cell_id,
         date,
