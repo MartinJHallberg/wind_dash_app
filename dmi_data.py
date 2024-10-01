@@ -3,6 +3,7 @@ import pandas as pd
 import datetime as dt
 import json
 from zipfile import ZipFile
+import requests
 
 def unzip_and_merge_dmi_obs_data(
         file_path,
@@ -67,6 +68,31 @@ def read_file_in_zip(
         df = pd.DataFrame(list_rows, columns=list_columns_to_keep)
 
     return df
+
+def get_dmi_forecast_data(api_key):
+
+    base_url="https://dmigw.govcloud.dk/v1/forecastedr/collections/"
+    
+    collection_name = {
+        "land": "harmonie_dini_sf",
+        "water": "dkss_nsbs"
+    }
+
+    api_type = collection_name["land"]
+
+    parameters = (
+        "gust-wind-speed-10m",
+        "wind-speed",
+        "wind-dir"
+    )
+
+    parameters_text = ",".join(parameters)
+    
+    query = f"{base_url}{api_type}cube?bbox=11,55,12,56&crs=crs84&parameter-name={parameters_text}&api-key={api_key}"
+
+    response = requests.get(query)
+
+    json_response = json.load(response)
 
 
 

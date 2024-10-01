@@ -144,7 +144,7 @@ app.layout = html.Div(
 
 def update_dmi_obs_chart(click_data, date):
 
-    #print(date)
+    print(click_data)
 
     if click_data is None:
         cell_id = start_cell_id
