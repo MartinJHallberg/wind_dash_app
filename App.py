@@ -61,8 +61,10 @@ SET UP GRID MAP
 
 ## READ GEOGPRAPHICAL DATA
 # Set url to geojson
+
 url = 'https://raw.githubusercontent.com/MartinJHallberg/DMI_Wind_DashApp/version2/assets/DKN_10KM_epsg4326_filtered_wCent.geojson'
 geoj_grid = json.loads(requests.get(url).text)
+
 
 shp_grid = pd.json_normalize(geoj_grid['features'])
 
