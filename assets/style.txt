@@ -1,0 +1,254 @@
+/* VARIABLES
+----------------------------------
+*/
+:root{
+--primary: rgb(76,155,232);
+--bg_blue: rgb(56, 97, 141);
+}
+
+/* BODY AND MAIN
+---------------------------------
+*/
+body {
+background: var(--bg_blue);
+}
+
+.div-main {
+padding-top: 1em
+}
+
+/* NAVIGATION MENU
+ ----------------------------------
+ */
+
+.nav-menu {
+    display: flex;
+    justify-content: center;
+    background: white;
+    padding-top: 0.7em;
+    padding-bottom: 0.7em;
+}
+
+
+.nav-header {
+    text-align: center;
+    padding-left: 1.5em;
+    color: black;
+    font-size: 30px;
+
+}
+
+
+.container-nav {
+  display: flex;
+  justify-content: space-around;
+  width: 90%;
+  align-items: center;
+}
+
+.but-about {
+    border-radius: 12px;
+    height: 4em;
+    width: 5.5em;
+    font-size: 40px;
+    background: None;
+    color: var(--primary);
+    font-weight: bold;
+    border: 3px solid var(--primary);
+}
+
+.img-logo {
+height: 5em;
+}
+
+
+
+/* MAP SECTION
+ ----------------------------------
+ */
+
+.section-map {
+    margin-top: 2.5em;
+    display:flex;
+    justify-content: center;
+}
+
+.container-map {
+    text-align: center;
+    width: 90%;
+    justify-content: center;
+    margin: auto;
+}
+
+.div-map {
+    background: grey;
+    height: 40vh;
+    width: 100%;
+    border-radius: 1em;
+    }
+.fig-map {
+    height: inherit;
+    width: 100%;
+    border-radius: 1em;
+    overflow: hidden;
+    }
+
+
+/* BUTTON MENU
+ ----------------------------------
+ */
+
+
+ .section-buttons {
+    margin-top: 1em;
+    display: flex;
+    justify-content: center;
+
+ }
+
+ .container-buttons {
+    display:flex;
+    width: 70%;
+ }
+
+ .div-forc-but {
+    width: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+ }
+
+ .div-back-but {
+     width: 50%;
+     display: flex;
+     flex-direction: column;
+     justify-content: center;
+     align-items: center;
+
+ }
+
+ .but-forc, .but-prev-1 {
+    border-radius: 12px;
+    height: 7em;
+    width: 11em;
+ }
+
+ .but-forc-text, .but-prev-1-text {
+    word-break: break-word;
+    font-size: 25px;
+ }
+
+/* BUTTON MENU
+ ----------------------------------
+ */
+ .date-prev-1 {
+    margin-top: 1em;
+ }
+
+.DateInput, .DateInput_1 {
+    border-radius: 10px !important;
+    width: 11em;
+}
+
+.DateInput_input, .DateInput_input_1 {
+    font-size: 25px;
+    text-align: center;
+    height: 50px !important;
+    width: 100% !important;
+    border-radius: inherit;
+}
+
+.SingleDatePickerInput__withBorder {
+    border-radius: 10px;
+    border: 1px solid #ccc !important;
+}
+
+
+
+
+
+
+.CalendarDay, .CalendarDay_1 {
+    font-size: 30px;
+    width: 50px !important;
+    height: 50px !important;
+    }
+
+
+
+
+.DayPicker_transitionContainer, .DayPicker_transitionContainer_1, .DayPicker_transitionContainer__horizontal, .DayPicker_transitionContainer__horizontal_2 {
+    width: 390px !important;
+    height: 390px !important;
+    }
+
+.SingleDatePicker_picker, .SingleDatePicker_picker_1, .SingleDatePicker_picker__directionLeft, .SingleDatePicker_picker__directionLeft_2 {
+    width: 390px !important;
+    height: 390px !important;
+    }
+
+.DayPicker DayPicker_1, .DayPicker__horizontal, .DayPicker__horizontal_2, .DayPicker__withBorder, .DayPicker__withBorder_3 {
+    width: 390px !important;
+    height: 390px !important;
+    }
+
+.DayPicker_focusRegion, .DayPicker_focusRegion_1 {
+    width: 390px !important;
+    height: 390px !important;
+    }
+
+.DayPicker_weekHeader, .DayPicker_weekHeader_1 {
+    width: 390px !important;
+    }
+
+.CalendarMonth_caption, .CalendarMonth_caption_1 {
+    font-size: 25px;
+    padding: 15px 0px;
+    }
+
+.CalendarMonth_table, .CalendarMonth_table_1 {
+    margin-top: 50px;
+    }
+
+.DayPicker_weekHeader_li, .DayPicker_weekHeader_li_1 {
+    font-size: 30px;
+    margin: 0px 5px;
+    }
+
+.DayPickerNavigation_button {
+    height: 40px;
+    width: 40px;
+    }
+
+/*
+.SingleDatePicker_picker, .SingleDatePicker_picker_1, .SingleDatePicker_picker__directionLeft, .SingleDatePicker_picker__directionLeft_2 {
+    width: 390px !important;
+    }
+
+.DayPicker DayPicker_1, .DayPicker__horizontal, .DayPicker__horizontal_2, .DayPicker__withBorder, .DayPicker__withBorder_3 {
+    width: 340px !important;
+    }
+
+*/
+
+
+.mantine-DatePicker-calendarBase mantine-170azaf {
+    border: 10px solid red !important;
+    }
+
+
+/* FORECAST
+ ----------------------------------
+ */
+
+.section-forecast {
+    margin-top: 2.5em;
+    display:flex;
+    justify-content: center;
+}
+
+ .container-forecast {
+    width: 90vw;
+    height: 40vh;
+    background: white;
+    }
