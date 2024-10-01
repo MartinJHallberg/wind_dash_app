@@ -3,3 +3,4 @@ TestCode.py
 .env
 test_file.py
 data/
+*.pyc
