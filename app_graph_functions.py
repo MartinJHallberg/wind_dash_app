@@ -37,29 +37,26 @@ def create_map_chart(
     dk_grid['Val'] = 1
     dk_grid['Col'] = fun_col_to_trans(layout_colors['primary'], 0.4)
 
-    dict_cent = {'lon': 10.52,
+    dict_center = {'lon': 10.52,
                 'lat': 55.89
                 }
 
     fig_map = go.Figure(
-        go.Choroplethmapbox(
+        go.Choroplethmap(
             geojson=geoj_grid,
             featureidkey="properties.KN10kmDK",
             locations=dk_grid['KN10kmDK'],
             z=dk_grid['Val'],
             colorscale=dk_grid['Col'],
             showscale=False,
-            customdata=dk_grid_hover,
-            hovertemplate='%{customdata[0]}<extra></extra>',
-            #colorbar={'outlinecolor': layout_colors['primary']}
+            #customdata=dk_grid_hover,
+            #hovertemplate='%{customdata[0]}<extra></extra>',
+            colorbar={'outlinecolor': layout_colors['primary']}
         ),
         layout=go.Layout(
-            mapbox=dict(
-                accesstoken=mapbox_api,
-                center=dict_cent,
-                zoom=5.5,
-                style="dark",
-            ),
+            map_style="carto-positron",
+            map_zoom=6,
+            map_center = dict_center,
             autosize=True,
             margin=dict(l=0, r=0, t=0, b=0),
             plot_bgcolor=layout_colors["transparent"],
