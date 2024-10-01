@@ -3,8 +3,8 @@ import plotly.graph_objects as go
 import numpy as np
 import pandas as pd
 
-def dict_layout_cols():
-    dict_cols = {
+
+layout_colors = {
     'primary': 'rgb(76,155,232)',
     'green': 'rgb(92,184,92)',
     'yellow': 'rgb(255,193,7)',
@@ -16,7 +16,7 @@ def dict_layout_cols():
     'transparent': 'rgba(255,255,255,0)'
     }
 
-    return dict_cols
+#    return dict_cols
 
 
 def fun_col_to_trans(col, transparency):
@@ -35,7 +35,7 @@ def create_map_chart(
     geoj_grid, dk_grid, dk_grid_hover = get_map()
 
     dk_grid['Val'] = 1
-    dk_grid['Col'] = fun_col_to_trans(dict_layout_cols()['primary'], 0.4)
+    dk_grid['Col'] = fun_col_to_trans(layout_colors['primary'], 0.4)
 
     dict_cent = {'lon': 10.52,
                 'lat': 55.89
@@ -51,7 +51,7 @@ def create_map_chart(
             showscale=False,
             customdata=dk_grid_hover,
             hovertemplate='%{customdata[0]}<extra></extra>',
-            #colorbar={'outlinecolor': dict_layout_cols()['primary']}
+            #colorbar={'outlinecolor': layout_colors['primary']}
         ),
         layout=go.Layout(
             mapbox=dict(
@@ -62,8 +62,8 @@ def create_map_chart(
             ),
             autosize=True,
             margin=dict(l=0, r=0, t=0, b=0),
-            plot_bgcolor=dict_layout_cols()["transparent"],
-            paper_bgcolor=dict_layout_cols()["transparent"],
+            plot_bgcolor=layout_colors["transparent"],
+            paper_bgcolor=layout_colors["transparent"],
             clickmode='event+select'
         )
     )
@@ -112,31 +112,87 @@ def create_obs_chart(
         obs_date
 
 ):
+    # Get data
     dmi_obs_filtered = filter_dmi_obs_data(
         dmi_data,
         cell_id = cell_id,
         obs_date = obs_date
     )
 
+    # Get mean wind chart
     chart = create_mean_wind_speed_chart(dmi_obs_filtered)
 
+    # Add directional arrows
     chart = add_direction_arrows(
         dmi_obs_filtered,
         chart,
         y_column="mean_wind_speed",
         dir_column="mean_wind_dir",
         x_scale=25,
-        y_scale=1,
+        y_scale=0.5,
         y_distance=1
     )
 
+    # Add max wind chart
     chart = add_max_wind_chart(
         dmi_obs_filtered,
         chart
     )
 
+
+
+    # Set layout
+    y_max = max(
+        dmi_obs_filtered["mean_wind_speed"].max(),
+        dmi_obs_filtered["max_wind_speed_3sec"].max()
+    )
+
+    if y_max> 19:
+        y_max= 30
+    else:
+        y_max= 20
+
+    # Set axes
+    y_axes = dict(
+        gridwidth=0.0001,
+        showticksuffix='last',
+        ticksuffix=' m/s',
+        range=[0, y_max],
+        fixedrange=True,
+        tickfont_size=14
+    )
+    
+    x_axes = dict(
+        linewidth=0.1,
+        showgrid=False,
+        fixedrange=True,
+        tickfont_size=13
+    )
+
+    #chart.update_yaxes(y_axes)
+    #chart.update_xaxes(x_axes)
+
     chart.update_layout(
+        xaxis=x_axes,
+        yaxis=y_axes,
+        legend=dict(
+            yanchor="top",
+            y=0.99,
+            xanchor="left",
+            x=0.01,
+            font_size=15
+        ),
+        margin=dict(l=40, r=40, t=10, b=20),
+        paper_bgcolor=layout_colors["transparent"],
+        hovermode='x unified',
+        hoverlabel=dict(
+            bgcolor=fun_col_to_trans(layout_colors['white'],0.75),
+            font=dict(color='black')
+        ),
         clickmode = "event+select"
+        #plot_bgcolor=layout_colors["transparent"],
+        #autosize=True,
+        #bargap=0.5,
     )
 
     return chart
@@ -144,12 +200,6 @@ def create_obs_chart(
 def create_mean_wind_speed_chart(
         df,
 ):
-    y_max= df["mean_wind_speed"].max()
-
-    if y_max> 19:
-        y_max= 30
-    else:
-        y_max= 20
         
     chart = go.Figure()
 
@@ -173,34 +223,6 @@ def create_mean_wind_speed_chart(
             '<br>Wind direction: %{customdata[1]} (%{customdata[0]}\xb0)',
             name="Mean wind speed [m/s]"
         )
-    )
-
-    y_axes = dict(
-        gridwidth=0.0001,
-        showticksuffix='last',
-        ticksuffix=' m/s',
-    )
-    
-    x_axes = dict(
-        linewidth=0.1,
-        showgrid=False
-    )
-
-    chart.update_yaxes(y_axes)
-    chart.update_xaxes(x_axes)
-
-    chart.update_layout(
-        yaxis=dict(range=[0, y_max]),
-    #     autosize=True,
-    #     bargap=0.5,
-        margin=dict(l=40, r=40, t=10, b=20),
-#     plot_bgcolor=dict_layout_cols()["transparent"],
-        paper_bgcolor=dict_layout_cols()["transparent"],
-        hovermode='x unified',
-        hoverlabel=dict(
-            bgcolor=fun_col_to_trans(dict_layout_cols()['white'],0.75),
-            font=dict(color='black')
-        ),
     )
 
     return chart
@@ -235,7 +257,7 @@ def add_direction_arrows(
             arrowhead=2,
             arrowsize=1.5,
             arrowwidth=1.1,
-            arrowcolor=dict_layout_cols()['orange'],
+            arrowcolor=layout_colors['orange'],
             xref="x",
             yref="y",
             # row=2,
@@ -259,8 +281,6 @@ def add_max_wind_chart(
             hovertemplate=
             'Max wind speed (3s): %{y}<extra></extra>',
             line=dict(
-                # opacity = 0.8,
-                #color="rgb(255,255,255)",  # dict_layout_cols['bg_blue']
                 width=2,
                 dash='dash'
             ),
