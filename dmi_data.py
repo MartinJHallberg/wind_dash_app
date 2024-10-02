@@ -69,7 +69,11 @@ def read_file_in_zip(
 
     return df
 
-def get_dmi_forecast_data(api_key):
+def get_dmi_forecast_data(
+        api_key,
+        lon,
+        lat
+        ):
 
     base_url="https://dmigw.govcloud.dk/v1/forecastedr/collections/"
     
@@ -80,20 +84,34 @@ def get_dmi_forecast_data(api_key):
 
     api_type = collection_name["land"]
 
-    parameters = (
+    parameters = [
         "gust-wind-speed-10m",
         "wind-speed",
         "wind-dir"
-    )
+    ]
 
     parameters_text = ",".join(parameters)
     
-    query = f"{base_url}{api_type}cube?bbox=11,55,12,56&crs=crs84&parameter-name={parameters_text}&api-key={api_key}"
+    query = f"{base_url}{api_type}/position?coords=POINT({lon} {lat})&crs=crs84&parameter-name={parameters_text}&api-key={api_key}"
 
     response = requests.get(query)
 
-    json_response = json.load(response)
+    json_response = json.loads(response.text)
 
+    time_values = json_response["domain"]["axes"]["t"]["values"]
 
+    parameter_values = {p:get_forecast_parameter_values(json_response,p) for p in parameters}
 
+    parameter_values["timestamp"] = time_values
+
+    df = pd.DataFrame(parameter_values)
+
+    return json_response
+
+def get_forecast_parameter_values(
+        json,
+        parameter
+):
+    
+    return json["ranges"][parameter]["values"]
     

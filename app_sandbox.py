@@ -144,7 +144,7 @@ app.layout = html.Div(
 
 def update_dmi_obs_chart(click_data, date):
 
-    print(click_data)
+    print(f"Map click {click_data}")
 
     if click_data is None:
         cell_id = start_cell_id
@@ -168,7 +168,9 @@ def update_dmi_obs_chart(click_data, date):
 
 def test_chart_click(click_data):
 
-    return f"Click output:{click_data}"
+    print(f"Chart click {click_data}")
+
+    return f"Chart click: {click_data}"
 
 ###########################################################
 
