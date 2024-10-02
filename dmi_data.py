@@ -72,41 +72,58 @@ def read_file_in_zip(
 def get_dmi_forecast_data(
         api_key,
         lon,
-        lat
-        ):
+        lat,
+        collection_type,
+        *parameters
+    ):
 
     base_url="https://dmigw.govcloud.dk/v1/forecastedr/collections/"
     
-    collection_name = {
-        "land": "harmonie_dini_sf",
-        "water": "dkss_nsbs"
+    collections = {
+        "wind": "harmonie_dini_sf",
+        "waves": "wam_dw"
     }
 
-    api_type = collection_name["land"]
+    if collection_type not in collections.keys():
+        error_message = f"""Collection type has to be one of {list(collections.keys())}.
+        {collection_type} not valid.
+        """
 
-    parameters = [
-        "gust-wind-speed-10m",
-        "wind-speed",
-        "wind-dir"
-    ]
+        raise ValueError(error_message)
+
+    api_type = collections[collection_type]
+
+    parameters = list(parameters)
 
     parameters_text = ",".join(parameters)
     
     query = f"{base_url}{api_type}/position?coords=POINT({lon} {lat})&crs=crs84&parameter-name={parameters_text}&api-key={api_key}"
 
-    response = requests.get(query)
+    try:
+        response = requests.get(query)
 
-    json_response = json.loads(response.text)
+        response.raise_for_status()
 
-    time_values = json_response["domain"]["axes"]["t"]["values"]
+        json_response = json.loads(response.text)
 
-    parameter_values = {p:get_forecast_parameter_values(json_response,p) for p in parameters}
+        time_values = json_response["domain"]["axes"]["t"]["values"]
+        longitude = json_response["domain"]["axes"]["x"]["values"][0]
+        latitude = json_response["domain"]["axes"]["y"]["values"][0]
 
-    parameter_values["timestamp"] = time_values
+        parameter_values = {p:get_forecast_parameter_values(json_response,p) for p in parameters}
 
-    df = pd.DataFrame(parameter_values)
+        parameter_values["timestamp"] = time_values
 
-    return json_response
+        df = pd.DataFrame(parameter_values)
+        
+        df["longitude"] = longitude
+        df["latitude"] = latitude
+
+        return df
+
+    except requests.exceptions.RequestException as errh:
+        raise ValueError(errh.args[0])
+
 
 def get_forecast_parameter_values(
         json,
