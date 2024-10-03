@@ -61,6 +61,18 @@ def filter_dmi_obs_data(
 
     return dmi_obs_filtered
 
+def parse_dmi_forecast_data_wind(
+        df
+):
+    
+    df["timestamp"] = pd.to_datetime(df['timestamp'].str.replace('\+00:00', "", regex=False))
+
+    new_col_names = {col: col.replace("-", "_") for col in df.columns}
+
+    df = df.rename(new_col_names, axis="columns")
+
+    return df
+
 
     
 
