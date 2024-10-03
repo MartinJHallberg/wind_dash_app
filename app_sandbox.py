@@ -26,9 +26,11 @@ start_date="2023-01-02"
 mapbox_api = os.getenv("mapbox_key")
 
 
-dmi_obs = pd.read_csv("data/parse_data_test.csv", usecols=[
+dmi_obs_data = pd.read_csv("data/parse_data_test.csv", usecols=[
     "cellId", "from", "parameterId", "value"
 ])
+
+dmi_forecast_data = pd.read_csv("data/wind_forecast.csv")
 
 ##############################################
 
@@ -61,9 +63,23 @@ map_app = dbc.Col(
     width=8,
 )
 
+# FORECAST CHART
+chart_dmi_forecast = graphs.create_forecast_chart_wind(dmi_forecast_data)
+
+chart_forecast_app = dbc.Col(
+    [
+        dcc.Graph(
+            id="chart_forecast",
+            figure=chart_dmi_forecast,
+        ),
+    ],
+    class_name="card",
+    width=8
+)
+
 # OBSERVATIONAL CHART
 chart_dmi_obs = graphs.create_obs_chart(
-    dmi_obs,
+    dmi_obs_data,
     start_cell_id,
     start_date,
 )
@@ -122,6 +138,11 @@ app.layout = html.Div(
         ),
 
         dbc.Row(
+            chart_forecast_app,
+            justify="center",
+            ),
+
+        dbc.Row(
             chart_obs_app,
             justify="center",
             ),
@@ -144,7 +165,7 @@ app.layout = html.Div(
 
 def update_dmi_obs_chart(click_data, date):
 
-    #print(date)
+    print(f"Map click {click_data}")
 
     if click_data is None:
         cell_id = start_cell_id
@@ -153,7 +174,7 @@ def update_dmi_obs_chart(click_data, date):
         cell_id = click_data["points"][0]["location"]
 
     chart = graphs.create_obs_chart(
-        dmi_obs,
+        dmi_obs_data,
         cell_id,
         date,
     )
@@ -168,7 +189,9 @@ def update_dmi_obs_chart(click_data, date):
 
 def test_chart_click(click_data):
 
-    return f"Click output:{click_data}"
+    print(f"Chart click {click_data}")
+
+    return f"Chart click: {click_data}"
 
 ###########################################################
 

@@ -3,6 +3,7 @@ import pandas as pd
 import datetime as dt
 import json
 from zipfile import ZipFile
+import requests
 
 def unzip_and_merge_dmi_obs_data(
         file_path,
@@ -68,6 +69,66 @@ def read_file_in_zip(
 
     return df
 
+def get_dmi_forecast_data(
+        api_key,
+        lon,
+        lat,
+        collection_type,
+        *parameters
+    ):
+
+    base_url="https://dmigw.govcloud.dk/v1/forecastedr/collections/"
+    
+    collections = {
+        "wind": "harmonie_dini_sf",
+        "waves": "wam_dw"
+    }
+
+    if collection_type not in collections.keys():
+        error_message = f"""Collection type has to be one of {list(collections.keys())}.
+        {collection_type} not valid.
+        """
+
+        raise ValueError(error_message)
+
+    api_type = collections[collection_type]
+
+    parameters = list(parameters)
+
+    parameters_text = ",".join(parameters)
+    
+    query = f"{base_url}{api_type}/position?coords=POINT({lon} {lat})&crs=crs84&parameter-name={parameters_text}&api-key={api_key}"
+
+    try:
+        response = requests.get(query)
+
+        response.raise_for_status()
+
+        json_response = json.loads(response.text)
+
+        time_values = json_response["domain"]["axes"]["t"]["values"]
+        longitude = json_response["domain"]["axes"]["x"]["values"][0]
+        latitude = json_response["domain"]["axes"]["y"]["values"][0]
+
+        parameter_values = {p:get_forecast_parameter_values(json_response,p) for p in parameters}
+
+        parameter_values["timestamp"] = time_values
+
+        df = pd.DataFrame(parameter_values)
+        
+        df["longitude"] = longitude
+        df["latitude"] = latitude
+
+        return df
+
+    except requests.exceptions.RequestException as errh:
+        raise ValueError(errh.args[0])
 
 
+def get_forecast_parameter_values(
+        json,
+        parameter
+):
+    
+    return json["ranges"][parameter]["values"]
     

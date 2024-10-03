@@ -1,4 +1,8 @@
-from app_helper_functions import filter_dmi_obs_data, get_map
+from app_helper_functions import (
+    filter_dmi_obs_data,
+    get_map,
+    parse_dmi_forecast_data_wind
+)
 import plotly.graph_objects as go
 import numpy as np
 import pandas as pd
@@ -117,14 +121,20 @@ def create_obs_chart(
     )
 
     # Get mean wind chart
-    chart = create_mean_wind_speed_chart(dmi_obs_filtered)
+    chart = create_wind_speed_chart(
+        dmi_obs_filtered,
+        "mean_wind_speed",
+        "mean_wind_dir",
+        "from"
+        )
 
     # Add directional arrows
     chart = add_direction_arrows(
         dmi_obs_filtered,
         chart,
-        y_column="mean_wind_speed",
-        dir_column="mean_wind_dir",
+        col_wind_speed="mean_wind_speed",
+        col_wind_direction="mean_wind_dir",
+        col_datetime="from",
         x_scale=25,
         y_scale=0.5,
         y_distance=1
@@ -194,26 +204,29 @@ def create_obs_chart(
 
     return chart
 
-def create_mean_wind_speed_chart(
+def create_wind_speed_chart(
         df,
+        col_wind_speed,
+        col_wind_direction,
+        col_datetime,
 ):
         
     chart = go.Figure()
 
-    df["mean_wind_direction_cardinal"] = df["mean_wind_dir"].apply(degrees_to_cardinal_directions)
+    df[col_wind_direction + "_cardinal"] = df[col_wind_direction].apply(degrees_to_cardinal_directions)
     hover_data_chart = np.stack(
         (
-            df["mean_wind_dir"],
-            df["mean_wind_direction_cardinal"],
-            df["from"].dt.hour.astype(str) + ':00'
+            df[col_wind_direction],
+            df[col_wind_direction + "_cardinal"],
+            df[col_datetime].dt.hour.astype(str) + ':00'
         ),
         axis=1
     )
 
     chart.add_trace(
         go.Bar(
-            x=df["from"],
-            y=df["mean_wind_speed"],
+            x=df[col_datetime],
+            y=df[col_wind_speed],
             customdata=hover_data_chart,
             hovertemplate=
             'Mean wind: %{y}' +
@@ -228,8 +241,9 @@ def create_mean_wind_speed_chart(
 def add_direction_arrows(
     df,
     chart,
-    y_column,
-    dir_column,
+    col_wind_speed,
+    col_wind_direction,
+    col_datetime,
     x_scale,
     y_scale,
     y_distance,
@@ -237,10 +251,10 @@ def add_direction_arrows(
 
     for i, row in df.iterrows():
     
-        x = row["from"]
-        y = row[y_column]
+        x = row[col_datetime]
+        y = row[col_wind_speed]
 
-        x_diff, y_diff = get_angle_coordinate_from_degree(row[dir_column])
+        x_diff, y_diff = get_angle_coordinate_from_degree(row[col_wind_direction])
         x_diff = x_diff * x_scale
         y_diff = y_diff * y_scale
 
@@ -285,6 +299,35 @@ def add_max_wind_chart(
             name='Max wind speed',
             legendrank=1
         )
+    )
+
+    return chart
+
+def create_forecast_chart_wind(
+        df,
+        #cell_id,
+):
+    # Get data
+    df = parse_dmi_forecast_data_wind(df)
+
+    # Get mean wind chart
+    chart = create_wind_speed_chart(
+        df,
+        "wind_speed",
+        "wind_dir",
+        "timestamp"
+        )
+
+    # Add directional arrows
+    chart = add_direction_arrows(
+        df,
+        chart,
+        col_wind_speed="wind_speed",
+        col_wind_direction="wind_dir",
+        col_datetime="timestamp",
+        x_scale=25,
+        y_scale=0.5,
+        y_distance=1
     )
 
     return chart
