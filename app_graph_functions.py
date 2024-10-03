@@ -6,6 +6,7 @@ from app_helper_functions import (
 import plotly.graph_objects as go
 import numpy as np
 import pandas as pd
+from plotly.subplots import make_subplots
 
 
 layout_colors = {
@@ -331,3 +332,43 @@ def create_forecast_chart_wind(
     chart.update_layout(title=cell_id)
 
     return chart
+
+
+def add_obs_data_to_forecast_chart(
+        forecast_chart,
+        obs_data,
+        col_wind_speed,
+        col_datetime,
+):
+    
+    obs_data[col_wind_speed] = obs_data[col_wind_speed]*0.5
+
+    chart = go.Figure(forecast_chart) # needed to create a copy
+    
+    chart.add_trace(
+        go.Bar(
+            x=obs_data[col_datetime],
+            y=obs_data[col_wind_speed],
+            #customdata=hover_data_chart,
+            #hovertemplate=
+            #'Mean wind: %{y}' +
+            #'<br>Wind direction: %{customdata[1]} (%{customdata[0]}\xb0)',
+            #name="Mean wind speed [m/s]"
+        )
+    )
+
+    return chart
+
+# def make_combo_forecast_and_obs_chart(
+#         forecast_chart,
+#         obs_chart
+# ):
+    
+#     chart = make_subplots(
+#         rows=2,
+#         cols=1,
+#         shared_xaxes=True,
+#         vertical_spacing=0.02
+#     )
+
+    

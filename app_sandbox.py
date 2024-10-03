@@ -83,6 +83,25 @@ chart_forecast_app = dbc.Col(
     width=8
 )
 
+# FORECAST W/ OBSERVATIONAL CHART
+chart_dmi_forecast_w_obs = graphs.add_obs_data_to_forecast_chart(
+    chart_dmi_forecast,
+    dmi_forecast_data,
+    "wind_speed",
+    "timestamp"
+)
+
+chart_forecast_w_obs_app = dbc.Col(
+    [
+        dcc.Graph(
+            id="chart_forecast_w_obs",
+            figure=chart_dmi_forecast_w_obs,
+        ),
+    ],
+    class_name="card",
+    width=8
+)
+
 # OBSERVATIONAL CHART
 chart_dmi_obs = graphs.create_obs_chart(
     dmi_obs_data,
@@ -145,6 +164,11 @@ app.layout = html.Div(
 
         dbc.Row(
             chart_forecast_app,
+            justify="center",
+            ),
+        
+        dbc.Row(
+            chart_forecast_w_obs_app,
             justify="center",
             ),
 
