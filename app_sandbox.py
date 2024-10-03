@@ -12,6 +12,7 @@ import app_graph_functions as graphs
 import datetime as dt
 
 
+
 ######## INITIALIZE APP ####################
 app = Dash(
     external_stylesheets=[dbc.themes.MORPH],
