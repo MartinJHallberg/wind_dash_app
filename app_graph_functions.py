@@ -305,10 +305,8 @@ def add_max_wind_chart(
 
 def create_forecast_chart_wind(
         df,
-        #cell_id,
+        cell_id=None,
 ):
-    # Get data
-    df = parse_dmi_forecast_data_wind(df)
 
     # Get mean wind chart
     chart = create_wind_speed_chart(
@@ -329,5 +327,7 @@ def create_forecast_chart_wind(
         y_scale=0.5,
         y_distance=1
     )
+
+    chart.update_layout(title=cell_id)
 
     return chart

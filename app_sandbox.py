@@ -9,6 +9,7 @@ from app_helper_functions import get_map
 import os
 import pandas as pd
 import app_graph_functions as graphs
+from app_helper_functions import parse_dmi_forecast_data_wind
 import datetime as dt
 
 
@@ -32,11 +33,12 @@ dmi_obs_data = pd.read_csv("data/parse_data_test.csv", usecols=[
 ])
 
 dmi_forecast_data = pd.read_csv("data/wind_forecast.csv")
+dmi_forecast_data = parse_dmi_forecast_data_wind(dmi_forecast_data)
 
 ##############################################
 
 
-######## SET UP DASH COMPONENTS
+######## SET UP DASH COMPONENTS ##############
 
 # HEADER
 header_app = dbc.Col(
@@ -65,7 +67,10 @@ map_app = dbc.Col(
 )
 
 # FORECAST CHART
-chart_dmi_forecast = graphs.create_forecast_chart_wind(dmi_forecast_data)
+chart_dmi_forecast = graphs.create_forecast_chart_wind(
+    dmi_forecast_data,
+    start_cell_id
+)
 
 chart_forecast_app = dbc.Col(
     [
@@ -158,6 +163,23 @@ app.layout = html.Div(
 
 
 ############ CALLBAKCKS #################################
+@app.callback(
+    Output('chart_forecast', 'figure'),
+    Input('map_figure', 'clickData'),
+)
+
+def update_dmi_forecast_data(click_data):
+
+    if click_data is None:
+        cell_id = start_cell_id
+    
+    else:
+        cell_id = click_data["points"][0]["location"]
+
+    graph = graphs.create_forecast_chart_wind(dmi_forecast_data, cell_id)
+
+    return graph
+
 @app.callback(
     Output('chart_obs', 'figure'),
     Input('map_figure', 'clickData'),
