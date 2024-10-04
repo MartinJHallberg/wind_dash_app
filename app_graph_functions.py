@@ -152,7 +152,7 @@ def create_full_wind_chart(
         gridwidth=0.0001,
         showticksuffix='last',
         ticksuffix=' m/s',
-        range=[0, y_max],
+        range=[-3, y_max],
         fixedrange=True,
         tickfont_size=14
     )
@@ -282,7 +282,7 @@ def add_direction_arrows(
     col_wind_direction,
     col_datetime,
     x_scale=25,
-    y_scale=0.5,
+    y_scale=0.75,
     y_distance=1,
     marker_opacity=1,
     **kwargs
@@ -291,7 +291,7 @@ def add_direction_arrows(
     for i, row in df.iterrows():
     
         x = row[col_datetime]
-        y = row[col_wind_speed]
+        y = -1#row[col_wind_speed]
 
         x_diff, y_diff = get_angle_coordinate_from_degree(row[col_wind_direction])
         x_diff = x_diff * x_scale
@@ -299,10 +299,10 @@ def add_direction_arrows(
 
         chart.add_annotation(
             x=x + pd.Timedelta(minutes=-x_diff),
-            y=y + y_distance + y_diff,
+            y=y + y_diff,
             ax=x + pd.Timedelta(minutes=x_diff),
             axref="x",
-            ay=y + y_distance - y_diff,
+            ay=y - y_diff,
             ayref="y",
             arrowhead=2,
             arrowsize=1.5,
