@@ -104,7 +104,7 @@ chart_forecast_w_obs_app = dbc.Col(
     [
         dcc.Graph(
             id="chart_forecast_w_obs",
-            figure=chart_dmi_forecast_w_obs,
+            figure=chart_dmi_forecast,
         ),
     ],
     class_name="card",
@@ -151,7 +151,7 @@ date_picker_app = dbc.Col(
             min_date_allowed=dt.date(2019, 1, 1),
             max_date_allowed=dt.date.today(),
             first_day_of_week=1,
-            #date=dt.date.fromisoformat(start_date),
+            date=dt.date.fromisoformat(start_date),
             display_format='YYYY-MM-DD'
             ),
         width="auto"
@@ -186,10 +186,10 @@ app.layout = html.Div(
 
         ),
 
-        dbc.Row(
-            chart_forecast_app,
-            justify="center",
-            ),
+        # dbc.Row(
+        #     chart_forecast_app,
+        #     justify="center",
+        #     ),
         
         dbc.Row(
             [
@@ -215,22 +215,22 @@ app.layout = html.Div(
 
 ############ CALLBAKCKS #################################
 
-@app.callback(
-    Output('chart_forecast', 'figure'),
-    Input('map_figure', 'clickData'),
-)
+# @app.callback(
+#     Output('chart_forecast', 'figure'),
+#     Input('map_figure', 'clickData'),
+# )
 
-def update_dmi_forecast_data(click_data):
+# def update_dmi_forecast_data(click_data):
 
-    if click_data is None:
-        cell_id = start_cell_id
+#     if click_data is None:
+#         cell_id = start_cell_id
     
-    else:
-        cell_id = click_data["points"][0]["location"]
+#     else:
+#         cell_id = click_data["points"][0]["location"]
 
-    chart = graphs.create_forecast_chart_wind(dmi_forecast_data, cell_id)
+#     chart = graphs.create_forecast_chart_wind(dmi_forecast_data, cell_id)
 
-    return chart
+#     return chart
 
 @app.callback(
     Output("chart_forecast_w_obs", 'figure'),
@@ -250,21 +250,19 @@ def update_dmi_forecast_data_with_obs(toggle, click_data, date): # date is to be
 
     chart = graphs.create_forecast_chart_wind(dmi_forecast_data, cell_id)
 
-    # if toggle:
-    #     if date:
-    #df = dmi_forecast_data.copy() # should be removed
-    #df["wind_speed"] = df["wind_speed"]*0.5 # should be removed
-    chart = graphs.add_obs_data_to_forecast_chart(
-        forecast_chart=chart,
-        obs_data=dmi_obs_data,
-        col_wind_speed="wind_speed",
-        col_datetime="timestamp",
-        cell_id=start_cell_id,
-        obs_date=date
-    )
-        #     return chart, "Observational data is shown"
-        # else:
-        #     return chart, f"No date given for observational data"
+    if toggle:
+        if date:
+            chart = graphs.add_obs_data_to_forecast_chart(
+                forecast_chart=chart,
+                obs_data=dmi_obs_data,
+                col_wind_speed="wind_speed",
+                col_datetime="timestamp",
+                cell_id=cell_id,
+                obs_date=date
+            )
+            return chart, "Observational data is shown"
+        else:
+            return chart, f"No date given for observational data"
 
     return chart, "Toggle off"
 
