@@ -116,20 +116,15 @@ def create_full_wind_chart(
         df,
         **kwargs
         )
+
+    if "chart" in kwargs.keys():
+        kwargs.pop("chart") # remove chart from kwargs, needed when createing overlay graphs
     
     # Add directional arrows
     chart = add_direction_arrows(
         df,
         chart=chart,
         **kwargs
-        # dmi_obs_filtered,
-        # chart,
-        # col_wind_speed="mean_wind_speed",
-        # col_wind_direction="mean_wind_dir",
-        # col_datetime="from",
-        # x_scale=25,
-        # y_scale=0.5,
-        # y_distance=1
     )
 
     # Add max wind chart
@@ -137,8 +132,6 @@ def create_full_wind_chart(
         df,
         chart=chart,
         **kwargs
-        # dmi_obs_filtered,
-        # chart
     )
 
     # Set layout
@@ -218,10 +211,6 @@ def create_obs_chart(
         col_wind_max_speed="max_wind_speed_3sec",
         col_wind_direction="mean_wind_dir",
         col_datetime="from",
-        bar_color_opacity=1,
-        x_scale=25,
-        y_scale=0.5,
-        y_distance=1
     )
 
     return chart
@@ -242,103 +231,18 @@ def create_forecast_chart(
             col_wind_max_speed="gust_wind_speed_10m",
             col_wind_direction="wind_dir",
             col_datetime="timestamp",
-            bar_color_opacity=1,
-            x_scale=25,
-            y_scale=0.5,
-            y_distance=1
+            marker_opacity=1,
     )
 
     return chart
 
-    # chart = create_wind_speed_chart(
-    #     dmi_obs_filtered,
-    #     "mean_wind_speed",
-    #     "mean_wind_dir",
-    #     "from",
-    #     1
-    #     )
-
-    # # Add directional arrows
-    # chart = add_direction_arrows(
-    #     dmi_obs_filtered,
-    #     chart,
-    #     col_wind_speed="mean_wind_speed",
-    #     col_wind_direction="mean_wind_dir",
-    #     col_datetime="from",
-    #     x_scale=25,
-    #     y_scale=0.5,
-    #     y_distance=1
-    # )
-
-    # # Add max wind chart
-    # chart = add_max_wind_chart(
-    #     dmi_obs_filtered,
-    #     chart
-    # )
-
-
-    # # Set layout
-    # y_max = max(
-    #     dmi_obs_filtered["mean_wind_speed"].max(),
-    #     dmi_obs_filtered["max_wind_speed_3sec"].max()
-    # )
-
-    # if y_max> 19:
-    #     y_max= 30
-    # else:
-    #     y_max= 20
-
-    # # Set axes
-    # y_axes = dict(
-    #     gridwidth=0.0001,
-    #     showticksuffix='last',
-    #     ticksuffix=' m/s',
-    #     range=[0, y_max],
-    #     fixedrange=True,
-    #     tickfont_size=14
-    # )
-    
-    # x_axes = dict(
-    #     linewidth=0.1,
-    #     showgrid=False,
-    #     fixedrange=True,
-    #     tickfont_size=13
-    # )
-
-    # #chart.update_yaxes(y_axes)
-    # #chart.update_xaxes(x_axes)
-
-    # chart.update_layout(
-    #     xaxis=x_axes,
-    #     yaxis=y_axes,
-    #     legend=dict(
-    #         yanchor="top",
-    #         y=0.99,
-    #         xanchor="left",
-    #         x=0.01,
-    #         font_size=15
-    #     ),
-    #     margin=dict(l=40, r=40, t=10, b=20),
-    #     paper_bgcolor=layout_colors["transparent"],
-    #     hovermode='x unified',
-    #     hoverlabel=dict(
-    #         bgcolor=fun_col_to_trans(layout_colors['white'],0.75),
-    #         font=dict(color='black')
-    #     ),
-    #     clickmode = "event+select"
-    #     #plot_bgcolor=layout_colors["transparent"],
-    #     #autosize=True,
-    #     #bargap=0.5,
-    # )
-
-    return chart
 
 def create_wind_speed_chart(
         df,
         col_wind_speed,
         col_wind_direction,
         col_datetime,
-        bar_color_opacity,
+        marker_opacity=1,
         chart=None,
         **kwargs
 ):
@@ -364,7 +268,7 @@ def create_wind_speed_chart(
             'Mean wind: %{y}' +
             '<br>Wind direction: %{customdata[1]} (%{customdata[0]}\xb0)',
             name="Mean wind speed [m/s]",
-            opacity=bar_color_opacity
+            opacity=marker_opacity
         )
     )
 
@@ -377,9 +281,10 @@ def add_direction_arrows(
     col_wind_speed,
     col_wind_direction,
     col_datetime,
-    x_scale,
-    y_scale,
-    y_distance,
+    x_scale=25,
+    y_scale=0.5,
+    y_distance=1,
+    marker_opacity=1,
     **kwargs
 ):
 
@@ -403,6 +308,7 @@ def add_direction_arrows(
             arrowsize=1.5,
             arrowwidth=1.1,
             arrowcolor=layout_colors['orange'],
+            opacity=marker_opacity,
             xref="x",
             yref="y",
             # row=2,
@@ -415,6 +321,7 @@ def add_max_wind_chart(
     df,
     col_datetime,
     col_wind_max_speed,
+    marker_opacity=1,
     chart=None,
     **kwargs
 ):
@@ -434,7 +341,8 @@ def add_max_wind_chart(
             ),
             showlegend=True,
             name='Max wind speed',
-            legendrank=1
+            legendrank=1,
+            opacity=marker_opacity
         )
     )
 
@@ -451,7 +359,7 @@ def create_forecast_chart_wind(
         "wind_speed",
         "wind_dir",
         "timestamp",
-        bar_color_opacity=1
+        marker_opacity=1
         )
 
     # Add directional arrows
@@ -474,8 +382,6 @@ def create_forecast_chart_wind(
 def add_obs_data_to_forecast_chart(
         forecast_chart,
         obs_data,
-        col_wind_speed,
-        col_datetime,
         **kwargs
 ):
     obs_filtered = filter_dmi_obs_data(
@@ -487,14 +393,28 @@ def add_obs_data_to_forecast_chart(
 
     chart = go.Figure(forecast_chart) # needed to create a copy
 
+    kwargs["col_datetime"] = "map_forecast_time"
+
     chart = create_wind_speed_chart(
         obs_filtered,
-        "mean_wind_speed",
-        "mean_wind_dir",
-        "map_forecast_time",
+        marker_opacity=0.2,
         chart=chart,
-        bar_color_opacity=0.2
-        )
+        **kwargs
+    )
+
+    chart = add_direction_arrows(
+        df=obs_filtered,
+        chart=chart,
+        marker_opacity=0.5,
+        **kwargs
+    )
+
+    chart = add_max_wind_chart(
+        df=obs_filtered,
+        chart=chart,
+        marker_opacity=0.5,
+        **kwargs
+    )
     
     chart.update_layout(barmode="overlay")
 

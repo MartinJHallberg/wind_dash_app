@@ -80,10 +80,6 @@ chart_dmi_forecast = graphs.create_forecast_chart(
         col_wind_max_speed="gust_wind_speed_10m",
         col_wind_direction="wind_dir",
         col_datetime="timestamp",
-        bar_color_opacity=1,
-        x_scale=25,
-        y_scale=0.5,
-        y_distance=1,
         cell_id=start_cell_id
     )
 
@@ -99,14 +95,17 @@ chart_forecast_app = dbc.Col(
 )
 
 # FORECAST W/ OBSERVATIONAL CHART
-chart_dmi_forecast_w_obs = graphs.add_obs_data_to_forecast_chart(
-        forecast_chart=chart_dmi_forecast,
-        obs_data=dmi_obs_data,
-        col_wind_speed="mean_wind_speed",
-        col_datetime="timestamp",
-        cell_id=start_cell_id,
-        obs_date=start_date
-    )
+# chart_dmi_forecast_w_obs = graphs.add_obs_data_to_forecast_chart(
+#                 forecast_chart=chart,
+#                 obs_data=dmi_obs_data,
+#                 col_wind_speed="mean_wind_speed",
+#                 col_wind_max_speed="max_wind_speed_3sec",
+#                 col_wind_direction="mean_wind_dir",
+#                 col_datetime="from",
+#                 cell_id=start_cell_id,
+#                 obs_date=date,
+#                 marker_opacity=0.2
+#             )
 
 chart_forecast_w_obs_app = dbc.Col(
     [
@@ -262,10 +261,6 @@ def update_dmi_forecast_data_with_obs(toggle, click_data, date): # date is to be
             col_wind_max_speed="gust_wind_speed_10m",
             col_wind_direction="wind_dir",
             col_datetime="timestamp",
-            bar_color_opacity=1,
-            x_scale=25,
-            y_scale=0.5,
-            y_distance=1,
             cell_id=start_cell_id
     )
 
@@ -274,10 +269,13 @@ def update_dmi_forecast_data_with_obs(toggle, click_data, date): # date is to be
             chart = graphs.add_obs_data_to_forecast_chart(
                 forecast_chart=chart,
                 obs_data=dmi_obs_data,
-                col_wind_speed="wind_speed",
-                col_datetime="timestamp",
+                col_wind_speed="mean_wind_speed",
+                col_wind_max_speed="max_wind_speed_3sec",
+                col_wind_direction="mean_wind_dir",
+                col_datetime="from",
                 cell_id=cell_id,
-                obs_date=date
+                obs_date=date,
+                #marker_opacity=0.2
             )
             return chart, "Observational data is shown"
         else:
