@@ -203,7 +203,6 @@ def create_obs_chart(
         dmi_data,
         cell_id,
         obs_date
-
 ):
     # Get data
     dmi_obs_filtered = filter_dmi_obs_data(
@@ -223,6 +222,30 @@ def create_obs_chart(
         x_scale=25,
         y_scale=0.5,
         y_distance=1
+    )
+
+    return chart
+    
+
+def create_forecast_chart(
+        forecast_data,
+        cell_id=None, # for later use
+        **kwargs
+    ):
+    
+    # Filter forecast data
+    forecast_data_filter = forecast_data.copy()
+
+    chart = create_full_wind_chart(
+            df=forecast_data_filter,
+            col_wind_speed="wind_speed",
+            col_wind_max_speed="gust_wind_speed_10m",
+            col_wind_direction="wind_dir",
+            col_datetime="timestamp",
+            bar_color_opacity=1,
+            x_scale=25,
+            y_scale=0.5,
+            y_distance=1
     )
 
     return chart

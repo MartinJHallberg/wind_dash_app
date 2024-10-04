@@ -74,10 +74,18 @@ map_app = dbc.Col(
 )
 
 # FORECAST CHART
-chart_dmi_forecast = graphs.create_forecast_chart_wind(
-    dmi_forecast_data,
-    start_cell_id
-)
+chart_dmi_forecast = graphs.create_forecast_chart(
+        forecast_data=dmi_forecast_data,
+        col_wind_speed="wind_speed",
+        col_wind_max_speed="gust_wind_speed_10m",
+        col_wind_direction="wind_dir",
+        col_datetime="timestamp",
+        bar_color_opacity=1,
+        x_scale=25,
+        y_scale=0.5,
+        y_distance=1,
+        cell_id=start_cell_id
+    )
 
 chart_forecast_app = dbc.Col(
     [
@@ -248,7 +256,18 @@ def update_dmi_forecast_data_with_obs(toggle, click_data, date): # date is to be
     else:
         cell_id = click_data["points"][0]["location"]
 
-    chart = graphs.create_forecast_chart_wind(dmi_forecast_data, cell_id)
+    chart = graphs.create_forecast_chart(
+            forecast_data=dmi_forecast_data,
+            col_wind_speed="wind_speed",
+            col_wind_max_speed="gust_wind_speed_10m",
+            col_wind_direction="wind_dir",
+            col_datetime="timestamp",
+            bar_color_opacity=1,
+            x_scale=25,
+            y_scale=0.5,
+            y_distance=1,
+            cell_id=start_cell_id
+    )
 
     if toggle:
         if date:
