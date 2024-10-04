@@ -113,7 +113,8 @@ toggle_switch_column = dbc.Col(
     [
         daq.ToggleSwitch(
             id='toggle-observational-data',
-            value=False
+            value=False,
+            color="blue"
         ),
         html.Div(id='toggle-switch-result'),
         html.Div(id="error-no-obs-date")        
@@ -231,7 +232,7 @@ def update_dmi_forecast_data(click_data):
 
 @app.callback(
     Output("chart_forecast_w_obs", 'figure'),
-    #Output("error-no-obs-date", 'children'),
+    Output("error-no-obs-date", 'children'),
     Input('toggle-observational-data', 'value'),
     Input('map_figure', 'clickData'),
     Input('date_picker', 'date')
@@ -248,17 +249,20 @@ def update_dmi_forecast_data_with_obs(toggle, click_data, date): # date is to be
     chart = graphs.create_forecast_chart_wind(dmi_forecast_data, cell_id)
 
     if toggle:
-        # if not date:
-        #     return chart#, f"No date given for observational data"
+        if date:
+            df = dmi_forecast_data.copy() # should be removed
+            df["wind_speed"] = df["wind_speed"]*0.5 # should be removed
+            chart = graphs.add_obs_data_to_forecast_chart(
+                chart,
+                df,
+                "wind_speed",
+                "timestamp"
+            )
+            return chart, "Observational data is shown"
+        else:
+            return chart, f"No date given for observational data"
 
-        chart = graphs.add_obs_data_to_forecast_chart(
-            chart,
-            dmi_forecast_data,
-            "wind_speed",
-            "timestamp"
-        )
-
-    return chart#, "All good"
+    return chart, "Toggle off"
 
 @app.callback(
     Output('toggle-switch-result', 'children'),
