@@ -41,7 +41,8 @@ def filter_dmi_obs_data(
         dmi_obs,
         cell_id,
         obs_date,
-        n_extra_days=1
+        n_extra_days=1,
+        **kwargs
 ):
 
     dmi_obs = dmi_obs.loc[dmi_obs["cellId"] == cell_id]

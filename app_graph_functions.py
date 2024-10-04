@@ -339,16 +339,21 @@ def add_obs_data_to_forecast_chart(
         obs_data,
         col_wind_speed,
         col_datetime,
+        **kwargs
 ):
-    
-    obs_data[col_wind_speed] = obs_data[col_wind_speed]*0.5
+    obs_filtered = filter_dmi_obs_data(
+        obs_data,
+        **kwargs
+    )
+
+    obs_filtered["map_forecast_time"] = forecast_chart.data[0].x.tolist()
 
     chart = go.Figure(forecast_chart) # needed to create a copy
     
     chart.add_trace(
         go.Bar(
-            x=obs_data[col_datetime],
-            y=obs_data[col_wind_speed],
+            x=obs_filtered["map_forecast_time"],
+            y=obs_filtered[col_wind_speed],
             #customdata=hover_data_chart,
             #hovertemplate=
             #'Mean wind: %{y}' +
@@ -361,16 +366,10 @@ def add_obs_data_to_forecast_chart(
 
     return chart
 
-# def make_combo_forecast_and_obs_chart(
-#         forecast_chart,
-#         obs_chart
+# def map_observational_datetime_to_forecast(
+#         obs_data,
+#         forecast_data
 # ):
     
-#     chart = make_subplots(
-#         rows=2,
-#         cols=1,
-#         shared_xaxes=True,
-#         vertical_spacing=0.02
-#     )
 
     

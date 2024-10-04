@@ -92,17 +92,19 @@ chart_forecast_app = dbc.Col(
 
 # FORECAST W/ OBSERVATIONAL CHART
 chart_dmi_forecast_w_obs = graphs.add_obs_data_to_forecast_chart(
-    chart_dmi_forecast,
-    dmi_forecast_data,
-    "wind_speed",
-    "timestamp"
-)
+        forecast_chart=chart_dmi_forecast,
+        obs_data=dmi_obs_data,
+        col_wind_speed="mean_wind_speed",
+        col_datetime="timestamp",
+        cell_id=start_cell_id,
+        obs_date=start_date
+    )
 
 chart_forecast_w_obs_app = dbc.Col(
     [
         dcc.Graph(
             id="chart_forecast_w_obs",
-            figure=chart_dmi_forecast,
+            figure=chart_dmi_forecast_w_obs,
         ),
     ],
     class_name="card",
@@ -248,19 +250,21 @@ def update_dmi_forecast_data_with_obs(toggle, click_data, date): # date is to be
 
     chart = graphs.create_forecast_chart_wind(dmi_forecast_data, cell_id)
 
-    if toggle:
-        if date:
-            df = dmi_forecast_data.copy() # should be removed
-            df["wind_speed"] = df["wind_speed"]*0.5 # should be removed
-            chart = graphs.add_obs_data_to_forecast_chart(
-                chart,
-                df,
-                "wind_speed",
-                "timestamp"
-            )
-            return chart, "Observational data is shown"
-        else:
-            return chart, f"No date given for observational data"
+    # if toggle:
+    #     if date:
+    #df = dmi_forecast_data.copy() # should be removed
+    #df["wind_speed"] = df["wind_speed"]*0.5 # should be removed
+    chart = graphs.add_obs_data_to_forecast_chart(
+        forecast_chart=chart,
+        obs_data=dmi_obs_data,
+        col_wind_speed="wind_speed",
+        col_datetime="timestamp",
+        cell_id=start_cell_id,
+        obs_date=date
+    )
+        #     return chart, "Observational data is shown"
+        # else:
+        #     return chart, f"No date given for observational data"
 
     return chart, "Toggle off"
 
