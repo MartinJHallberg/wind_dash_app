@@ -34,9 +34,7 @@ def fun_col_to_trans(col, transparency):
 
     return col_out
 
-def create_map_chart(
-        mapbox_api,
-):
+def create_map_chart():
     geoj_grid, dk_grid, dk_grid_hover = get_map()
 
     dk_grid['Val'] = 1
@@ -287,6 +285,8 @@ def add_direction_arrows(
     marker_opacity=1,
     **kwargs
 ):
+
+
 
     for i, row in df.iterrows():
     

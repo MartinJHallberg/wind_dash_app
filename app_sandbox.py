@@ -26,6 +26,7 @@ app = Dash(
     external_stylesheets=[dbc.themes.MORPH],
     prevent_initial_callbacks=True
 )
+
 load_figure_template("MORPH")
 
 start_cell_id="10km_622_71"
@@ -56,7 +57,7 @@ header_app = dbc.Col(
 )
 
 # MAP
-fig_map = graphs.create_map_chart(mapbox_api)
+fig_map = graphs.create_map_chart()
 
 map_app = dbc.Col(
     [
@@ -123,7 +124,8 @@ toggle_switch_column = dbc.Col(
         daq.ToggleSwitch(
             id='toggle-observational-data',
             value=False,
-            color="blue"
+            #color="blue",
+            #className="form-switch"
         ),
         html.Div(id='toggle-switch-result'),
         html.Div(id="error-no-obs-date")        
