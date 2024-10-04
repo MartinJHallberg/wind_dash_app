@@ -1,5 +1,4 @@
-import plotly.graph_objects as go
-from dash import dcc, html, Dash
+from dash import dcc, html, Dash, set_props
 import dash_bootstrap_components as dbc
 from dash_bootstrap_templates import load_figure_template
 from dash.dependencies import Input, Output, State
@@ -11,10 +10,18 @@ import pandas as pd
 import app_graph_functions as graphs
 from app_helper_functions import parse_dmi_forecast_data_wind
 import datetime as dt
+import dash_daq as daq
 
 
 
 ######## INITIALIZE APP ####################
+def custom_error_handler(err):
+    set_props(
+        "error-no-obs-date",
+        dict(children="No date for observational data has been chosen.")
+    )
+
+
 app = Dash(
     external_stylesheets=[dbc.themes.MORPH],
     prevent_initial_callbacks=True
@@ -95,12 +102,26 @@ chart_forecast_w_obs_app = dbc.Col(
     [
         dcc.Graph(
             id="chart_forecast_w_obs",
-            figure=chart_dmi_forecast_w_obs,
+            figure=chart_dmi_forecast,
         ),
     ],
     class_name="card",
     width=8
 )
+
+toggle_switch_column = dbc.Col(
+    [
+        daq.ToggleSwitch(
+            id='toggle-observational-data',
+            value=False
+        ),
+        html.Div(id='toggle-switch-result'),
+        html.Div(id="error-no-obs-date")        
+    ],
+    width=2
+)
+
+#toggle_switch_column = dbc.Col(html.Div("One of three columns"), width=3),
 
 # OBSERVATIONAL CHART
 chart_dmi_obs = graphs.create_obs_chart(
@@ -127,7 +148,7 @@ date_picker_app = dbc.Col(
             min_date_allowed=dt.date(2019, 1, 1),
             max_date_allowed=dt.date.today(),
             first_day_of_week=1,
-            date=dt.date.fromisoformat(start_date),
+            #date=dt.date.fromisoformat(start_date),
             display_format='YYYY-MM-DD'
             ),
         width="auto"
@@ -168,7 +189,10 @@ app.layout = html.Div(
             ),
         
         dbc.Row(
-            chart_forecast_w_obs_app,
+            [
+                chart_forecast_w_obs_app,
+                toggle_switch_column,
+            ],
             justify="center",
             ),
 
@@ -187,6 +211,7 @@ app.layout = html.Div(
 
 
 ############ CALLBAKCKS #################################
+
 @app.callback(
     Output('chart_forecast', 'figure'),
     Input('map_figure', 'clickData'),
@@ -200,9 +225,48 @@ def update_dmi_forecast_data(click_data):
     else:
         cell_id = click_data["points"][0]["location"]
 
-    graph = graphs.create_forecast_chart_wind(dmi_forecast_data, cell_id)
+    chart = graphs.create_forecast_chart_wind(dmi_forecast_data, cell_id)
 
-    return graph
+    return chart
+
+@app.callback(
+    Output("chart_forecast_w_obs", 'figure'),
+    #Output("error-no-obs-date", 'children'),
+    Input('toggle-observational-data', 'value'),
+    Input('map_figure', 'clickData'),
+    Input('date_picker', 'date')
+)
+
+def update_dmi_forecast_data_with_obs(toggle, click_data, date): # date is to be added as input here
+
+    if click_data is None:
+        cell_id = start_cell_id
+    
+    else:
+        cell_id = click_data["points"][0]["location"]
+
+    chart = graphs.create_forecast_chart_wind(dmi_forecast_data, cell_id)
+
+    if toggle:
+        # if not date:
+        #     return chart#, f"No date given for observational data"
+
+        chart = graphs.add_obs_data_to_forecast_chart(
+            chart,
+            dmi_forecast_data,
+            "wind_speed",
+            "timestamp"
+        )
+
+    return chart#, "All good"
+
+@app.callback(
+    Output('toggle-switch-result', 'children'),
+    Input('toggle-observational-data', 'value')
+)
+
+def update_output(value):
+    return f'The switch is {value}.'
 
 @app.callback(
     Output('chart_obs', 'figure'),

@@ -357,6 +357,8 @@ def add_obs_data_to_forecast_chart(
         )
     )
 
+    chart.update_layout(barmode="overlay")
+
     return chart
 
 # def make_combo_forecast_and_obs_chart(
