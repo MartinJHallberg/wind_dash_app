@@ -10,21 +10,22 @@ from plotly.subplots import make_subplots
 
 
 layout_colors = {
-    'primary': 'rgb(76,155,232)',
-    'green': 'rgb(92,184,92)',
-    'yellow': 'rgb(255,193,7)',
-    'red': 'rgb(217,83,79)',
-    'bg_blue': 'rgb(56, 97, 141)',
+    'primary': 'rgb(55, 141, 252)',
+    'secondary': 'rgb(217, 227, 241)',
+    'dark_blue': 'rgb(0, 72, 170)',
+    # 'yellow': 'rgb(255,193,7)',
+    # 'red': 'rgb(217,83,79)',
+    # 'bg_blue': 'rgb(56, 97, 141)',
     'white': 'rgb(255, 255,255)',
-    'bg_blue2': 'rgb(15,37,55)',
-    'orange': 'rgb(246,105,35)',
+    # 'bg_blue2': 'rgb(15,37,55)',
+    # 'orange': 'rgb(246,105,35)',
     'transparent': 'rgba(255,255,255,0)'
     }
 
 #    return dict_cols
 
 
-def fun_col_to_trans(col, transparency):
+def add_transparency_to_color(col, transparency):
 
     t_trans = str(transparency)
 
@@ -38,7 +39,7 @@ def create_map_chart():
     geoj_grid, dk_grid, dk_grid_hover = get_map()
 
     dk_grid['Val'] = 1
-    dk_grid['Col'] = fun_col_to_trans(layout_colors['primary'], 0.4)
+    dk_grid['Col'] = add_transparency_to_color(layout_colors['primary'], 0.4)
 
     dict_center = {'lon': 10.52,
                 'lat': 55.89
@@ -50,11 +51,17 @@ def create_map_chart():
             featureidkey="properties.KN10kmDK",
             locations=dk_grid['KN10kmDK'],
             z=dk_grid['Val'],
-            colorscale=dk_grid['Col'],
+            colorscale=[[0, layout_colors['primary']], [1, layout_colors['primary']]],
             showscale=False,
-            #customdata=dk_grid_hover,
-            #hovertemplate='%{customdata[0]}<extra></extra>',
-            colorbar={'outlinecolor': layout_colors['primary']}
+            marker_line_width=0,
+            marker_opacity=0.4,
+            customdata=dk_grid_hover,
+            hovertemplate='%{customdata[0]}<extra></extra>',
+            hoverlabel=dict(
+                font_color=layout_colors["dark_blue"],
+                bgcolor=add_transparency_to_color(layout_colors["secondary"],0.4),
+                bordercolor=layout_colors['transparent']
+            )
         ),
         layout=go.Layout(
             map_style="carto-positron",
@@ -179,7 +186,7 @@ def create_full_wind_chart(
         paper_bgcolor=layout_colors["transparent"],
         hovermode='x unified',
         hoverlabel=dict(
-            bgcolor=fun_col_to_trans(layout_colors['white'],0.75),
+            bgcolor=add_transparency_to_color(layout_colors['white'],0.75),
             font=dict(color='black')
         ),
         clickmode = "event+select"

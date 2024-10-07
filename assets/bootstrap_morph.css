@@ -201,6 +201,12 @@
   }
 }
 
+.header {
+  margin-bottom: var(--bs-card-title-spacer-y);
+  color: var(--bs-primary-text-emphasis);
+  text-align: center;
+}
+
 body {
   margin: 0;
   font-family: var(--bs-body-font-family);

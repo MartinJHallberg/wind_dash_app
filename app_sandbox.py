@@ -2,6 +2,7 @@ from dash import dcc, html, Dash, set_props
 import dash_bootstrap_components as dbc
 from dash_bootstrap_templates import load_figure_template
 from dash.dependencies import Input, Output, State
+import dash_mantine_components as dmc
 from plotly.subplots import make_subplots
 from dotenv import load_dotenv
 from app_helper_functions import get_map
@@ -47,11 +48,33 @@ dmi_forecast_data = parse_dmi_forecast_data_wind(dmi_forecast_data)
 # HEADER
 header_app = dbc.Col(
     html.H1(
-        "Header",
-        className="navbar navbar-expand-lg bg-primary"
+        children=["Test"],
+        className="header"
     ),
 )
 
+navbar_app = dbc.Col(
+    dbc.NavbarSimple(
+    children=[
+        dbc.NavItem(dbc.NavLink("Page 1", href="#")),
+        dbc.DropdownMenu(
+            children=[
+                dbc.DropdownMenuItem("More pages", header=True),
+                dbc.DropdownMenuItem("Page 2", href="#"),
+                dbc.DropdownMenuItem("Page 3", href="#"),
+            ],
+            nav=True,
+            in_navbar=True,
+            label="More",
+        ),
+    ],
+    brand="Surf Wind",
+    brand_href="#",
+    color="primary",
+    dark=True,
+    class_name="navbar navbar-expand-lg bg-primary"
+    )
+)
 # MAP
 fig_map = graphs.create_map_chart()
 
@@ -91,19 +114,6 @@ chart_forecast_app = dbc.Col(
     width=8
 )
 
-# FORECAST W/ OBSERVATIONAL CHART
-# chart_dmi_forecast_w_obs = graphs.add_obs_data_to_forecast_chart(
-#                 forecast_chart=chart,
-#                 obs_data=dmi_obs_data,
-#                 col_wind_speed="mean_wind_speed",
-#                 col_wind_max_speed="max_wind_speed_3sec",
-#                 col_wind_direction="mean_wind_dir",
-#                 col_datetime="from",
-#                 cell_id=start_cell_id,
-#                 obs_date=date,
-#                 marker_opacity=0.2
-#             )
-
 chart_forecast_w_obs_app = dbc.Col(
     [
         dcc.Graph(
@@ -115,16 +125,32 @@ chart_forecast_w_obs_app = dbc.Col(
     width=8
 )
 
-toggle_switch_column = dbc.Col(
+date_and_toggle_switch_column = dbc.Col(
     [
-        daq.ToggleSwitch(
-            id='toggle-observational-data',
-            value=False,
-            #color="blue",
-            #className="form-switch"
-        ),
+        # daq.ToggleSwitch(
+        #     id='toggle-observational-data',
+        #     value=False,
+        #     #color="blue",
+        #     #className="form-switch"
+        # ),
+        dcc.DatePickerSingle(
+            id='date_picker_old',
+            min_date_allowed=dt.date(2019, 1, 1),
+            max_date_allowed=dt.date.today(),
+            first_day_of_week=1,
+            date=dt.date.fromisoformat(start_date),
+            display_format='YYYY-MM-DD'
+            ),
+    
+        dmc.Switch(
+        #size="lg",
+        #radius="sm",
+        id='toggle-observational-data',
+        label="Show conditions from previous date",
+        checked=False
+    ),
         html.Div(id='toggle-switch-result'),
-        html.Div(id="error-no-obs-date")        
+        html.Div(id="error-no-obs-date")    
     ],
     width=2
 )
@@ -152,14 +178,14 @@ chart_obs_app = dbc.Col(
 # DATE PICKER
 date_picker_app = dbc.Col(
     dcc.DatePickerSingle(
-            id='date_picker',
+            id='date_picker_old',
             min_date_allowed=dt.date(2019, 1, 1),
             max_date_allowed=dt.date.today(),
             first_day_of_week=1,
             date=dt.date.fromisoformat(start_date),
             display_format='YYYY-MM-DD'
             ),
-        width="auto"
+    width="auto"
 )
 
 text_app = dbc.Col(
@@ -174,6 +200,11 @@ text_app = dbc.Col(
 ########### APP LAYOUT ##############################
 app.layout = html.Div(
     [
+        dbc.Row(
+            navbar_app,
+            justify="center",
+        ),
+
         dbc.Row(
             header_app,
             justify="center",
@@ -199,7 +230,7 @@ app.layout = html.Div(
         dbc.Row(
             [
                 chart_forecast_w_obs_app,
-                toggle_switch_column,
+                date_and_toggle_switch_column,
             ],
             justify="center",
             ),
@@ -240,7 +271,7 @@ app.layout = html.Div(
 @app.callback(
     Output("chart_forecast_w_obs", 'figure'),
     Output("error-no-obs-date", 'children'),
-    Input('toggle-observational-data', 'value'),
+    Input('toggle-observational-data', 'checked'),
     Input('map_figure', 'clickData'),
     Input('date_picker', 'date')
 )
