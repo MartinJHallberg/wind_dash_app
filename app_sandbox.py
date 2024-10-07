@@ -32,9 +32,6 @@ start_cell_id="10km_622_71"
 start_date="2023-01-02"
 
 ######## READ BASE DATA ######################
-mapbox_api = os.getenv("mapbox_key")
-
-
 dmi_obs_data = pd.read_csv("data/parse_data_test.csv", usecols=[
     "cellId", "from", "parameterId", "value"
 ])
