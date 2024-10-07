@@ -134,7 +134,7 @@ date_and_toggle_switch_column = dbc.Col(
         #     #className="form-switch"
         # ),
         dcc.DatePickerSingle(
-            id='date_picker_old',
+            id='date_picker',
             min_date_allowed=dt.date(2019, 1, 1),
             max_date_allowed=dt.date.today(),
             first_day_of_week=1,
@@ -216,11 +216,11 @@ app.layout = html.Div(
 
         ),
 
-        dbc.Row(
-            date_picker_app,
-            justify="center",
+        # dbc.Row(
+        #     date_picker_app,
+        #     justify="center",
 
-        ),
+        # ),
 
         # dbc.Row(
         #     chart_forecast_app,

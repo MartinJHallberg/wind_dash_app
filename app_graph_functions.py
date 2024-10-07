@@ -13,12 +13,12 @@ layout_colors = {
     'primary': 'rgb(55, 141, 252)',
     'secondary': 'rgb(217, 227, 241)',
     'dark_blue': 'rgb(0, 72, 170)',
-    # 'yellow': 'rgb(255,193,7)',
-    # 'red': 'rgb(217,83,79)',
+    'yellow': 'rgb(255, 193, 7)',
+    'red': 'rgb(180, 15, 74)',
     # 'bg_blue': 'rgb(56, 97, 141)',
     'white': 'rgb(255, 255,255)',
     # 'bg_blue2': 'rgb(15,37,55)',
-    # 'orange': 'rgb(246,105,35)',
+    'orange': 'rgb(253, 126, 20)',
     'transparent': 'rgba(255,255,255,0)'
     }
 
@@ -248,6 +248,7 @@ def create_wind_speed_chart(
         col_wind_direction,
         col_datetime,
         marker_opacity=1,
+        marker_color=layout_colors["primary"],
         chart=None,
         **kwargs
 ):
@@ -273,7 +274,8 @@ def create_wind_speed_chart(
             'Mean wind: %{y}' +
             '<br>Wind direction: %{customdata[1]} (%{customdata[0]}\xb0)',
             name="Mean wind speed [m/s]",
-            opacity=marker_opacity
+            opacity=marker_opacity,
+            marker_color=marker_color
         )
     )
 
@@ -289,6 +291,7 @@ def add_direction_arrows(
     x_scale=25,
     y_scale=0.75,
     y_distance=1,
+    marker_color=layout_colors["primary"],
     marker_opacity=1,
     **kwargs
 ):
@@ -314,7 +317,7 @@ def add_direction_arrows(
             arrowhead=2,
             arrowsize=1.5,
             arrowwidth=1.1,
-            #arrowcolor=layout_colors['orange'],
+            arrowcolor=marker_color,
             opacity=marker_opacity,
             xref="x",
             yref="y",
@@ -329,6 +332,7 @@ def add_max_wind_chart(
     col_datetime,
     col_wind_max_speed,
     marker_opacity=1,
+    marker_color=layout_colors["primary"],
     chart=None,
     **kwargs
 ):
@@ -343,13 +347,14 @@ def add_max_wind_chart(
             hovertemplate=
             'Max wind speed (3s): %{y}<extra></extra>',
             line=dict(
-                width=2,
+                width=3,
                 dash='dash'
             ),
             showlegend=True,
             name='Max wind speed',
             legendrank=1,
-            opacity=marker_opacity
+            opacity=marker_opacity,
+            marker_color=marker_color,
         )
     )
 
@@ -402,9 +407,12 @@ def add_obs_data_to_forecast_chart(
 
     kwargs["col_datetime"] = "map_forecast_time"
 
+    color = layout_colors["orange"]
+
     chart = create_wind_speed_chart(
         obs_filtered,
-        marker_opacity=0.2,
+        marker_opacity=0.6,
+        marker_color=color,
         chart=chart,
         **kwargs
     )
@@ -412,14 +420,16 @@ def add_obs_data_to_forecast_chart(
     chart = add_direction_arrows(
         df=obs_filtered,
         chart=chart,
-        marker_opacity=0.5,
+        marker_opacity=0.6,
+        marker_color=color,
         **kwargs
     )
 
     chart = add_max_wind_chart(
         df=obs_filtered,
         chart=chart,
-        marker_opacity=0.5,
+        marker_opacity=0.7,
+        marker_color=color,
         **kwargs
     )
     
