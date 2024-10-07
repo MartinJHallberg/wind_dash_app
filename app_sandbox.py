@@ -23,7 +23,6 @@ def custom_error_handler(err):
 
 
 app = Dash(
-    #external_stylesheets=[dbc.themes.MORPH],
     prevent_initial_callbacks=True
 )
 
