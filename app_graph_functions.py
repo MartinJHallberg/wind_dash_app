@@ -307,7 +307,7 @@ def add_direction_arrows(
             arrowhead=2,
             arrowsize=1.5,
             arrowwidth=1.1,
-            arrowcolor=layout_colors['orange'],
+            #arrowcolor=layout_colors['orange'],
             opacity=marker_opacity,
             xref="x",
             yref="y",

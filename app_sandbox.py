@@ -23,7 +23,7 @@ def custom_error_handler(err):
 
 
 app = Dash(
-    external_stylesheets=[dbc.themes.MORPH],
+    #external_stylesheets=[dbc.themes.MORPH],
     prevent_initial_callbacks=True
 )
 
@@ -50,10 +50,10 @@ dmi_forecast_data = parse_dmi_forecast_data_wind(dmi_forecast_data)
 
 # HEADER
 header_app = dbc.Col(
-    html.H1("Header"),
-    style={
-        "background-color" : "#2196f3",
-    }
+    html.H1(
+        "Header",
+        className="navbar navbar-expand-lg bg-primary"
+    ),
 )
 
 # MAP
