@@ -55,9 +55,7 @@ header_app = dbc.Col(
     ),
 )
 
-navbar_app = dbc.Col(
-    #html.H1("Card Header"),
-    dbc.Card([
+navbar_app = dbc.Card([
         dbc.CardBody([
             html.H2(id="navigation_bar_header", children="Card header")
         ])
@@ -65,11 +63,12 @@ navbar_app = dbc.Col(
     class_name="card",
     style={
         "height": "100vh",
-        "width": "20rem",
-        "position": "fixed"
+        "width": "16rem",
+        "position": "fixed",
+        "background-color": "blue",
     }
     ),
-    width=2,
+    #width=2,
     # dbc.NavbarSimple(
     # children=[
     #     dbc.NavItem(dbc.NavLink("Page 1", href="#")),
@@ -90,11 +89,13 @@ navbar_app = dbc.Col(
     # dark=True,
     # class_name="navbar navbar-expand-lg bg-primary"
     # )
-)
-# MAP
+
+
+# FIGURES
+# Map
 fig_map = graphs.create_map_chart()
 
-# FORECAST CHART
+# Forecast chart
 chart_dmi_forecast = graphs.create_forecast_chart(
         forecast_data=dmi_forecast_data,
         col_wind_speed="wind_speed",
@@ -104,8 +105,7 @@ chart_dmi_forecast = graphs.create_forecast_chart(
         cell_id=start_cell_id
     )
 
-map_app = dbc.Col(
-    [
+content_top_row = html.Div([
         dcc.Graph(
             id='map_figure',
             figure=fig_map,
@@ -113,15 +113,33 @@ map_app = dbc.Col(
                 'displayModeBar': False},
             style={
                 'height': '50vh',
+                "display": "inline-block",
+                "width": "70%",
                 }
-            ),
+        ),
+        html.H1(
+            id="some_text",
+            children="Test text",
+            style={
+                "display": "inline-block",
+                "width": "20%",
+                "verticalAlign": "top"
+            }
+        ),
+    ],
+
+)
+
+content = html.Div(
+    [
+        content_top_row,
         dcc.Graph(
             id="chart_forecast_new",
             figure=chart_dmi_forecast,
         ),
 
     ],
-    width=8,
+    #width=8,
 )
 
 
@@ -228,43 +246,33 @@ app.layout = dbc.Container(
             justify="center",
         ),
 
-        dbc.Row(
-            [
+        dbc.Row([
+            dbc.Col(
                 navbar_app,
-                map_app
-            ],
-            justify="start",
+                width=6,
+                lg=3,
+            ),
+            dbc.Col(
+                content,
+                width=5,
+                lg=8,
+            ),
+        ],
+        justify="start",
         ),
-
+        
         # dbc.Row(
-        #     map_app,
-        #     justify="center",
-
-        # ),
-
-        # dbc.Row(
-        #     date_picker_app,
-        #     justify="center",
-
-        # ),
-
-        # dbc.Row(
-        #     chart_forecast_app,
+        #     [
+        #         chart_forecast_w_obs_app,
+        #         date_and_toggle_switch_column,
+        #     ],
         #     justify="center",
         #     ),
-        
-        dbc.Row(
-            [
-                chart_forecast_w_obs_app,
-                date_and_toggle_switch_column,
-            ],
-            justify="center",
-            ),
 
-        dbc.Row(
-            chart_obs_app,
-            justify="center",
-            ),
+        # dbc.Row(
+        #     chart_obs_app,
+        #     justify="center",
+        #     ),
         
         dbc.Row(
             text_app,
