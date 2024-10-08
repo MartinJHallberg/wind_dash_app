@@ -55,18 +55,65 @@ header_app = dbc.Col(
     ),
 )
 
+sidebar = html.Div(
+    [
+        dbc.Row(
+            [
+                html.Img(src="assets/logos/amazon.svg", style={"height": "35px"})
+            ],
+            className="sidebar-logo",
+        ),
+        html.Hr(),
+        dbc.Nav(
+            [
+                dbc.NavLink(
+                    "Purchase Overview", href="/puchase_overview", active="exact"
+                ),
+                dbc.NavLink(
+                    "Customer demographics",
+                    href="/customer_demographics",
+                    active="exact",
+                ),
+                dbc.NavLink(
+                    "Book recommendation", href="/book_recommendation", active="exact"
+                ),
+            ],
+            vertical=True,
+            pills=True,
+        ),
+        html.Div(
+            [
+                html.Br(),
+            ],
+            className="subtitle-sidebar",
+            style={"position": "absolute", "bottom": "10px", "width": "100%"},
+        ),
+    ],
+    className="sidebar"
+    # style={
+    #     "position": "fixed",
+    #     "top": "0",
+    #     "left": "0",
+    #     "bottom": "0",
+    #     "width": "16rem",
+    #     "padding": "1rem 1rem",
+    #     "background-color": "#fff",
+    # }
+)
+
+
 navbar_app = dbc.Card([
         dbc.CardBody([
             html.H2(id="navigation_bar_header", children="Card header")
         ])
     ],
     class_name="card",
-    style={
-        "height": "100vh",
-        "width": "13rem",
-        "position": "fixed",
-        "background-color": "blue",
-    }
+    # style={
+    #     "height": "100vh",
+    #     "width": "13rem",
+    #     "position": "fixed",
+    #     "background-color": "blue",
+    # }
     ),
 
 # FIGURES
@@ -98,10 +145,10 @@ content_top_row = html.Div([
                 'height': '50vh',
             }
         ),
-        style={
-                "display": "inline-block",
-                "width": "70%",
-                },
+        # style={
+        #         "display": "inline-block",
+        #         "width": "70%",
+        #         },
        class_name="card"
     ),
         html.Div([
@@ -130,12 +177,12 @@ content_top_row = html.Div([
             class_name="card bg-light mb-3",
             ),
         ],
-        style={
-                "display": "inline-block",
-                "width": "20%",
-                "verticalAlign": "top",
-                "justify-content": "right",
-            }
+        # style={
+        #         "display": "inline-block",
+        #         "width": "20%",
+        #         "verticalAlign": "top",
+        #         "justify-content": "right",
+        #     }
         ),
     ],
 )
@@ -144,10 +191,10 @@ content_bottom_row = html.Div([
         dcc.Graph(
             id="chart_forecast",
             figure=chart_dmi_forecast,
-            style={
-                "display": "inline-block",
-                "width": "80%",
-            }
+            # style={
+            #     "display": "inline-block",
+            #     "width": "80%",
+            # }
         ),
 
          html.Div([
@@ -171,11 +218,11 @@ content_bottom_row = html.Div([
             html.Div(id='toggle-switch-result'),
             html.Div(id="error-no-obs-date"),
             ],
-            style={
-                    "display": "inline-block",
-                    "width": "20%",
-                    "vertical-align":"top",
-                }
+            # style={
+            #         "display": "inline-block",
+            #         "width": "20%",
+            #         "vertical-align":"top",
+            #     }
             ),
 ])
 
@@ -251,33 +298,60 @@ text_app = dbc.Col(
 )
 #####################################################
 
+content_ = html.Div(
+    className="content"
+)
 
+page_content = dbc.Container(
+    html.Div(
+        [
+            html.H1("Header")
+        ],
+        className="content"
+    )
+)
 
 ########### APP LAYOUT ##############################
-app.layout = dbc.Container(
+app.layout = html.Div(
     [
-        dbc.Row(
-            header_app,
-            justify="center",
-        ),
+        sidebar,
+        #content_,
+        page_content
+        # dbc.Container([
+        #     html.H1("Test")
+        # ],
+        # fluid=True)
+        #html.H1("Test"),
 
-        dbc.Row([
-            dbc.Col(
-                navbar_app,
-                width=6,
-                lg=2,
-            ),
-            dbc.Col(
-                content,
-                width={"size":"5"},
-                lg=8,
-            style={
-                "margin-left": "3rem",
-            }
-            ),
-        ],
-        justify="start",
-        ),
+    #     dbc.Container([
+    #         html.Div([
+    #             dbc.Row([
+    #             # dbc.Col(
+    #             #     navbar_app,
+    #             #     width=6,
+    #             #     lg=2,
+    #             # ),
+    #             dbc.Col(
+    #                 #content,
+    #                 html.H1("Test"),
+    #                 # width={"size":"5"},
+    #                 # lg=8,
+    #             style={
+    #                 "margin-left": "3rem",
+    #             }
+    #         ),
+    #     ],
+    #     justify="start",
+    #     ),
+    #     ],
+    #     #className="page-content"
+    #     ),
+
+    #     ],
+    #     fluid=True
+    # ),
+
+
         
         # dbc.Row(
         #     [
@@ -292,13 +366,14 @@ app.layout = dbc.Container(
         #     justify="center",
         #     ),
         
-        dbc.Row(
-            text_app,
-            justify="center",
-            ),
+        # dbc.Row(
+        #     text_app,
+        #     justify="center",
+        #     ),
     ],
-    fluid=True,
-    class_name="container-fluid"
+    className="main-div"
+    # fluid=True,
+    # class_name="container-fluid"
 )
 #########################################################
 
