@@ -215,13 +215,17 @@
 }
 
 .content {
-  margin-left: 12rem;
+  margin-left: calc(16rem + 1rem);
   margin-right: 1rem;
   padding: 1rem;
-  background-color: #f5f5f5;
+  background-color: var(--bs-secondary);
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+}
+
+.row-content{
+  display: flex;
 }
 
 .sidebar {
@@ -231,7 +235,7 @@
   bottom: 0;
   width: 16rem;
   padding: 1rem 1rem;
-  background-color: #fff;
+  background-color: var(--bs-light);
 }
 
 body {

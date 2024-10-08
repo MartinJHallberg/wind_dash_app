@@ -185,6 +185,7 @@ content_top_row = html.Div([
         #     }
         ),
     ],
+    className="row-content"
 )
 
 content_bottom_row = html.Div([
@@ -305,10 +306,18 @@ content_ = html.Div(
 page_content = dbc.Container(
     html.Div(
         [
-            html.H1("Header")
+            html.H1("Header"),
+
+            dbc.Row(
+                dbc.Col(
+                    content_top_row,
+                    lg=10
+                )
+            )
         ],
         className="content"
-    )
+    ),
+    fluid=True,
 )
 
 ########### APP LAYOUT ##############################
@@ -396,6 +405,18 @@ app.layout = html.Div(
 #     chart = graphs.create_forecast_chart_wind(dmi_forecast_data, cell_id)
 
 #     return chart
+
+@app.callback(
+        Output("area_name_card", "children"),
+        Input('map_figure', 'clickData'),
+)
+def update_area_name(click_data):
+
+    if click_data is None:
+        return "Gilleleje"
+    
+    else:
+        return click_data["points"][0]["customdata"][0]
 
 @app.callback(
     Output("chart_forecast", 'figure'),
