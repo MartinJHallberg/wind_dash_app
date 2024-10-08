@@ -99,9 +99,16 @@ cardinal_directions = [
 
 def degrees_to_cardinal_directions(degrees):
 
+    #try:
     ix = round(degrees / (360. / len(cardinal_directions)))
-    
     card_text = cardinal_directions[ix % len(cardinal_directions)]
+
+    return card_text
+    
+    # except:
+    #     print(degrees)
+    
+    
     
     return card_text
 

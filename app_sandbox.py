@@ -33,9 +33,11 @@ start_cell_id="10km_622_71"
 start_date="2023-01-02"
 
 ######## READ BASE DATA ######################
-dmi_obs_data = pd.read_csv("data/parse_data_test.csv", usecols=[
-    "cellId", "from", "parameterId", "value"
-])
+dmi_obs_data = pd.read_csv(
+    "data/parse_data_test.csv", 
+    usecols=["cellId", "from", "parameterId", "value"],
+    nrows=200000
+    )
 
 dmi_forecast_data = pd.read_csv("data/wind_forecast.csv")
 dmi_forecast_data = parse_dmi_forecast_data_wind(dmi_forecast_data)
@@ -48,35 +50,59 @@ dmi_forecast_data = parse_dmi_forecast_data_wind(dmi_forecast_data)
 # HEADER
 header_app = dbc.Col(
     html.H1(
-        children=["Test"],
+        children=["Header"],
         className="header"
     ),
 )
 
 navbar_app = dbc.Col(
-    dbc.NavbarSimple(
-    children=[
-        dbc.NavItem(dbc.NavLink("Page 1", href="#")),
-        dbc.DropdownMenu(
-            children=[
-                dbc.DropdownMenuItem("More pages", header=True),
-                dbc.DropdownMenuItem("Page 2", href="#"),
-                dbc.DropdownMenuItem("Page 3", href="#"),
-            ],
-            nav=True,
-            in_navbar=True,
-            label="More",
-        ),
+    #html.H1("Card Header"),
+    dbc.Card([
+        dbc.CardBody([
+            html.H2(id="navigation_bar_header", children="Card header")
+        ])
     ],
-    brand="Surf Wind",
-    brand_href="#",
-    color="primary",
-    dark=True,
-    class_name="navbar navbar-expand-lg bg-primary"
-    )
+    class_name="card",
+    style={
+        "height": "100vh",
+        "width": "20rem",
+        "position": "fixed"
+    }
+    ),
+    width=2,
+    # dbc.NavbarSimple(
+    # children=[
+    #     dbc.NavItem(dbc.NavLink("Page 1", href="#")),
+    #     dbc.DropdownMenu(
+    #         children=[
+    #             dbc.DropdownMenuItem("More pages", header=True),
+    #             dbc.DropdownMenuItem("Page 2", href="#"),
+    #             dbc.DropdownMenuItem("Page 3", href="#"),
+    #         ],
+    #         nav=True,
+    #         in_navbar=True,
+    #         label="More",
+    #     ),
+    # ],
+    # brand="Surf Wind",
+    # brand_href="#",
+    # color="primary",
+    # dark=True,
+    # class_name="navbar navbar-expand-lg bg-primary"
+    # )
 )
 # MAP
 fig_map = graphs.create_map_chart()
+
+# FORECAST CHART
+chart_dmi_forecast = graphs.create_forecast_chart(
+        forecast_data=dmi_forecast_data,
+        col_wind_speed="wind_speed",
+        col_wind_max_speed="gust_wind_speed_10m",
+        col_wind_direction="wind_dir",
+        col_datetime="timestamp",
+        cell_id=start_cell_id
+    )
 
 map_app = dbc.Col(
     [
@@ -89,19 +115,16 @@ map_app = dbc.Col(
                 'height': '50vh',
                 }
             ),
+        dcc.Graph(
+            id="chart_forecast_new",
+            figure=chart_dmi_forecast,
+        ),
+
     ],
     width=8,
 )
 
-# FORECAST CHART
-chart_dmi_forecast = graphs.create_forecast_chart(
-        forecast_data=dmi_forecast_data,
-        col_wind_speed="wind_speed",
-        col_wind_max_speed="gust_wind_speed_10m",
-        col_wind_direction="wind_dir",
-        col_datetime="timestamp",
-        cell_id=start_cell_id
-    )
+
 
 chart_forecast_app = dbc.Col(
     [
@@ -198,23 +221,26 @@ text_app = dbc.Col(
 
 
 ########### APP LAYOUT ##############################
-app.layout = html.Div(
+app.layout = dbc.Container(
     [
-        dbc.Row(
-            navbar_app,
-            justify="center",
-        ),
-
         dbc.Row(
             header_app,
             justify="center",
         ),
 
         dbc.Row(
-            map_app,
-            justify="center",
-
+            [
+                navbar_app,
+                map_app
+            ],
+            justify="start",
         ),
+
+        # dbc.Row(
+        #     map_app,
+        #     justify="center",
+
+        # ),
 
         # dbc.Row(
         #     date_picker_app,
@@ -244,7 +270,9 @@ app.layout = html.Div(
             text_app,
             justify="center",
             ),
-    ]
+    ],
+    fluid=True,
+    class_name="container-fluid"
 )
 #########################################################
 
