@@ -127,17 +127,51 @@ content_top_row = html.Div([
             }
         ),
     ],
-
 )
+
+content_bottom_row = html.Div([
+        dcc.Graph(
+            id="chart_forecast",
+            figure=chart_dmi_forecast,
+            style={
+                "display": "inline-block",
+                "width": "70%",
+            }
+        ),
+
+         html.Div([
+
+            dcc.DatePickerSingle(
+                id='date_picker',
+                min_date_allowed=dt.date(2019, 1, 1),
+                max_date_allowed=dt.date.today(),
+                first_day_of_week=1,
+                date=dt.date.fromisoformat(start_date),
+                display_format='YYYY-MM-DD'
+            ),
+    
+            dmc.Switch(
+                #size="lg",
+                #radius="sm",
+                id='toggle-observational-data',
+                label="Show conditions from previous date",
+                checked=False
+            ),
+            html.Div(id='toggle-switch-result'),
+            html.Div(id="error-no-obs-date"),
+            ],
+            style={
+                    "display": "inline-block",
+                    "width": "20%",
+                    "vertical-align":"top",
+                }
+            ),
+])
 
 content = html.Div(
     [
         content_top_row,
-        dcc.Graph(
-            id="chart_forecast_new",
-            figure=chart_dmi_forecast,
-        ),
-
+        content_bottom_row
     ],
     #width=8,
 )
@@ -168,30 +202,24 @@ chart_forecast_w_obs_app = dbc.Col(
 
 date_and_toggle_switch_column = dbc.Col(
     [
-        # daq.ToggleSwitch(
-        #     id='toggle-observational-data',
-        #     value=False,
-        #     #color="blue",
-        #     #className="form-switch"
-        # ),
-        dcc.DatePickerSingle(
-            id='date_picker',
-            min_date_allowed=dt.date(2019, 1, 1),
-            max_date_allowed=dt.date.today(),
-            first_day_of_week=1,
-            date=dt.date.fromisoformat(start_date),
-            display_format='YYYY-MM-DD'
-            ),
+    #     dcc.DatePickerSingle(
+    #         id='date_picker',
+    #         min_date_allowed=dt.date(2019, 1, 1),
+    #         max_date_allowed=dt.date.today(),
+    #         first_day_of_week=1,
+    #         date=dt.date.fromisoformat(start_date),
+    #         display_format='YYYY-MM-DD'
+    #         ),
     
-        dmc.Switch(
-        #size="lg",
-        #radius="sm",
-        id='toggle-observational-data',
-        label="Show conditions from previous date",
-        checked=False
-    ),
-        html.Div(id='toggle-switch-result'),
-        html.Div(id="error-no-obs-date")    
+    #     dmc.Switch(
+    #     #size="lg",
+    #     #radius="sm",
+    #     id='toggle-observational-data',
+    #     label="Show conditions from previous date",
+    #     checked=False
+    # ),
+    #     html.Div(id='toggle-switch-result'),
+    #     html.Div(id="error-no-obs-date")    
     ],
     width=2
 )
@@ -305,7 +333,7 @@ app.layout = dbc.Container(
 #     return chart
 
 @app.callback(
-    Output("chart_forecast_w_obs", 'figure'),
+    Output("chart_forecast", 'figure'),
     Output("error-no-obs-date", 'children'),
     Input('toggle-observational-data', 'checked'),
     Input('map_figure', 'clickData'),
