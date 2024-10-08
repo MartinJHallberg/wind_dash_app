@@ -51,7 +51,7 @@ dmi_forecast_data = parse_dmi_forecast_data_wind(dmi_forecast_data)
 header_app = dbc.Col(
     html.H1(
         children=["Header"],
-        className="header"
+        className="page-header"
     ),
 )
 
@@ -63,33 +63,11 @@ navbar_app = dbc.Card([
     class_name="card",
     style={
         "height": "100vh",
-        "width": "16rem",
+        "width": "13rem",
         "position": "fixed",
         "background-color": "blue",
     }
     ),
-    #width=2,
-    # dbc.NavbarSimple(
-    # children=[
-    #     dbc.NavItem(dbc.NavLink("Page 1", href="#")),
-    #     dbc.DropdownMenu(
-    #         children=[
-    #             dbc.DropdownMenuItem("More pages", header=True),
-    #             dbc.DropdownMenuItem("Page 2", href="#"),
-    #             dbc.DropdownMenuItem("Page 3", href="#"),
-    #         ],
-    #         nav=True,
-    #         in_navbar=True,
-    #         label="More",
-    #     ),
-    # ],
-    # brand="Surf Wind",
-    # brand_href="#",
-    # color="primary",
-    # dark=True,
-    # class_name="navbar navbar-expand-lg bg-primary"
-    # )
-
 
 # FIGURES
 # Map
@@ -105,7 +83,12 @@ chart_dmi_forecast = graphs.create_forecast_chart(
         cell_id=start_cell_id
     )
 
+content_header = html.Div([
+    html.H1("Surf Wind Analytics")
+])
+
 content_top_row = html.Div([
+    dbc.Card(
         dcc.Graph(
             id='map_figure',
             figure=fig_map,
@@ -113,17 +96,45 @@ content_top_row = html.Div([
                 'displayModeBar': False},
             style={
                 'height': '50vh',
+            }
+        ),
+        style={
                 "display": "inline-block",
                 "width": "70%",
-                }
-        ),
-        html.H1(
-            id="some_text",
-            children="Test text",
-            style={
+                },
+       class_name="card"
+    ),
+        html.Div([
+            dbc.Card(
+                dbc.CardBody([
+                    html.Div(
+                        "Area",
+                    ),
+                    html.H5(
+                        id="area_name_card",
+                        children="Gilleleje"
+                    )
+                ]),
+            class_name="card bg-light mb-3",
+            ),
+            dbc.Card(
+                dbc.CardBody([
+                    html.Div(
+                        "Wind speed",
+                    ),
+                    html.H5(
+                        id="wind_speed_card",
+                        children="7 m/s"
+                    )
+                ]),
+            class_name="card bg-light mb-3",
+            ),
+        ],
+        style={
                 "display": "inline-block",
                 "width": "20%",
-                "verticalAlign": "top"
+                "verticalAlign": "top",
+                "justify-content": "right",
             }
         ),
     ],
@@ -135,7 +146,7 @@ content_bottom_row = html.Div([
             figure=chart_dmi_forecast,
             style={
                 "display": "inline-block",
-                "width": "70%",
+                "width": "80%",
             }
         ),
 
@@ -170,6 +181,7 @@ content_bottom_row = html.Div([
 
 content = html.Div(
     [
+        content_header,
         content_top_row,
         content_bottom_row
     ],
@@ -200,31 +212,6 @@ chart_forecast_w_obs_app = dbc.Col(
     width=8
 )
 
-date_and_toggle_switch_column = dbc.Col(
-    [
-    #     dcc.DatePickerSingle(
-    #         id='date_picker',
-    #         min_date_allowed=dt.date(2019, 1, 1),
-    #         max_date_allowed=dt.date.today(),
-    #         first_day_of_week=1,
-    #         date=dt.date.fromisoformat(start_date),
-    #         display_format='YYYY-MM-DD'
-    #         ),
-    
-    #     dmc.Switch(
-    #     #size="lg",
-    #     #radius="sm",
-    #     id='toggle-observational-data',
-    #     label="Show conditions from previous date",
-    #     checked=False
-    # ),
-    #     html.Div(id='toggle-switch-result'),
-    #     html.Div(id="error-no-obs-date")    
-    ],
-    width=2
-)
-
-#toggle_switch_column = dbc.Col(html.Div("One of three columns"), width=3),
 
 # OBSERVATIONAL CHART
 chart_dmi_obs = graphs.create_obs_chart(
@@ -278,12 +265,15 @@ app.layout = dbc.Container(
             dbc.Col(
                 navbar_app,
                 width=6,
-                lg=3,
+                lg=2,
             ),
             dbc.Col(
                 content,
-                width=5,
+                width={"size":"5"},
                 lg=8,
+            style={
+                "margin-left": "3rem",
+            }
             ),
         ],
         justify="start",
