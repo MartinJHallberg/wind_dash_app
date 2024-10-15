@@ -59,7 +59,7 @@ sidebar = html.Div(
     [
         dbc.Row(
             [
-                html.Img(src="assets/logos/amazon.svg", style={"height": "35px"})
+                #html.Img(src="assets/logos/amazon.svg", style={"height": "35px"})
             ],
             className="sidebar-logo",
         ),
@@ -134,8 +134,7 @@ content_header = html.Div([
     html.H1("Surf Wind Analytics")
 ])
 
-content_top_row = html.Div([
-    dbc.Card(
+map_card = dbc.Card(
         dcc.Graph(
             id='map_figure',
             figure=fig_map,
@@ -145,23 +144,24 @@ content_top_row = html.Div([
                 'height': '50vh',
             }
         ),
-        # style={
-        #         "display": "inline-block",
-        #         "width": "70%",
-        #         },
        class_name="card"
-    ),
-        html.Div([
+    )
+
+right_cards = html.Div([
             dbc.Card(
                 dbc.CardBody([
                     html.Div(
                         "Area",
+                        className="card-header",
                     ),
                     html.H5(
                         id="area_name_card",
-                        children="Gilleleje"
+                        children="Gilleleje",
+                        className="card-title"
                     )
-                ]),
+                ],
+                class_name="card-body",
+                ),
             class_name="card bg-light mb-3",
             ),
             dbc.Card(
@@ -177,29 +177,15 @@ content_top_row = html.Div([
             class_name="card bg-light mb-3",
             ),
         ],
-        # style={
-        #         "display": "inline-block",
-        #         "width": "20%",
-        #         "verticalAlign": "top",
-        #         "justify-content": "right",
-        #     }
         ),
-    ],
-    className="row-content"
-)
 
-content_bottom_row = html.Div([
-        dcc.Graph(
+fig_forecast_w_obs = dcc.Graph(
             id="chart_forecast",
             figure=chart_dmi_forecast,
-            # style={
-            #     "display": "inline-block",
-            #     "width": "80%",
-            # }
-        ),
+        )
 
-         html.Div([
 
+control_fig_forecast = html.Div([
             dcc.DatePickerSingle(
                 id='date_picker',
                 min_date_allowed=dt.date(2019, 1, 1),
@@ -219,19 +205,13 @@ content_bottom_row = html.Div([
             html.Div(id='toggle-switch-result'),
             html.Div(id="error-no-obs-date"),
             ],
-            # style={
-            #         "display": "inline-block",
-            #         "width": "20%",
-            #         "vertical-align":"top",
-            #     }
-            ),
-])
+            )
 
 content = html.Div(
     [
         content_header,
-        content_top_row,
-        content_bottom_row
+        #content_top_row,
+        #content_bottom_row
     ],
     #width=8,
 )
@@ -309,10 +289,34 @@ page_content = dbc.Container(
             html.H1("Header"),
 
             dbc.Row(
-                dbc.Col(
-                    content_top_row,
-                    lg=10
-                )
+                [
+                    dbc.Col(
+                        map_card,
+                        lg=8
+                    ),
+                    
+                    dbc.Col(
+                        right_cards,
+                        width=2
+                    )
+                ]
+            ),
+
+            html.Br(),
+
+            dbc.Row(
+                [
+                    dbc.Col(
+                        fig_forecast_w_obs,
+                        lg=8
+                    ),
+
+                    dbc.Col(
+                        control_fig_forecast,
+                        width=2
+                    )
+
+                ]
             )
         ],
         className="content"
