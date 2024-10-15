@@ -330,63 +330,8 @@ app.layout = html.Div(
         sidebar,
         #content_,
         page_content
-        # dbc.Container([
-        #     html.H1("Test")
-        # ],
-        # fluid=True)
-        #html.H1("Test"),
-
-    #     dbc.Container([
-    #         html.Div([
-    #             dbc.Row([
-    #             # dbc.Col(
-    #             #     navbar_app,
-    #             #     width=6,
-    #             #     lg=2,
-    #             # ),
-    #             dbc.Col(
-    #                 #content,
-    #                 html.H1("Test"),
-    #                 # width={"size":"5"},
-    #                 # lg=8,
-    #             style={
-    #                 "margin-left": "3rem",
-    #             }
-    #         ),
-    #     ],
-    #     justify="start",
-    #     ),
-    #     ],
-    #     #className="page-content"
-    #     ),
-
-    #     ],
-    #     fluid=True
-    # ),
-
-
-        
-        # dbc.Row(
-        #     [
-        #         chart_forecast_w_obs_app,
-        #         date_and_toggle_switch_column,
-        #     ],
-        #     justify="center",
-        #     ),
-
-        # dbc.Row(
-        #     chart_obs_app,
-        #     justify="center",
-        #     ),
-        
-        # dbc.Row(
-        #     text_app,
-        #     justify="center",
-        #     ),
     ],
     className="main-div"
-    # fluid=True,
-    # class_name="container-fluid"
 )
 #########################################################
 
@@ -430,7 +375,9 @@ def update_area_name(click_data):
     Input('date_picker', 'date')
 )
 
-def update_dmi_forecast_data_with_obs(toggle, click_data, date): # date is to be added as input here
+def update_dmi_forecast_data_with_obs(toggle, click_data, date):
+
+    print(date)
 
     if click_data is None:
         cell_id = start_cell_id
