@@ -292,12 +292,12 @@ page_content = dbc.Container(
                 [
                     dbc.Col(
                         map_card,
-                        lg=8
+                        md=9
                     ),
                     
                     dbc.Col(
                         right_cards,
-                        width=2
+                        md=2
                     )
                 ]
             ),
@@ -308,12 +308,12 @@ page_content = dbc.Container(
                 [
                     dbc.Col(
                         fig_forecast_w_obs,
-                        lg=8
+                        md=9
                     ),
 
                     dbc.Col(
                         control_fig_forecast,
-                        width=2
+                        md=2
                     )
 
                 ]
