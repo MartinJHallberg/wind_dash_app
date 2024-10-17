@@ -184,10 +184,25 @@ fig_forecast_w_obs = dcc.Graph(
             figure=chart_dmi_forecast,
         )
 
+control_fig_forecast = html.Div(
+    children=[
+        html.Div(id='toggle-switch-result'),
 
-control_fig_forecast = html.Div([
+        html.Div(id="error-no-obs-date"),
 
-    html.Div(
+        dcc.DatePickerSingle(
+                id='date_picker',
+                min_date_allowed=dt.date(2019, 1, 1),
+                max_date_allowed=dt.date.today(),
+                first_day_of_week=1,
+                date=dt.date.fromisoformat(start_date),
+                display_format='YYYY-MM-DD'
+        )
+    ]
+)
+
+card_control_fig_corecast = dbc.Card(
+    dbc.CardBody(
         [
             html.H6("Compare forecast with previous date"),
             dmc.Switch(
@@ -196,25 +211,17 @@ control_fig_forecast = html.Div([
                 id='toggle-observational-data',
                 #label="Show conditions from previous date",
                 checked=False
-            ),
-        ],
-        className="toggle-control"
-    ),
-
-    html.Div(id='toggle-switch-result'),
-
-    html.Div(id="error-no-obs-date"),
-
-    dcc.DatePickerSingle(
-            id='date_picker',
-            min_date_allowed=dt.date(2019, 1, 1),
-            max_date_allowed=dt.date.today(),
-            first_day_of_week=1,
-            date=dt.date.fromisoformat(start_date),
-            display_format='YYYY-MM-DD'
         ),
-    ],
-    )
+        html.Div(
+            id = "control_fig_forecast",
+            children=[]
+        )
+        ],
+        class_name="card-body"
+        ),
+        class_name="card bg-light mb-3"
+)
+
 
 content = html.Div(
     [
@@ -321,7 +328,7 @@ page_content = dbc.Container(
                     ),
 
                     dbc.Col(
-                        control_fig_forecast,
+                        card_control_fig_corecast,
                         md=2
                     )
 
@@ -363,6 +370,17 @@ app.layout = html.Div(
 #     chart = graphs.create_forecast_chart_wind(dmi_forecast_data, cell_id)
 
 #     return chart
+@app.callback(
+    Output("control_fig_forecast", "children"),
+    Input('toggle-observational-data', 'checked'),
+)
+def show_forecast_control(toggle):
+
+    if toggle:
+
+        return control_fig_forecast
+    
+    return []
 
 @app.callback(
         Output("area_name_card", "children"),
