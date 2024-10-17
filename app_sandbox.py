@@ -40,6 +40,19 @@ dmi_obs_data = pd.read_csv(
 dmi_forecast_data = pd.read_csv("data/wind_forecast.csv")
 dmi_forecast_data = parse_dmi_forecast_data_wind(dmi_forecast_data)
 
+######## CREATE INITIAL FIGURES ##############
+# Map
+fig_map = graphs.create_map_chart()
+
+# Forecast chart
+chart_dmi_forecast = graphs.create_forecast_chart(
+        forecast_data=dmi_forecast_data,
+        col_wind_speed="wind_speed",
+        col_wind_max_speed="gust_wind_speed_10m",
+        col_wind_direction="wind_dir",
+        col_datetime="timestamp",
+        cell_id=start_cell_id
+    )
 
 ######## SET UP DASH COMPONENTS ##############
 
@@ -87,20 +100,6 @@ sidebar = html.Div(
     ],
     className="sidebar"
 )
-
-# FIGURES
-# Map
-fig_map = graphs.create_map_chart()
-
-# Forecast chart
-chart_dmi_forecast = graphs.create_forecast_chart(
-        forecast_data=dmi_forecast_data,
-        col_wind_speed="wind_speed",
-        col_wind_max_speed="gust_wind_speed_10m",
-        col_wind_direction="wind_dir",
-        col_datetime="timestamp",
-        cell_id=start_cell_id
-    )
 
 map_card = dbc.Card(
         dcc.Graph(
@@ -154,18 +153,6 @@ fig_forecast_w_obs = dcc.Graph(
 
 control_fig_forecast = html.Div(
     children=[
-        html.Div(id='toggle-switch-result'),
-
-        html.Div(id="error-no-obs-date"),
-
-        dcc.DatePickerSingle(
-                id='date_picker',
-                min_date_allowed=dt.date(2019, 1, 1),
-                max_date_allowed=dt.date.today(),
-                first_day_of_week=1,
-                date=dt.date.fromisoformat(start_date),
-                display_format='YYYY-MM-DD'
-        )
     ]
 )
 
@@ -181,7 +168,21 @@ card_control_fig_corecast = dbc.Card(
         ),
         html.Div(
             id = "control_fig_forecast",
-            children=[]
+            children=[
+                html.Div(id='toggle-switch-result'),
+
+                html.Div(id="error-no-obs-date"),
+
+                dcc.DatePickerSingle(
+                        id='date_picker',
+                        min_date_allowed=dt.date(2019, 1, 1),
+                        max_date_allowed=dt.date.today(),
+                        first_day_of_week=1,
+                        date=dt.date.fromisoformat(start_date),
+                        display_format='YYYY-MM-DD'
+                ),
+            ],
+            style={"display":"none"}
         )
         ],
         class_name="card-body"
@@ -189,18 +190,7 @@ card_control_fig_corecast = dbc.Card(
         class_name="card bg-light mb-3"
 )
 
-chart_forecast_w_obs_app = dbc.Col(
-    [
-        dcc.Graph(
-            id="chart_forecast_w_obs",
-            figure=chart_dmi_forecast,
-        ),
-    ],
-    class_name="card",
-    width=8
-)
-
-
+########### APP LAYOUT ##############################
 page_content = dbc.Container(
     html.Div(
         [
@@ -242,7 +232,6 @@ page_content = dbc.Container(
     fluid=True,
 )
 
-########### APP LAYOUT ##############################
 app.layout = html.Div(
     [
         sidebar,
@@ -251,38 +240,20 @@ app.layout = html.Div(
     ],
     className="main-div"
 )
-#########################################################
-
-
-############ CALLBAKCKS #################################
-
-# @app.callback(
-#     Output('chart_forecast', 'figure'),
-#     Input('map_figure', 'clickData'),
-# )
-
-# def update_dmi_forecast_data(click_data):
-
-#     if click_data is None:
-#         cell_id = start_cell_id
-    
-#     else:
-#         cell_id = click_data["points"][0]["location"]
-
-#     chart = graphs.create_forecast_chart_wind(dmi_forecast_data, cell_id)
-
-#     return chart
+############ CALLBAKCKS ################
 @app.callback(
-    Output("control_fig_forecast", "children"),
+    Output("control_fig_forecast", "style"),
     Input('toggle-observational-data', 'checked'),
 )
 def show_forecast_control(toggle):
 
     if toggle:
 
-        return control_fig_forecast
+        return {"display":"block"}
     
-    return []
+    else:
+        
+        return {"display":"none"}
 
 @app.callback(
         Output("area_name_card", "children"),
@@ -305,8 +276,6 @@ def update_area_name(click_data):
 )
 
 def update_dmi_forecast_data_with_obs(toggle, click_data, date):
-
-    print(date)
 
     if click_data is None:
         cell_id = start_cell_id
@@ -334,7 +303,6 @@ def update_dmi_forecast_data_with_obs(toggle, click_data, date):
                 col_datetime="from",
                 cell_id=cell_id,
                 obs_date=date,
-                #marker_opacity=0.2
             )
             return chart, "Observational data is shown"
         else:
@@ -350,45 +318,7 @@ def update_dmi_forecast_data_with_obs(toggle, click_data, date):
 def update_output(value):
     return f'The switch is {value}.'
 
-@app.callback(
-    Output('chart_obs', 'figure'),
-    Input('map_figure', 'clickData'),
-    Input('date_picker', 'date')
-)
-
-def update_dmi_obs_chart(click_data, date):
-
-    print(f"Map click {click_data}")
-
-    if click_data is None:
-        cell_id = start_cell_id
-    
-    else:
-        cell_id = click_data["points"][0]["location"]
-
-    chart = graphs.create_obs_chart(
-        dmi_obs_data,
-        cell_id,
-        date,
-    )
-
-    return chart
-
-
-@app.callback(
-    Output('text_output', 'children'),
-    Input('chart_obs', 'clickData'),
-)
-
-def test_chart_click(click_data):
-
-    print(f"Chart click {click_data}")
-
-    return f"Chart click: {click_data}"
-
 ###########################################################
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-
