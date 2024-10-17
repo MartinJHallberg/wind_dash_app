@@ -13,8 +13,6 @@ from app_helper_functions import parse_dmi_forecast_data_wind
 import datetime as dt
 import dash_daq as daq
 
-
-
 ######## INITIALIZE APP ####################
 def custom_error_handler(err):
     set_props(
@@ -41,8 +39,6 @@ dmi_obs_data = pd.read_csv(
 
 dmi_forecast_data = pd.read_csv("data/wind_forecast.csv")
 dmi_forecast_data = parse_dmi_forecast_data_wind(dmi_forecast_data)
-
-##############################################
 
 
 ######## SET UP DASH COMPONENTS ##############
@@ -90,31 +86,7 @@ sidebar = html.Div(
         ),
     ],
     className="sidebar"
-    # style={
-    #     "position": "fixed",
-    #     "top": "0",
-    #     "left": "0",
-    #     "bottom": "0",
-    #     "width": "16rem",
-    #     "padding": "1rem 1rem",
-    #     "background-color": "#fff",
-    # }
 )
-
-
-navbar_app = dbc.Card([
-        dbc.CardBody([
-            html.H2(id="navigation_bar_header", children="Card header")
-        ])
-    ],
-    class_name="card",
-    # style={
-    #     "height": "100vh",
-    #     "width": "13rem",
-    #     "position": "fixed",
-    #     "background-color": "blue",
-    # }
-    ),
 
 # FIGURES
 # Map
@@ -129,10 +101,6 @@ chart_dmi_forecast = graphs.create_forecast_chart(
         col_datetime="timestamp",
         cell_id=start_cell_id
     )
-
-content_header = html.Div([
-    html.H1("Surf Wind Analytics")
-])
 
 map_card = dbc.Card(
         dcc.Graph(
@@ -209,7 +177,6 @@ card_control_fig_corecast = dbc.Card(
                 #size="lg",
                 #radius="sm",
                 id='toggle-observational-data',
-                #label="Show conditions from previous date",
                 checked=False
         ),
         html.Div(
@@ -220,29 +187,6 @@ card_control_fig_corecast = dbc.Card(
         class_name="card-body"
         ),
         class_name="card bg-light mb-3"
-)
-
-
-content = html.Div(
-    [
-        content_header,
-        #content_top_row,
-        #content_bottom_row
-    ],
-    #width=8,
-)
-
-
-
-chart_forecast_app = dbc.Col(
-    [
-        dcc.Graph(
-            id="chart_forecast",
-            figure=chart_dmi_forecast,
-        ),
-    ],
-    class_name="card",
-    width=8
 )
 
 chart_forecast_w_obs_app = dbc.Col(
@@ -256,48 +200,6 @@ chart_forecast_w_obs_app = dbc.Col(
     width=8
 )
 
-
-# OBSERVATIONAL CHART
-chart_dmi_obs = graphs.create_obs_chart(
-    dmi_obs_data,
-    start_cell_id,
-    start_date,
-)
-
-chart_obs_app = dbc.Col(
-    [
-        dcc.Graph(
-            id="chart_obs",
-            figure=chart_dmi_obs,
-        ),
-    ],
-    class_name="card",
-    width=8
-)
-
-# DATE PICKER
-date_picker_app = dbc.Col(
-    dcc.DatePickerSingle(
-            id='date_picker_old',
-            min_date_allowed=dt.date(2019, 1, 1),
-            max_date_allowed=dt.date.today(),
-            first_day_of_week=1,
-            date=dt.date.fromisoformat(start_date),
-            display_format='YYYY-MM-DD'
-            ),
-    width="auto"
-)
-
-text_app = dbc.Col(
-    html.Div(
-        id="text_output"
-    )
-)
-#####################################################
-
-content_ = html.Div(
-    className="content"
-)
 
 page_content = dbc.Container(
     html.Div(
