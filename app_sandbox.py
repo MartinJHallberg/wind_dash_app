@@ -186,26 +186,35 @@ fig_forecast_w_obs = dcc.Graph(
 
 
 control_fig_forecast = html.Div([
-            dcc.DatePickerSingle(
-                id='date_picker',
-                min_date_allowed=dt.date(2019, 1, 1),
-                max_date_allowed=dt.date.today(),
-                first_day_of_week=1,
-                date=dt.date.fromisoformat(start_date),
-                display_format='YYYY-MM-DD'
-            ),
-    
+
+    html.Div(
+        [
+            html.H6("Compare forecast with previous date"),
             dmc.Switch(
                 #size="lg",
                 #radius="sm",
                 id='toggle-observational-data',
-                label="Show conditions from previous date",
+                #label="Show conditions from previous date",
                 checked=False
             ),
-            html.Div(id='toggle-switch-result'),
-            html.Div(id="error-no-obs-date"),
-            ],
-            )
+        ],
+        className="toggle-control"
+    ),
+
+    html.Div(id='toggle-switch-result'),
+
+    html.Div(id="error-no-obs-date"),
+
+    dcc.DatePickerSingle(
+            id='date_picker',
+            min_date_allowed=dt.date(2019, 1, 1),
+            max_date_allowed=dt.date.today(),
+            first_day_of_week=1,
+            date=dt.date.fromisoformat(start_date),
+            display_format='YYYY-MM-DD'
+        ),
+    ],
+    )
 
 content = html.Div(
     [
