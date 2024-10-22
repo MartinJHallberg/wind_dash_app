@@ -161,9 +161,10 @@ def create_full_wind_chart(
 
     # Set axes
     y_axes = dict(
-        gridwidth=0.1,
+        gridwidth=0.001,
         showticksuffix='last',
         ticksuffix=' m/s',
+        showgrid=True,
         range=[-2, y_max],
         #tickvals=[0,2,4],
         tickvals=[*range(0,int(y_max), 2)],

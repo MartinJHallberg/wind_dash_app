@@ -146,10 +146,14 @@ right_cards = html.Div([
         ],
         ),
 
-fig_forecast_w_obs = dcc.Graph(
+fig_forecast_w_obs = dbc.Card(
+    dcc.Graph(
             id="chart_forecast",
             figure=chart_dmi_forecast,
-        )
+        style={"margin":"1rem"}
+        ),
+    class_name="card"
+)
 
 control_fig_forecast = html.Div(
     children=[
@@ -164,11 +168,9 @@ card_control_fig_corecast = dbc.Card(
             ),
         
             dmc.Switch(
-                #size="lg",
-                #radius="sm",
                 id='toggle-observational-data',
                 checked=False,
-                color="rgba(41, 96, 214, 1)",
+                #color="rgba(41, 96, 214, 1)",
                 style={"display":"inline-block"}
             ),
         ],
