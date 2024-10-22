@@ -157,9 +157,13 @@ control_fig_forecast = html.Div(
 )
 
 card_control_fig_corecast = dbc.Card(
+    [
+        html.H6(
+            "Compare forecast with previous date",
+            className="toggle-control-header"
+        ),
     dbc.CardBody(
         [
-            html.H6("Compare forecast with previous date"),
             dmc.Switch(
                 #size="lg",
                 #radius="sm",
@@ -186,8 +190,9 @@ card_control_fig_corecast = dbc.Card(
         )
         ],
         class_name="card-body"
-        ),
-        class_name="card bg-light mb-3"
+    ),
+    ],
+    class_name="card bg-light mb-3"
 )
 
 ########### APP LAYOUT ##############################
