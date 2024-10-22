@@ -165,6 +165,9 @@ card_control_fig_corecast = dbc.Card(
         html.Div([
             html.H6(
                 "Compare forecast with previous date",
+                style={
+                    "margin-top": "0.5rem"
+                }
             ),
         
             dmc.Switch(
