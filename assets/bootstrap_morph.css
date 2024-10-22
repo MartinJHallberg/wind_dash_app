@@ -207,6 +207,7 @@
   color: var(--bs-primary-text-emphasis);
   background-color: var(--bs-light);
   text-align: center;
+  color: var(--bs-white);
 }
 
 .main-div{
@@ -230,7 +231,9 @@
 
 .toggle-control-header{
   background-color: var(--bs-primary);
-  color: var(--bs-secondary);
+  border-radius: var(--bs-border-radius) var(--bs-border-radius) 0 0;
+  color: var(--bs-white);
+  text-align: center;
 }
 
 .sidebar {

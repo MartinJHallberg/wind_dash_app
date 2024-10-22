@@ -158,18 +158,25 @@ control_fig_forecast = html.Div(
 
 card_control_fig_corecast = dbc.Card(
     [
-        html.H6(
-            "Compare forecast with previous date",
-            className="toggle-control-header"
-        ),
-    dbc.CardBody(
-        [
+        html.Div([
+            html.H6(
+                "Compare forecast with previous date",
+            ),
+        
             dmc.Switch(
                 #size="lg",
                 #radius="sm",
                 id='toggle-observational-data',
-                checked=False
+                checked=False,
+                color="rgba(41, 96, 214, 1)",
+                style={"display":"inline-block"}
+            ),
+        ],
+        className="toggle-control-header",
         ),
+
+    dbc.CardBody(
+        [
         html.Div(
             id = "control_fig_forecast",
             children=[
