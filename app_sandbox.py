@@ -119,12 +119,10 @@ right_cards = html.Div([
                 dbc.CardBody([
                     html.Div(
                         "Area",
-                        className="card-header",
                     ),
                     html.H5(
                         id="area_name_card",
                         children="Gilleleje",
-                        className="card-title"
                     )
                 ],
                 class_name="card-body",
@@ -150,7 +148,9 @@ fig_forecast_w_obs = dbc.Card(
     dcc.Graph(
             id="chart_forecast",
             figure=chart_dmi_forecast,
-        style={"margin":"1rem"}
+        style={
+            "margin":"1rem",
+            }
         ),
     class_name="card"
 )
@@ -185,9 +185,16 @@ card_control_fig_corecast = dbc.Card(
         html.Div(
             id = "control_fig_forecast",
             children=[
-                html.Div(id='toggle-switch-result'),
+                # html.Div(id='toggle-switch-result'),
 
-                html.Div(id="error-no-obs-date"),
+                # html.Div(id="error-no-obs-date"),
+
+                dmc.Select(
+                    #label="Select previous session",
+                    data=["Session1", "Session2"],
+                    searchable=True,
+                    #checkIconPosition="right",
+                ),
 
                 dcc.DatePickerSingle(
                         id='date_picker',
