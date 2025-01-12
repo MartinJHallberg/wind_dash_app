@@ -185,9 +185,9 @@ card_control_fig_corecast = dbc.Card(
         html.Div(
             id = "control_fig_forecast",
             children=[
-                # html.Div(id='toggle-switch-result'),
+                html.Div(id='toggle-switch-result'),
 
-                # html.Div(id="error-no-obs-date"),
+                html.Div(id="error-no-obs-date"),
 
                 dmc.Select(
                     #label="Select previous session",
