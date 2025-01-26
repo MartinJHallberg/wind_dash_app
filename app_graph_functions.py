@@ -154,30 +154,33 @@ def create_full_wind_chart(
         df[col_wind_max_speed].max()
     )
 
-    if y_max> 19:
-        y_max= 30
-    else:
-        y_max= 20
+    bins_list = [0.0, 15.0, 20.0, 25.0]
+    bins = np.array(bins_list)
+
+    y_max = bins_list[np.digitize(y_max, bins)] + 2
 
     # Set axes
     y_axes = dict(
-        gridwidth=0.0001,
+        gridwidth=0.001,
         showticksuffix='last',
         ticksuffix=' m/s',
-        range=[-3, y_max],
+        showgrid=True,
+        range=[-2, y_max],
+        #tickvals=[0,2,4],
+        tickvals=[*range(0,int(y_max), 2)],
         fixedrange=True,
-        tickfont_size=14
+        tickfont_size=12,
+        zerolinecolor=layout_colors["white"],
+        gridcolor=layout_colors["white"],
+        zerolinewidth=3
     )
     
     x_axes = dict(
         linewidth=0.1,
         showgrid=False,
         fixedrange=True,
-        tickfont_size=13
+        tickfont_size=12
     )
-
-    #chart.update_yaxes(y_axes)
-    #chart.update_xaxes(x_axes)
 
     chart.update_layout(
         xaxis=x_axes,
@@ -189,7 +192,12 @@ def create_full_wind_chart(
             x=0.01,
             font_size=15
         ),
-        margin=dict(l=40, r=40, t=10, b=20),
+        margin=dict(
+            l=1,
+            r=1,
+            b=10,
+            t=10,
+        ),
         paper_bgcolor=layout_colors["transparent"],
         hovermode='x unified',
         hoverlabel=dict(
@@ -197,9 +205,6 @@ def create_full_wind_chart(
             font=dict(color='black')
         ),
         clickmode = "event+select"
-        #plot_bgcolor=layout_colors["transparent"],
-        #autosize=True,
-        #bargap=0.5,
     )
 
     return chart
@@ -292,12 +297,10 @@ def create_wind_speed_chart(
 def add_direction_arrows(
     df,
     chart,
-    col_wind_speed,
     col_wind_direction,
     col_datetime,
     x_scale=25,
-    y_scale=0.75,
-    y_distance=1,
+    y_scale=0.65,
     marker_color=layout_colors["primary"],
     marker_opacity=1,
     **kwargs
@@ -308,7 +311,7 @@ def add_direction_arrows(
     for i, row in df.iterrows():
     
         x = row[col_datetime]
-        y = -1#row[col_wind_speed]
+        y = -1
 
         x_diff, y_diff = get_angle_coordinate_from_degree(row[col_wind_direction])
         x_diff = x_diff * x_scale
@@ -328,8 +331,6 @@ def add_direction_arrows(
             opacity=marker_opacity,
             xref="x",
             yref="y",
-            # row=2,
-            # col=1
         )
 
     return chart
@@ -440,7 +441,9 @@ def add_obs_data_to_forecast_chart(
         **kwargs
     )
     
-    chart.update_layout(barmode="overlay")
+    chart.update_layout(
+        barmode="overlay"
+    )
 
     return chart
 

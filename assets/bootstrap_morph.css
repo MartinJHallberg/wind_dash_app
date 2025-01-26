@@ -207,6 +207,7 @@
   color: var(--bs-primary-text-emphasis);
   background-color: var(--bs-light);
   text-align: center;
+  color: var(--bs-white);
 }
 
 .main-div{
@@ -226,6 +227,14 @@
 
 .row-content{
   display: flex;
+}
+
+.toggle-control-header{
+  background-color: var(--bs-primary);
+  border-radius: var(--bs-border-radius) var(--bs-border-radius) 0 0;
+  color: var(--bs-white);
+  text-align: center;
+  margin-bottom: 0.5rem;
 }
 
 .sidebar {
@@ -12770,31 +12779,31 @@ textarea.form-control-lg {
 }
 
 .card {
-  box-shadow: inset 2px 2px 6px rgba(109, 114, 121, 0.2), inset -3px -2px 4px rgba(255, 255, 255, 0.2);
+  box-shadow: 2px 2px 6px rgba(109, 114, 121, 0.2),  -3px -2px 4px rgba(255, 255, 255, 0.2);
 }
 .card-primary {
-  box-shadow: inset 2px 2px 6px rgba(11, 28, 50, 0.05), inset -3px -2px 4px rgba(215, 232, 254, 0.2);
+  box-shadow:  2px 2px 6px rgba(11, 28, 50, 0.05),  -3px -2px 4px rgba(215, 232, 254, 0.2);
 }
 .card-secondary {
-  box-shadow: inset 2px 2px 6px rgba(43, 45, 48, 0.05), inset -3px -2px 4px rgba(247, 249, 252, 0.2);
+  box-shadow:  2px 2px 6px rgba(43, 45, 48, 0.05),  -3px -2px 4px rgba(247, 249, 252, 0.2);
 }
 .card-success {
-  box-shadow: inset 2px 2px 6px rgba(13, 41, 8, 0.05), inset -3px -2px 4px rgba(217, 245, 212, 0.2);
+  box-shadow:  2px 2px 6px rgba(13, 41, 8, 0.05),  -3px -2px 4px rgba(217, 245, 212, 0.2);
 }
 .card-info {
-  box-shadow: inset 2px 2px 6px rgba(18, 20, 49, 0.05), inset -3px -2px 4px rgba(222, 224, 253, 0.2);
+  box-shadow:  2px 2px 6px rgba(18, 20, 49, 0.05),  -3px -2px 4px rgba(222, 224, 253, 0.2);
 }
 .card-warning {
-  box-shadow: inset 2px 2px 6px rgba(51, 39, 1, 0.05), inset -3px -2px 4px rgba(255, 243, 205, 0.2);
+  box-shadow:  2px 2px 6px rgba(51, 39, 1, 0.05),  -3px -2px 4px rgba(255, 243, 205, 0.2);
 }
 .card-danger {
-  box-shadow: inset 2px 2px 6px rgba(46, 7, 8, 0.05), inset -3px -2px 4px rgba(250, 211, 212, 0.2);
+  box-shadow:  2px 2px 6px rgba(46, 7, 8, 0.05),  -3px -2px 4px rgba(250, 211, 212, 0.2);
 }
 .card-light {
-  box-shadow: inset 2px 2px 6px rgba(48, 49, 50, 0.05), inset -3px -2px 4px rgba(252, 253, 254, 0.2);
+  box-shadow:  2px 2px 6px rgba(48, 49, 50, 0.05),  -3px -2px 4px rgba(252, 253, 254, 0.2);
 }
 .card-dark {
-  box-shadow: inset 2px 2px 6px rgba(7, 7, 8, 0.05), inset -3px -2px 4px rgba(211, 211, 212, 0.2);
+  box-shadow:  2px 2px 6px rgba(7, 7, 8, 0.05),  -3px -2px 4px rgba(211, 211, 212, 0.2);
 }
 .card-header {
   border-bottom: 1px solid rgba(55, 94, 148, 0.1);
