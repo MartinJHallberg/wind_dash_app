@@ -1,4 +1,4 @@
-from app_helper_functions import (
+from helper_functions.app_helper_functions import (
     filter_dmi_obs_data,
     get_map,
     parse_dmi_forecast_data_wind

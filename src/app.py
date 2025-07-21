@@ -3,15 +3,11 @@ import dash_bootstrap_components as dbc
 from dash_bootstrap_templates import load_figure_template
 from dash.dependencies import Input, Output, State
 import dash_mantine_components as dmc
-from plotly.subplots import make_subplots
-from dotenv import load_dotenv
-from app_helper_functions import get_map
-import os
 import pandas as pd
-import app_graph_functions as graphs
-from app_helper_functions import parse_dmi_forecast_data_wind
+from helper_functions import app_graph_functions as  graphs
+from helper_functions.app_helper_functions import parse_dmi_forecast_data_wind
 import datetime as dt
-import dash_daq as daq
+
 
 
 ######## INITIALIZE APP ####################
@@ -31,12 +27,12 @@ start_date = "2023-01-02"
 
 ######## READ BASE DATA ######################
 dmi_obs_data = pd.read_csv(
-    "data/parse_data_test.csv",
+    "src/data/parse_data_test.csv",
     usecols=["cellId", "from", "parameterId", "value"],
     nrows=200000,
 )
 
-dmi_forecast_data = pd.read_csv("data/wind_forecast.csv")
+dmi_forecast_data = pd.read_csv("src/data/wind_forecast.csv")
 dmi_forecast_data = parse_dmi_forecast_data_wind(dmi_forecast_data)
 
 ######## CREATE INITIAL FIGURES ##############
