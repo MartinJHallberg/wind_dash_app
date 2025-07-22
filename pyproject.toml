@@ -21,6 +21,15 @@ psycopg2-binary = "^2.9.10"
 pytest = "^8.4.1"
 
 
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.12.4"
+
+[tool.ruff]
+line-length = 120
+lint.select = ["E", "F"]  # E: pycodestyle errors, F: pyflakes
+lint.ignore = []
+exclude = ["migrations", ".venv"]
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

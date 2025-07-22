@@ -1,12 +1,10 @@
 from helper_functions.app_helper_functions import (
     filter_dmi_obs_data,
-    get_map,
-    parse_dmi_forecast_data_wind
+    get_map
 )
 import plotly.graph_objects as go
 import numpy as np
 import pandas as pd
-from plotly.subplots import make_subplots
 
 
 layout_colors = {

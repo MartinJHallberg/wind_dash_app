@@ -3,7 +3,6 @@ import pandas as pd
 import requests
 import numpy as np
 import datetime as dt
-from pandas.api.types import is_datetime64_ns_dtype
 
 def get_map(
         dk_grid_url = 'https://raw.githubusercontent.com/MartinJHallberg/DMI_Wind_DashApp/version2/assets/DKN_10KM_epsg4326_filtered_wCent.geojson',

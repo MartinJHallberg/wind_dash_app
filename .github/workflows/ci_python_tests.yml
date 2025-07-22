@@ -42,3 +42,5 @@ jobs:
         DB_WEATHER_PASSWORD: ${{ secrets.DB_WEATHER_PASSWORD }}
       run: |
         poetry run pytest
+    - name: Lint with Ruff
+      run: poetry run ruff check src/
