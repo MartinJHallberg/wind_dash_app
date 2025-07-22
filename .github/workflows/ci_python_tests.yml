@@ -18,6 +18,18 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    - name: Set up Cloud SQL Proxy
+      shell: pwsh
+      run: |
+        # Save the service account key to a file
+        $env:GCP_SERVICE_ACCOUNT_KEY | Out-File -FilePath "gcp-key.json"
+        # Download Cloud SQL Proxy
+        wget https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O cloud_sql_proxy
+        chmod +x cloud_sql_proxy
+        # Start the proxy in the background
+        ./cloud_sql_proxy -dir=/cloudsql -credential_file=gcp-key.json -instances=hidden-moon-466309-a0:europe-north2:weather-db=tcp:5432 &
+      env:
+        GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v3
       with:
