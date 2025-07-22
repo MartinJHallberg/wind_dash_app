@@ -3,6 +3,12 @@ import pandas as pd
 import requests
 import numpy as np
 import datetime as dt
+from src.data_processing.dmi import (
+    fetch_dmi_forecast_data,
+    parse_dmi_forecast_data,
+    fetch_dmi_observational_data,
+    parse_dmi_observational_data
+)
 
 def get_map(
         dk_grid_url = 'https://raw.githubusercontent.com/MartinJHallberg/DMI_Wind_DashApp/version2/assets/DKN_10KM_epsg4326_filtered_wCent.geojson',
@@ -76,6 +82,29 @@ def parse_dmi_forecast_data_wind(
 
     return df
 
+def load_dmi_forecast_data_to_app(
+    api_key: str,
+    lon: float,
+    lat: float,
+    collection_type: str,
+):
 
+    json_response = fetch_dmi_forecast_data(api_key, lon, lat, collection_type)
+    df = parse_dmi_forecast_data(json_response)
+
+    return df
+
+
+def load_dmi_obs_data_to_app(
+    api_key: str,
+    cell_id: str,
+    date_from: str,
+    date_to: str,
+):
+
+    json_response = fetch_dmi_observational_data(api_key, cell_id, date_from, date_to)
+    df = parse_dmi_observational_data(json_response)
+
+    return df
     
 

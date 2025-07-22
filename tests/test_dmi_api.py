@@ -1,9 +1,9 @@
 import pytest
 from src.data_processing.dmi import (
-    get_dmi_forecast_data,
-    extract_and_parse_forecast_data,
-    get_dmi_observational_data,
-    extract_and_parse_observational_data
+    fetch_dmi_forecast_data,
+    parse_dmi_forecast_data,
+    fetch_dmi_observational_data,
+    parse_dmi_observational_data,
 )
 import pandas as pd
 from dotenv import load_dotenv
@@ -20,7 +20,7 @@ def test_get_dmi_forecast_data():
     lat = 55.6761
     collection_type = "wind"
 
-    json_response = get_dmi_forecast_data(DMI_API_KEY_FORECAST, lon, lat, collection_type)
+    json_response = fetch_dmi_forecast_data(DMI_API_KEY_FORECAST, lon, lat, collection_type)
 
     assert json_response is not None
 
@@ -45,7 +45,7 @@ def test_extract_and_parse_forecast_data_minimal():
     }
     parameters = ["wind-speed", "wind-dir"]
 
-    df = extract_and_parse_forecast_data(mock_json, parameters)
+    df = parse_dmi_forecast_data(mock_json, parameters)
 
     # Check DataFrame shape and columns
     assert isinstance(df, pd.DataFrame)
@@ -59,20 +59,21 @@ def test_get_dmi_forecast_data_integration():
     lat = 55.6761
     collection_type = "wind"
 
-    json_response = get_dmi_forecast_data(DMI_API_KEY_FORECAST, lon, lat, collection_type)
+    json_response = fetch_dmi_forecast_data(DMI_API_KEY_FORECAST, lon, lat, collection_type)
 
-    df = extract_and_parse_forecast_data(json_response, ["wind-speed", "wind-dir"])
+    df = parse_dmi_forecast_data(json_response, ["wind-speed", "wind-dir"])
 
     assert isinstance(df, pd.DataFrame)
     assert list(df.columns) == ["wind-speed", "wind-dir", "timestamp", "longitude", "latitude"]
-
 
 def test_get_dmi_observational_data_integration():
     cell_id = "10km_620_44"
     date_from = "2025-07-20"
     date_to = "2025-07-21"
-    json_response = get_dmi_observational_data(DMI_API_KEY_OBSERVATION, cell_id, date_from, date_to)
-    df = extract_and_parse_observational_data(json_response)
-    
+
+    json_response = fetch_dmi_observational_data(DMI_API_KEY_OBSERVATION, cell_id, date_from, date_to)
+
+    df = parse_dmi_observational_data(json_response)
+
     assert isinstance(df, pd.DataFrame)
     assert list(df.columns) == ["cell_id", "from", "to", "parameter_id", "value"]

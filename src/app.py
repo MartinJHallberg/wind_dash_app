@@ -7,8 +7,14 @@ import pandas as pd
 from helper_functions import app_graph_functions as  graphs
 from helper_functions.app_helper_functions import parse_dmi_forecast_data_wind
 import datetime as dt
+from dotenv import load_dotenv
+import os
+from data_processing.dmi import load_dmi_obs_data_to_app, load_dmi_forecast_data_to_app
 
+load_dotenv()
 
+DMI_API_KEY_OBSERVATION = os.getenv("DMI_API_KEY_OBSERVATION")
+DMI_API_KEY_FORECAST = os.getenv("DMI_API_KEY_FORECAST")
 
 ######## INITIALIZE APP ####################
 def custom_error_handler(err):
@@ -26,11 +32,7 @@ start_cell_id = "10km_622_71"
 start_date = "2023-01-02"
 
 ######## READ BASE DATA ######################
-dmi_obs_data = pd.read_csv(
-    "src/data/parse_data_test.csv",
-    usecols=["cellId", "from", "parameterId", "value"],
-    nrows=200000,
-)
+dmi_obs_data = load_dmi_obs_data_to_app(DMI_API_KEY_OBSERVATION, start_cell_id, start_date, start_date)
 
 dmi_forecast_data = pd.read_csv("src/data/wind_forecast.csv")
 dmi_forecast_data = parse_dmi_forecast_data_wind(dmi_forecast_data)
