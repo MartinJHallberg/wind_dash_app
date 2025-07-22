@@ -1,5 +1,10 @@
 import pytest
-from src.data_processing.dmi import get_dmi_forecast_data, extract_and_parse_forecast_data
+from src.data_processing.dmi import (
+    get_dmi_forecast_data,
+    extract_and_parse_forecast_data,
+    get_dmi_observational_data,
+    extract_and_parse_observational_data
+)
 import pandas as pd
 from dotenv import load_dotenv
 import os
@@ -60,3 +65,14 @@ def test_get_dmi_forecast_data_integration():
 
     assert isinstance(df, pd.DataFrame)
     assert list(df.columns) == ["wind-speed", "wind-dir", "timestamp", "longitude", "latitude"]
+
+
+def test_get_dmi_observational_data_integration():
+    cell_id = "10km_620_44"
+    date_from = "2025-07-20"
+    date_to = "2025-07-21"
+    json_response = get_dmi_observational_data(DMI_API_KEY_OBSERVATION, cell_id, date_from, date_to)
+    df = extract_and_parse_observational_data(json_response)
+    
+    assert isinstance(df, pd.DataFrame)
+    assert list(df.columns) == ["cell_id", "from", "to", "parameter_id", "value"]

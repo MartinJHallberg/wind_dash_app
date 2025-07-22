@@ -201,14 +201,25 @@ def get_dmi_observational_data(
     except requests.exceptions.RequestException as errh:
         raise ValueError(errh.args[0])
 
-if __name__ == "__main__":
-    api_key = os.getenv("DMI_API_KEY_OBSERVATION")
-    cell_id = "10km_620_44"
-    date_from = "2025-07-20"
-    date_to = "2025-07-21"
-    json_response = get_dmi_observational_data(api_key, cell_id, date_from, date_to)
-    print(json_response)
 
+def extract_and_parse_observational_data(
+    json_response: Dict[str, Any],
+    parameters: List[str] = None,
+):
+    if parameters is None:
+        parameters = ["mean_temp", "mean_daily_max_temp", "mean_daily_min_temp", "mean_wind_speed", "max_wind_speed_10min", "max_wind_speed_3sec", "mean_wind_dir", "mean_pressure"]
+    
+    # The relevant data is nested under each feature's "properties" key.
+    records = []
+    for feature in json_response["features"]:
+        props = feature.get("properties", {})
+        if props["parameterId"] in parameters:
+            records.append(props)
+    df = pd.DataFrame(records)
+    df = df[["cellId", "from", "to", "parameterId","value"]]
+    df = df.rename(columns={"cellId": "cell_id", "parameterId": "parameter_id"})
+
+    return df
 
 
 
