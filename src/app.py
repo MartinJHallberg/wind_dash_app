@@ -1,7 +1,7 @@
 from dash import dcc, html, Dash, set_props
 import dash_bootstrap_components as dbc
 from dash_bootstrap_templates import load_figure_template
-from dash.dependencies import Input, Output, State
+from dash.dependencies import Input, Output
 import dash_mantine_components as dmc
 import pandas as pd
 from helper_functions import app_graph_functions as  graphs
@@ -291,7 +291,7 @@ def update_dmi_forecast_data_with_obs(toggle, click_data, date):
             )
             return chart, "Observational data is shown"
         else:
-            return chart, f"No date given for observational data"
+            return chart, "No date given for observational data"
 
     return chart, "Toggle off"
 
