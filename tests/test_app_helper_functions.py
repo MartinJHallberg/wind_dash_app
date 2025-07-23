@@ -13,13 +13,20 @@ DMI_API_KEY_FORECAST = os.getenv("DMI_API_KEY_FORECAST")
 
 def test_load_dmi_observational_data():
     cell_id = "10km_620_44"
-    date_from = "2025-07-20"
-    date_to = "2025-07-21"
+    date_from = "2025-06-20"
 
-    df = load_dmi_obs_data_to_app(DMI_API_KEY_OBSERVATION, cell_id, date_from, date_to)
+    df = load_dmi_obs_data_to_app(DMI_API_KEY_OBSERVATION, cell_id, date_from)
 
     assert isinstance(df, pd.DataFrame)
     assert list(df.columns) == ["cell_id", "from", "to", "parameter_id", "value"]
+
+    # Check min and max date in 'from' column
+    df_from_dates = pd.to_datetime(df["from"])
+    min_date = df_from_dates.min().date()
+    max_date = df_from_dates.max().date()
+    input_date = pd.to_datetime(date_from).date()
+    assert min_date == input_date
+    assert max_date == (input_date + pd.Timedelta(days=1))
 
 def test_load_dmi_forecast_data():
     lon = 12.5683

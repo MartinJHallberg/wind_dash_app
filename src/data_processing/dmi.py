@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 import requests
 from typing import List, Optional, Dict, Any
+from zoneinfo import ZoneInfo
 
 CACHE_DIR = "cache"
 FORECAST_WIND_PARAMETERS = ["wind-speed", "wind-dir", "gust-wind-speed-10m"]
@@ -103,14 +104,21 @@ def fetch_dmi_observational_data(
     api_key: str,
     cell_id: str,
     date_from: str,
-    date_to: str,
+    n_hours: int,
     cache_dir: str = CACHE_DIR
 ):
 
 
     base_url = "https://dmigw.govcloud.dk/v2/climateData/collections/10kmGridValue/items?"
 
-    query_url = f"{base_url}cellId={cell_id}&datetime={date_from}T00:00:00Z/{date_to}T23:59:59Z&api-key={api_key}"
+    date_str = date_from + "T00:00:00"
+    dt_from = dt.datetime.fromisoformat(date_str)  # naive datetime
+    dt_from_dk = dt_from.replace(tzinfo=ZoneInfo("Europe/Copenhagen"))
+    dt_from_utc = dt_from_dk.astimezone(ZoneInfo("UTC"))
+    dt_to_utc = dt_from_utc + dt.timedelta(hours=n_hours)
+
+
+    query_url = f"{base_url}cellId={cell_id}&datetime={dt_from_utc.replace(tzinfo=None).isoformat()}Z/{dt_to_utc.replace(tzinfo=None).isoformat()}Z&api-key={api_key}"
 
     # --- Caching logic ---
     if not os.path.exists(cache_dir):

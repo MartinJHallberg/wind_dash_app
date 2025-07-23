@@ -9,7 +9,7 @@ from helper_functions.app_helper_functions import parse_dmi_forecast_data_wind
 import datetime as dt
 from dotenv import load_dotenv
 import os
-from data_processing.dmi import load_dmi_obs_data_to_app, load_dmi_forecast_data_to_app
+from helper_functions.app_helper_functions import load_dmi_obs_data_to_app, load_dmi_forecast_data_to_app
 
 load_dotenv()
 
