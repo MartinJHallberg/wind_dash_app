@@ -3,7 +3,7 @@ import pandas as pd
 import requests
 import numpy as np
 import datetime as dt
-from src.data_processing.dmi import (
+from data_processing.dmi import (
     fetch_dmi_forecast_data,
     parse_dmi_forecast_data,
     fetch_dmi_observational_data,
