@@ -1,4 +1,7 @@
 {
+    "python.analysis.extraPaths": [
+        "${workspaceFolder}/src"
+    ],
     "python.testing.unittestArgs": [
         "-v",
         "-s",
@@ -11,5 +14,6 @@
     "python.testing.pytestArgs": [
         "tests"
     ],
-    "python.testing.cwd": "${workspaceFolder}"
+    "python.testing.cwd": "${workspaceFolder}",
+
 }

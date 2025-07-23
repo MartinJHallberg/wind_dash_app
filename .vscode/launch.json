@@ -2,11 +2,11 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Current File (from src)",
+            "name": "Python: Run wind_dashapp.app as module",
             "type": "python",
             "request": "launch",
-            "program": "${file}",
+            "module": "wind_dashapp.app",
             "cwd": "${workspaceFolder}/src"
         }
     ]
-} 
+}

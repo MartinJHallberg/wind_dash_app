@@ -1,5 +1,5 @@
 import pytest
-from src.wind_dashapp.data_processing.dmi import (
+from wind_dashapp.data_processing.dmi import (
     fetch_dmi_forecast_data,
     parse_dmi_forecast_data,
     fetch_dmi_observational_data,

@@ -2,18 +2,13 @@ import pytest
 import pandas as pd
 from dotenv import load_dotenv
 import os
-from src.wind_dashapp.helper_functions.functions import new_function
+from wind_dashapp.helper_functions import app_helper_functions as f
 
 load_dotenv()
 
 DMI_API_KEY_OBSERVATION = os.getenv("DMI_API_KEY_OBSERVATION")
 DMI_API_KEY_FORECAST = os.getenv("DMI_API_KEY_FORECAST")
 
-
-def test_new_function():
-    assert new_function() == 1
-
-from src.wind_dashapp.helper_functions import app_helper_functions as f
 
 
 def test_load_dmi_observational_data():

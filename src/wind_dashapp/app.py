@@ -4,12 +4,14 @@ from dash_bootstrap_templates import load_figure_template
 from dash.dependencies import Input, Output
 import dash_mantine_components as dmc
 import pandas as pd
-from helper_functions import app_graph_functions as graphs
-from helper_functions.app_helper_functions import parse_dmi_forecast_data_wind
+import os
+#from wind_dashapp.data_processing import dmi
+from wind_dashapp.helper_functions import app_graph_functions as graphs
+from wind_dashapp.helper_functions.app_helper_functions import parse_dmi_forecast_data_wind
 import datetime as dt
 from dotenv import load_dotenv
-import os
-from helper_functions.app_helper_functions import load_dmi_obs_data_to_app, load_dmi_forecast_data_to_app
+
+from wind_dashapp.helper_functions.app_helper_functions import load_dmi_obs_data_to_app, load_dmi_forecast_data_to_app
 
 load_dotenv()
 
@@ -34,7 +36,7 @@ start_date = "2023-01-02"
 ######## READ BASE DATA ######################
 dmi_obs_data = load_dmi_obs_data_to_app(DMI_API_KEY_OBSERVATION, start_cell_id, start_date)
 
-dmi_forecast_data = pd.read_csv("src/wind_dashapp/data/wind_forecast.csv")
+dmi_forecast_data = pd.read_csv("wind_dashapp/data/wind_forecast.csv")
 dmi_forecast_data = parse_dmi_forecast_data_wind(dmi_forecast_data)
 
 ######## CREATE INITIAL FIGURES ##############

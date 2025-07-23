@@ -1,4 +1,4 @@
-from helper_functions.app_helper_functions import (
+from wind_dashapp.helper_functions.app_helper_functions import (
     filter_dmi_obs_data,
     get_map
 )
