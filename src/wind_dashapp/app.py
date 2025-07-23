@@ -5,7 +5,6 @@ from dash.dependencies import Input, Output
 import dash_mantine_components as dmc
 import pandas as pd
 import os
-#from wind_dashapp.data_processing import dmi
 from wind_dashapp.helper_functions import app_graph_functions as graphs
 from wind_dashapp.helper_functions.app_helper_functions import parse_dmi_forecast_data_wind
 import datetime as dt
