@@ -105,23 +105,24 @@ def load_dmi_obs_data_to_app(
     json_response = fetch_dmi_observational_data(api_key, cell_id, date_from, n_hours)
     df = parse_dmi_observational_data(json_response)
 
-    df["from_datetime"] = pd.to_datetime(df["from"], format='ISO8601')
-    df["to_datetime"] = pd.to_datetime(df["to"], format='ISO8601')
-
     # --- Parse to datetime ---
     # Remove observations with microseconds, seems to be a bug in the DMI API
     df["has_microseconds"] =  df["from"].str.contains("00:00:00.001000")
-    df_filtered = df[~df["has_microseconds"]]
+    df_filtered = df[~df["has_microseconds"]].copy()
 
-    df_filtered['from_datetime'] = pd.to_datetime(df_filtered['from_datetime'])
-    df_filtered['to_datetime'] = pd.to_datetime(df_filtered['to_datetime'])
+    df_filtered['from_datetime'] = pd.to_datetime(df_filtered['from'], format='ISO8601')
+    df_filtered['to_datetime'] = pd.to_datetime(df_filtered['to'], format='ISO8601')
 
-    df_filtered = df_filtered.drop(columns=["from", "to", "has_microseconds"])
-
+    # Check if timestamps are parsed correctly
     if df_filtered['from_datetime'].dtype != 'datetime64[ns, UTC]' or df_filtered['to_datetime'].dtype != 'datetime64[ns, UTC]':
         raise ValueError("Timestamps could not be parsed correctly from API response")
 
-    df_filtered['from_datetime_dk'] = df_filtered['from_datetime'].dt.tz_convert('Europe/Copenhagen')
+    # Convert to Copenhagen time 
+    df_filtered['from_datetime'] = df_filtered['from_datetime'].dt.tz_convert('Europe/Copenhagen')
+    df_filtered['to_datetime'] = df_filtered['to_datetime'].dt.tz_convert('Europe/Copenhagen')
+
+
+    df_filtered = df_filtered.drop(columns=["from", "to", "has_microseconds"])
 
     return df_filtered
     

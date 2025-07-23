@@ -69,9 +69,8 @@ def test_get_dmi_forecast_data_integration():
 def test_get_dmi_observational_data_integration():
     cell_id = "10km_620_44"
     date_from = "2025-07-20"
-    date_to = "2025-07-21"
 
-    json_response = fetch_dmi_observational_data(DMI_API_KEY_OBSERVATION, cell_id, date_from, date_to)
+    json_response = fetch_dmi_observational_data(DMI_API_KEY_OBSERVATION, cell_id, date_from, n_hours=2)
 
     df = parse_dmi_observational_data(json_response)
 

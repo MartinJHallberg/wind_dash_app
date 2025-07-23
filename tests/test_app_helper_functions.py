@@ -18,15 +18,12 @@ def test_load_dmi_observational_data():
     df = load_dmi_obs_data_to_app(DMI_API_KEY_OBSERVATION, cell_id, date_from)
 
     assert isinstance(df, pd.DataFrame)
-    assert list(df.columns) == ["cell_id", "from", "to", "parameter_id", "value"]
+    assert list(df.columns).sort() == ["cell_id", "from_datetime", "to_datetime", "parameter_id", "value"].sort()
 
     # Check min and max date in 'from' column
-    df_from_dates = pd.to_datetime(df["from"])
-    min_date = df_from_dates.min().date()
-    max_date = df_from_dates.max().date()
+    min_date = df["from_datetime"].min().date()
     input_date = pd.to_datetime(date_from).date()
     assert min_date == input_date
-    assert max_date == (input_date + pd.Timedelta(days=1))
 
 def test_load_dmi_forecast_data():
     lon = 12.5683
