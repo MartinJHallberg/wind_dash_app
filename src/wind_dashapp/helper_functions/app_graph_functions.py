@@ -245,7 +245,7 @@ def create_forecast_chart(
             col_wind_speed="wind_speed",
             col_wind_max_speed="gust_wind_speed_10m",
             col_wind_direction="wind_dir",
-            col_datetime="timestamp",
+            col_datetime="from_datetime",
             marker_opacity=1,
     )
 
@@ -376,7 +376,7 @@ def create_forecast_chart_wind(
         df,
         "wind_speed",
         "wind_dir",
-        "timestamp",
+        "from_datetime",
         marker_opacity=1
         )
 
@@ -386,7 +386,7 @@ def create_forecast_chart_wind(
         chart,
         col_wind_speed="wind_speed",
         col_wind_direction="wind_dir",
-        col_datetime="timestamp",
+        col_datetime="from_datetime",
         x_scale=25,
         y_scale=0.5,
         y_distance=1

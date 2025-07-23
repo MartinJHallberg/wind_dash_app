@@ -10,7 +10,7 @@ from wind_dashapp.helper_functions.app_helper_functions import parse_dmi_forecas
 import datetime as dt
 from dotenv import load_dotenv
 
-from wind_dashapp.helper_functions.app_helper_functions import load_dmi_obs_data_to_app, load_dmi_forecast_data_to_app
+from wind_dashapp.helper_functions.app_helper_functions import load_wind_obs_data_to_app, load_wind_forecast_data_to_app
 
 load_dotenv()
 
@@ -30,13 +30,14 @@ app = Dash(prevent_initial_callbacks=True)
 load_figure_template("MORPH")
 
 start_cell_id = "10km_622_71"
+start_lon = 12.374
+start_lat = 56.078
 start_date = "2023-01-02"
 
 ######## READ BASE DATA ######################
-dmi_obs_data = load_dmi_obs_data_to_app(DMI_API_KEY_OBSERVATION, start_cell_id, start_date)
+wind_obs_data = load_wind_obs_data_to_app(DMI_API_KEY_OBSERVATION, start_cell_id, start_date)
 
-dmi_forecast_data = pd.read_csv("wind_dashapp/data/wind_forecast.csv")
-dmi_forecast_data = parse_dmi_forecast_data_wind(dmi_forecast_data)
+wind_forecast_data = load_wind_forecast_data_to_app(DMI_API_KEY_FORECAST, start_lon, start_lat, "wind")
 
 ######## CREATE INITIAL FIGURES ##############
 # Map
@@ -44,11 +45,11 @@ fig_map = graphs.create_map_chart()
 
 # Forecast chart
 chart_dmi_forecast = graphs.create_forecast_chart(
-    forecast_data=dmi_forecast_data,
+    forecast_data=wind_forecast_data,
     col_wind_speed="wind_speed",
     col_wind_max_speed="gust_wind_speed_10m",
     col_wind_direction="wind_dir",
-    col_datetime="timestamp",
+    col_datetime="from_datetime",
     cell_id=start_cell_id,
 )
 
@@ -263,7 +264,7 @@ def update_area_name(click_data):
     Input("map_figure", "clickData"),
     Input("date_picker", "date"),
 )
-def update_dmi_forecast_data_with_obs(toggle, click_data, date):
+def update_wind_forecast_data_with_obs(toggle, click_data, date):
 
     if click_data is None:
         cell_id = start_cell_id
@@ -272,11 +273,11 @@ def update_dmi_forecast_data_with_obs(toggle, click_data, date):
         cell_id = click_data["points"][0]["location"]
 
     chart = graphs.create_forecast_chart(
-        forecast_data=dmi_forecast_data,
+        forecast_data=wind_forecast_data,
         col_wind_speed="wind_speed",
         col_wind_max_speed="gust_wind_speed_10m",
         col_wind_direction="wind_dir",
-        col_datetime="timestamp",
+        col_datetime="from_datetime",
         cell_id=start_cell_id,
     )
 
@@ -284,7 +285,7 @@ def update_dmi_forecast_data_with_obs(toggle, click_data, date):
         if date:
             chart = graphs.add_obs_data_to_forecast_chart(
                 forecast_chart=chart,
-                obs_data=dmi_obs_data,
+                obs_data=wind_obs_data,
                 col_wind_speed="mean_wind_speed",
                 col_wind_max_speed="max_wind_speed_3sec",
                 col_wind_direction="mean_wind_dir",

@@ -82,7 +82,7 @@ def parse_dmi_forecast_data_wind(
 
     return df
 
-def load_dmi_forecast_data_to_app(
+def load_wind_forecast_data_to_app(
     api_key: str,
     lon: float,
     lat: float,
@@ -92,10 +92,19 @@ def load_dmi_forecast_data_to_app(
     json_response = fetch_dmi_forecast_data(api_key, lon, lat, collection_type)
     df = parse_dmi_forecast_data(json_response)
 
+    
+    df = parse_and_filter_dates(df)
+
+    new_col_names = {col: col.replace("-", "_") for col in df.columns}
+
+    df = df.rename(new_col_names, axis="columns")
+
+    df = df.tail(48) # forecast for last 48 hours
+
     return df
 
 
-def load_dmi_obs_data_to_app(
+def load_wind_obs_data_to_app(
     api_key: str,
     cell_id: str,
     date_from: str,
@@ -105,25 +114,36 @@ def load_dmi_obs_data_to_app(
     json_response = fetch_dmi_observational_data(api_key, cell_id, date_from, n_hours)
     df = parse_dmi_observational_data(json_response)
 
-    # --- Parse to datetime ---
+    df = parse_and_filter_dates(df)
+
+    df_pivot = pd.pivot_table(df, values='value',
+                            index='from_datetime',
+                            columns='parameter_id').reset_index()
+
+    return df_pivot
+
+
+
+def parse_and_filter_dates(
+    df: pd.DataFrame
+):
     # Remove observations with microseconds, seems to be a bug in the DMI API
     df["has_microseconds"] =  df["from"].str.contains("00:00:00.001000")
     df_filtered = df[~df["has_microseconds"]].copy()
 
     df_filtered['from_datetime'] = pd.to_datetime(df_filtered['from'], format='ISO8601')
-    df_filtered['to_datetime'] = pd.to_datetime(df_filtered['to'], format='ISO8601')
+    #df_filtered['to_datetime'] = pd.to_datetime(df_filtered['to'], format='ISO8601')
 
     # Check if timestamps are parsed correctly
-    if df_filtered['from_datetime'].dtype != 'datetime64[ns, UTC]' or df_filtered['to_datetime'].dtype != 'datetime64[ns, UTC]':
+    if df_filtered['from_datetime'].dtype != 'datetime64[ns, UTC]':
         raise ValueError("Timestamps could not be parsed correctly from API response")
 
     # Convert to Copenhagen time 
     df_filtered['from_datetime'] = df_filtered['from_datetime'].dt.tz_convert('Europe/Copenhagen')
-    df_filtered['to_datetime'] = df_filtered['to_datetime'].dt.tz_convert('Europe/Copenhagen')
+    #df_filtered['to_datetime'] = df_filtered['to_datetime'].dt.tz_convert('Europe/Copenhagen')
 
 
-    df_filtered = df_filtered.drop(columns=["from", "to", "has_microseconds"])
+    df_filtered = df_filtered.drop(columns=["from", "to", "has_microseconds"], errors="ignore")
 
     return df_filtered
-    
 

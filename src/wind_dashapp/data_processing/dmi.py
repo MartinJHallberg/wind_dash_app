@@ -11,6 +11,7 @@ from zoneinfo import ZoneInfo
 
 CACHE_DIR = "cache"
 FORECAST_WIND_PARAMETERS = ["wind-speed", "wind-dir", "gust-wind-speed-10m"]
+OBSERVATIONAL_WIND_PARAMETERS = ["mean_temp", "mean_daily_max_temp", "mean_daily_min_temp", "mean_wind_speed", "max_wind_speed_10min", "max_wind_speed_3sec", "mean_wind_dir", "mean_pressure"]
 
 def fetch_dmi_forecast_data(
         api_key: str,
@@ -97,6 +98,11 @@ def parse_dmi_forecast_data(
     df["longitude"] = longitude
     df["latitude"] = latitude
 
+    colnames_snake_case = [col.replace("-", "_") for col in df.columns]
+    df.columns = colnames_snake_case
+
+    df = df.rename(columns={"timestamp": "from"})
+
     return df
         
 
@@ -151,7 +157,7 @@ def parse_dmi_observational_data(
     parameters: List[str] = None,
 ):
     if parameters is None:
-        parameters = ["mean_temp", "mean_daily_max_temp", "mean_daily_min_temp", "mean_wind_speed", "max_wind_speed_10min", "max_wind_speed_3sec", "mean_wind_dir", "mean_pressure"]
+        parameters = OBSERVATIONAL_WIND_PARAMETERS
     
     # The relevant data is nested under each feature's "properties" key.
     records = []
