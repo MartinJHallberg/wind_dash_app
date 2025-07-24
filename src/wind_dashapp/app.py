@@ -186,7 +186,7 @@ card_control_fig_corecast = dbc.Card(
                             min_date_allowed=dt.date(2019, 1, 1),
                             max_date_allowed=dt.date.today(),
                             first_day_of_week=1,
-                            date=dt.date.fromisoformat(start_date),
+                            #date=dt.date.fromisoformat(start_date),
                             display_format="YYYY-MM-DD",
                         ),
                     ],
@@ -272,8 +272,13 @@ def update_wind_forecast_data_with_obs(toggle, click_data, date):
     else:
         cell_id = click_data["points"][0]["location"]
 
+    lon=click_data['points'][0]['customdata'][1]
+    lat=click_data['points'][0]['customdata'][2]
+
+    wind_forecast_data_from_click = load_wind_forecast_data_to_app(DMI_API_KEY_FORECAST, lon, lat, "wind")
+
     chart = graphs.create_forecast_chart(
-        forecast_data=wind_forecast_data,
+        forecast_data=wind_forecast_data_from_click,
         col_wind_speed="wind_speed",
         col_wind_max_speed="gust_wind_speed_10m",
         col_wind_direction="wind_dir",
@@ -283,13 +288,16 @@ def update_wind_forecast_data_with_obs(toggle, click_data, date):
 
     if toggle:
         if date:
+
+            wind_obs_data_from_click = load_wind_obs_data_to_app(DMI_API_KEY_OBSERVATION, cell_id, date)
+
             chart = graphs.add_obs_data_to_forecast_chart(
                 forecast_chart=chart,
-                obs_data=wind_obs_data,
+                obs_data=wind_obs_data_from_click,
                 col_wind_speed="mean_wind_speed",
                 col_wind_max_speed="max_wind_speed_3sec",
                 col_wind_direction="mean_wind_dir",
-                col_datetime="from",
+                col_datetime="from_datetime",
                 cell_id=cell_id,
                 obs_date=date,
             )

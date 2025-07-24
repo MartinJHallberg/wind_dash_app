@@ -402,12 +402,8 @@ def add_obs_data_to_forecast_chart(
         obs_data,
         **kwargs
 ):
-    obs_filtered = filter_dmi_obs_data(
-        obs_data,
-        **kwargs
-    )
 
-    obs_filtered["map_forecast_time"] = forecast_chart.data[0].x.tolist()
+    obs_data["map_forecast_time"] = forecast_chart.data[0].x.tolist()
 
     chart = go.Figure(forecast_chart) # needed to create a copy
 
@@ -416,7 +412,7 @@ def add_obs_data_to_forecast_chart(
     color = layout_colors["orange"]
 
     chart = create_wind_speed_chart(
-        obs_filtered,
+        obs_data,
         marker_opacity=0.6,
         marker_color=color,
         chart=chart,
@@ -424,7 +420,7 @@ def add_obs_data_to_forecast_chart(
     )
 
     chart = add_direction_arrows(
-        df=obs_filtered,
+        df=obs_data,
         chart=chart,
         marker_opacity=0.6,
         marker_color=color,
@@ -432,7 +428,7 @@ def add_obs_data_to_forecast_chart(
     )
 
     chart = add_max_wind_chart(
-        df=obs_filtered,
+        df=obs_data,
         chart=chart,
         marker_opacity=0.7,
         marker_color=color,

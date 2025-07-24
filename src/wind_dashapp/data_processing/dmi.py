@@ -121,7 +121,7 @@ def fetch_dmi_observational_data(
     dt_from = dt.datetime.fromisoformat(date_str)  # naive datetime
     dt_from_dk = dt_from.replace(tzinfo=ZoneInfo("Europe/Copenhagen"))
     dt_from_utc = dt_from_dk.astimezone(ZoneInfo("UTC"))
-    dt_to_utc = dt_from_utc + dt.timedelta(hours=n_hours)
+    dt_to_utc = dt_from_utc + dt.timedelta(hours=n_hours-1) # -1 because the API returns the data for the last hour
 
 
     query_url = f"{base_url}cellId={cell_id}&datetime={dt_from_utc.replace(tzinfo=None).isoformat()}Z/{dt_to_utc.replace(tzinfo=None).isoformat()}Z&api-key={api_key}"
