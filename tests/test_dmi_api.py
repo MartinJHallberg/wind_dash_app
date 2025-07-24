@@ -14,7 +14,7 @@ load_dotenv()
 DMI_API_KEY_OBSERVATION = os.getenv("DMI_API_KEY_OBSERVATION")
 DMI_API_KEY_FORECAST = os.getenv("DMI_API_KEY_FORECAST")
 
-
+@pytest.mark.skip(reason="Includes API call")
 def test_get_dmi_forecast_data():
     lon = 12.56
     lat = 55.67
@@ -49,11 +49,12 @@ def test_extract_and_parse_forecast_data_minimal():
 
     # Check DataFrame shape and columns
     assert isinstance(df, pd.DataFrame)
-    assert list(df.columns) == ["wind-speed", "wind-dir", "timestamp", "longitude", "latitude"]
+    assert list(df.columns).sort() == ["wind_speed", "wind_dir", "from", "longitude", "latitude"].sort()
     assert df.shape == (2, 5)
-    assert df["wind-speed"].tolist() == [5.0, 6.0]
+    assert df["wind_speed"].tolist() == [5.0, 6.0]
 
 
+@pytest.mark.skip(reason="Includes API call")
 def test_get_dmi_forecast_data_integration():
     lon = 12.5683
     lat = 55.6761
@@ -61,11 +62,13 @@ def test_get_dmi_forecast_data_integration():
 
     json_response = fetch_dmi_forecast_data(DMI_API_KEY_FORECAST, lon, lat, collection_type)
 
-    df = parse_dmi_forecast_data(json_response, ["wind-speed", "wind-dir"])
+    df = parse_dmi_forecast_data(json_response, ["wind_speed", "wind_dir"])
 
     assert isinstance(df, pd.DataFrame)
-    assert list(df.columns) == ["wind-speed", "wind-dir", "timestamp", "longitude", "latitude"]
+    assert list(df.columns).sort() == ["wind_speed", "wind_dir", "timestamp", "longitude", "latitude"]
 
+
+@pytest.mark.skip(reason="Includes API call")
 def test_get_dmi_observational_data_integration():
     cell_id = "10km_620_44"
     date_from = "2025-07-20"

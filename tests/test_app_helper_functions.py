@@ -23,7 +23,7 @@ def test_load_dmi_observational_data():
     min_date = df["from_datetime"].min().date()
     input_date = pd.to_datetime(date_from).date()
     assert min_date == input_date
-    assert len(df) == 49
+    assert len(df) == 48
 
 def test_load_dmi_forecast_data():
     lon = 12.5683

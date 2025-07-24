@@ -12,6 +12,7 @@ DB_PASSWORD = os.getenv("DB_WEATHER_PASSWORD")
 DB_HOST = "localhost"
 DB_PORT = "5432"
 
+@pytest.mark.skip(reason="Database currently not used")
 def test_database_connection():
     try:
         conn = psycopg2.connect(
