@@ -8,7 +8,10 @@ from wind_dashapp.data_processing.dmi import (
     parse_dmi_forecast_data,
     fetch_dmi_observational_data,
     parse_dmi_observational_data,
+    CACHE_DIR,
 )
+
+DEFAULT_NUMBER_OF_HOURS_FETCH = 48
 
 
 def get_map(
@@ -71,8 +74,16 @@ def load_wind_forecast_data_to_app(
     lon: float,
     lat: float,
     collection_type: str,
+    n_hours: int = DEFAULT_NUMBER_OF_HOURS_FETCH,
+    cache_dir: str = CACHE_DIR,
+    use_mock_data: bool = True,
 ):
-    json_response = fetch_dmi_forecast_data(api_key, lon, lat, collection_type)
+
+    if use_mock_data:
+        json_response = json.load(open("wind_dashapp/mock_data/dmi_wind_forecast_data_mock1.json"))
+        print("Using mock data for forecast data")
+    else:
+        json_response = fetch_dmi_forecast_data(api_key, lon, lat, collection_type, cache_dir=cache_dir)
     df = parse_dmi_forecast_data(json_response)
 
     df = parse_and_filter_dates(df)
@@ -81,18 +92,44 @@ def load_wind_forecast_data_to_app(
 
     df = df.rename(new_col_names, axis="columns")
 
-    df = df.tail(48)  # forecast for last 48 hours
+    df = df.sort_values(by="from_datetime")
+
+    df = df.head(n_hours)  # forecast for last 48 hours
+
+    if use_mock_data:
+        df["wind_speed"] = df["wind_speed"].apply(lambda x: x * np.random.uniform(0.5, 1.5))
 
     return df
 
 
-def load_wind_obs_data_to_app(api_key: str, cell_id: str, date_from: str, n_hours=48):
-    json_response = fetch_dmi_observational_data(api_key, cell_id, date_from, n_hours)
+def load_wind_obs_data_to_app(
+    api_key: str,
+    cell_id: str,
+    date_from: str,
+    n_hours=DEFAULT_NUMBER_OF_HOURS_FETCH,
+    cache_dir: str = CACHE_DIR,
+    use_mock_data: bool = True,
+):
+
+    if use_mock_data:
+        json_response = json.load(open("wind_dashapp/mock_data/dmi_wind_obs_data_mock1.json"))
+        print("Using mock data for observational data")
+    else:
+        json_response = fetch_dmi_observational_data(
+            api_key,
+            cell_id,
+            date_from,
+            n_hours,
+            cache_dir=cache_dir
+        )
     df = parse_dmi_observational_data(json_response)
 
     df = parse_and_filter_dates(df)
 
     df_pivot = pd.pivot_table(df, values="value", index="from_datetime", columns="parameter_id").reset_index()
+
+    if use_mock_data:
+        df_pivot["mean_wind_speed"] = df_pivot["mean_wind_speed"].apply(lambda x: x * np.random.uniform(0.5, 1.5))
 
     return df_pivot
 

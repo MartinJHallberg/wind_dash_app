@@ -14,6 +14,7 @@ load_dotenv()
 
 DMI_API_KEY_OBSERVATION = os.getenv("DMI_API_KEY_OBSERVATION")
 DMI_API_KEY_FORECAST = os.getenv("DMI_API_KEY_FORECAST")
+USE_MOCK_DATA = os.getenv("USE_MOCK_DATA")
 
 
 ######## INITIALIZE APP ####################
@@ -34,9 +35,9 @@ start_lat = 56.078
 start_date = "2023-01-02"
 
 ######## READ BASE DATA ######################
-wind_obs_data = load_wind_obs_data_to_app(DMI_API_KEY_OBSERVATION, start_cell_id, start_date)
+wind_obs_data = load_wind_obs_data_to_app(DMI_API_KEY_OBSERVATION, start_cell_id, start_date, use_mock_data=USE_MOCK_DATA)
 
-wind_forecast_data = load_wind_forecast_data_to_app(DMI_API_KEY_FORECAST, start_lon, start_lat, "wind")
+wind_forecast_data = load_wind_forecast_data_to_app(DMI_API_KEY_FORECAST, start_lon, start_lat, "wind", use_mock_data=USE_MOCK_DATA)
 
 ######## CREATE INITIAL FIGURES ##############
 # Map
@@ -269,7 +270,7 @@ def update_wind_forecast_data_with_obs(toggle, click_data, date):
     lon = click_data["points"][0]["customdata"][1]
     lat = click_data["points"][0]["customdata"][2]
 
-    wind_forecast_data_from_click = load_wind_forecast_data_to_app(DMI_API_KEY_FORECAST, lon, lat, "wind")
+    wind_forecast_data_from_click = load_wind_forecast_data_to_app(DMI_API_KEY_FORECAST, lon, lat, "wind", use_mock_data=USE_MOCK_DATA)
 
     chart = graphs.create_forecast_chart(
         forecast_data=wind_forecast_data_from_click,
@@ -282,7 +283,7 @@ def update_wind_forecast_data_with_obs(toggle, click_data, date):
 
     if toggle:
         if date:
-            wind_obs_data_from_click = load_wind_obs_data_to_app(DMI_API_KEY_OBSERVATION, cell_id, date)
+            wind_obs_data_from_click = load_wind_obs_data_to_app(DMI_API_KEY_OBSERVATION, cell_id, date, use_mock_data=USE_MOCK_DATA)
 
             chart = graphs.add_obs_data_to_forecast_chart(
                 forecast_chart=chart,

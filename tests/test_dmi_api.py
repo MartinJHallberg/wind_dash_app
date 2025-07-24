@@ -1,3 +1,4 @@
+from dash.html import Dfn
 import pytest
 from wind_dashapp.data_processing.dmi import (
     fetch_dmi_forecast_data,
@@ -14,7 +15,7 @@ load_dotenv()
 DMI_API_KEY_OBSERVATION = os.getenv("DMI_API_KEY_OBSERVATION")
 DMI_API_KEY_FORECAST = os.getenv("DMI_API_KEY_FORECAST")
 
-@pytest.mark.skip(reason="Includes API call")
+@pytest.mark.api_call()
 def test_get_dmi_forecast_data():
     lon = 12.56
     lat = 55.67
@@ -54,21 +55,21 @@ def test_extract_and_parse_forecast_data_minimal():
     assert df["wind_speed"].tolist() == [5.0, 6.0]
 
 
-@pytest.mark.skip(reason="Includes API call")
-def test_get_dmi_forecast_data_integration():
+@pytest.mark.api_call()
+def test_get_dmi_forecast_data_integration(tmp_path):
     lon = 12.5683
     lat = 55.6761
     collection_type = "wind"
 
-    json_response = fetch_dmi_forecast_data(DMI_API_KEY_FORECAST, lon, lat, collection_type)
+    json_response = fetch_dmi_forecast_data(DMI_API_KEY_FORECAST, lon, lat, collection_type, cache_dir=tmp_path)
 
-    df = parse_dmi_forecast_data(json_response, ["wind_speed", "wind_dir"])
+    df = parse_dmi_forecast_data(json_response, ["wind-speed", "wind-dir"])
 
     assert isinstance(df, pd.DataFrame)
-    assert list(df.columns).sort() == ["wind_speed", "wind_dir", "timestamp", "longitude", "latitude"]
+    assert list(df.columns).sort() == ["wind_speed", "wind_dir", "timestamp", "longitude", "latitude"].sort()
 
 
-@pytest.mark.skip(reason="Includes API call")
+@pytest.mark.api_call()
 def test_get_dmi_observational_data_integration():
     cell_id = "10km_620_44"
     date_from = "2025-07-20"
