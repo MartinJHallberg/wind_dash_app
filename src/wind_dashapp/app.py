@@ -139,6 +139,10 @@ right_cards = (
 )
 
 fig_forecast_w_obs = dbc.Card(
+    [
+        html.Div(
+            [
+
     dcc.Graph(
         id="chart_forecast",
         figure=chart_dmi_forecast,
@@ -146,6 +150,15 @@ fig_forecast_w_obs = dbc.Card(
             "margin": "1rem",
         },
     ),
+        dmc.RangeSlider(
+            id="range_slider_forecast",
+            min=0,
+            max=100,
+            step=1,
+            value=[0, 100],
+        ),
+       ], )
+    ],
     class_name="card",
 )
 
