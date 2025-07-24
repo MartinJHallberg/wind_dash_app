@@ -50,7 +50,10 @@ def fetch_dmi_forecast_data(
 
     api_type = collections[collection_type]
     parameters_text = ",".join(parameters)
-    query_url = f"{base_url}{api_type}/position?coords=POINT({lon} {lat})&crs=crs84&parameter-name={parameters_text}&api-key={api_key}"
+    query_url = (
+        f"{base_url}{api_type}/position?coords=POINT({lon} {lat})"
+        f"&crs=crs84&parameter-name={parameters_text}&api-key={api_key}"
+    )
 
     # --- Caching logic ---
     if not os.path.exists(cache_dir):
@@ -117,7 +120,10 @@ def fetch_dmi_observational_data(api_key: str, cell_id: str, date_from: str, n_h
     dt_from_utc = dt_from_dk.astimezone(ZoneInfo("UTC"))
     dt_to_utc = dt_from_utc + dt.timedelta(hours=n_hours - 1)  # -1 because the API returns the data for the last hour
 
-    query_url = f"{base_url}cellId={cell_id}&datetime={dt_from_utc.replace(tzinfo=None).isoformat()}Z/{dt_to_utc.replace(tzinfo=None).isoformat()}Z&api-key={api_key}"
+    query_url = (
+        f"{base_url}cellId={cell_id}&datetime={dt_from_utc.replace(tzinfo=None).isoformat()}Z"
+        f"/{dt_to_utc.replace(tzinfo=None).isoformat()}Z&api-key={api_key}"
+    )
 
     # --- Caching logic ---
     if not os.path.exists(cache_dir):
