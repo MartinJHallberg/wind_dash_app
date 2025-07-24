@@ -8,3 +8,4 @@ map_fix.py
 __pycache__/app_graph_functions.cpython-39.pyc
 __pycache__/app_helper_functions.cpython-39.pyc
 .DS_store
+cache/
