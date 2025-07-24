@@ -3,7 +3,6 @@ import json
 import os
 from zipfile import ZipFile
 import hashlib
-import numpy as np
 import pandas as pd
 import requests
 from typing import List, Optional, Dict, Any

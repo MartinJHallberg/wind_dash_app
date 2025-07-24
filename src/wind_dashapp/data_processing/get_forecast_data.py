@@ -1,5 +1,4 @@
 from dmi_data import get_dmi_forecast_data
-from dotenv import load_dotenv
 import os
 
 api_key = os.getenv("DMI_API_KEY_FORECAST")

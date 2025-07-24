@@ -16,8 +16,8 @@ DMI_API_KEY_FORECAST = os.getenv("DMI_API_KEY_FORECAST")
 
 
 def test_get_dmi_forecast_data():
-    lon = 12.5683
-    lat = 55.6761
+    lon = 12.56
+    lat = 55.67
     collection_type = "wind"
 
     json_response = fetch_dmi_forecast_data(DMI_API_KEY_FORECAST, lon, lat, collection_type)

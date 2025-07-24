@@ -1,4 +1,4 @@
-from dmi_data import unzip_and_merge_dmi_obs_data, read_file_in_zip
+from dmi_data import unzip_and_merge_dmi_obs_data
 
 df = unzip_and_merge_dmi_obs_data(
     "data/2023.zip",

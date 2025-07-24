@@ -37,10 +37,13 @@ jobs:
     - name: Install dependencies
       run: |
         poetry install
+    - name: Lint with Ruff
+      run: poetry run ruff check src/
     - name: Run tests
       env:
         DB_WEATHER_PASSWORD: ${{ secrets.DB_WEATHER_PASSWORD }}
+        DMI_API_KEY_OBSERVATION: ${{ secrets.DMI_API_KEY_OBSERVATION }}
+        DMI_API_KEY_FORECAST: ${{ secrets.DMI_API_KEY_FORECAST }}
       run: |
         poetry run pytest
-    - name: Lint with Ruff
-      run: poetry run ruff check src/
+
