@@ -15,6 +15,7 @@ load_dotenv()
 DMI_API_KEY_OBSERVATION = os.getenv("DMI_API_KEY_OBSERVATION")
 DMI_API_KEY_FORECAST = os.getenv("DMI_API_KEY_FORECAST")
 
+
 ######## INITIALIZE APP ####################
 def custom_error_handler(err):
     set_props(
@@ -184,7 +185,7 @@ card_control_fig_corecast = dbc.Card(
                             min_date_allowed=dt.date(2019, 1, 1),
                             max_date_allowed=dt.date.today(),
                             first_day_of_week=1,
-                            #date=dt.date.fromisoformat(start_date),
+                            # date=dt.date.fromisoformat(start_date),
                             display_format="YYYY-MM-DD",
                         ),
                     ],
@@ -232,13 +233,10 @@ app.layout = html.Div(
     Input("toggle-observational-data", "checked"),
 )
 def show_forecast_control(toggle):
-
     if toggle:
-
         return {"display": "block"}
 
     else:
-
         return {"display": "none"}
 
 
@@ -247,7 +245,6 @@ def show_forecast_control(toggle):
     Input("map_figure", "clickData"),
 )
 def update_area_name(click_data):
-
     if click_data is None:
         return "Gilleleje"
 
@@ -263,15 +260,14 @@ def update_area_name(click_data):
     Input("date_picker", "date"),
 )
 def update_wind_forecast_data_with_obs(toggle, click_data, date):
-
     if click_data is None:
         cell_id = start_cell_id
 
     else:
         cell_id = click_data["points"][0]["location"]
 
-    lon=click_data['points'][0]['customdata'][1]
-    lat=click_data['points'][0]['customdata'][2]
+    lon = click_data["points"][0]["customdata"][1]
+    lat = click_data["points"][0]["customdata"][2]
 
     wind_forecast_data_from_click = load_wind_forecast_data_to_app(DMI_API_KEY_FORECAST, lon, lat, "wind")
 
@@ -286,7 +282,6 @@ def update_wind_forecast_data_with_obs(toggle, click_data, date):
 
     if toggle:
         if date:
-
             wind_obs_data_from_click = load_wind_obs_data_to_app(DMI_API_KEY_OBSERVATION, cell_id, date)
 
             chart = graphs.add_obs_data_to_forecast_chart(

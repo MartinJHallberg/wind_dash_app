@@ -1,10 +1,6 @@
 from dmi_data import unzip_and_merge_dmi_obs_data
 
-df = unzip_and_merge_dmi_obs_data(
-    "data/2023.zip",
-    "txt",
-    n_files=50
-)
+df = unzip_and_merge_dmi_obs_data("data/2023.zip", "txt", n_files=50)
 
 # df = read_file_in_zip(
 #     "data/2023.zip",

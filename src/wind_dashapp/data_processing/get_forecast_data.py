@@ -8,7 +8,7 @@ df = get_dmi_forecast_data(
     12.3,
     56.13,
     "wind",
-    )
+)
 
 df.to_csv("data/wind_forecast.csv", index=False)
 
@@ -26,7 +26,7 @@ df = get_dmi_forecast_data(
     "mean-windwave-dir",
     "significant-totalswell-height",
     "mean-totalswell-period",
-    "mean-totalswell-dir"
-    )
+    "mean-totalswell-dir",
+)
 
 df.to_csv("data/wave_forecast.csv", index=False)
