@@ -162,13 +162,6 @@ fig_corecast_control_panel = dmc.SimpleGrid(
         dmc.Stack(
             [
                 html.H6("Forecast hours"),
-                dmc.Slider(
-                    id="range_slider_forecast",
-                    min=0,
-                    max=DEFAULT_NUMBER_OF_HOURS_FETCH,
-                    value=DEFAULT_NUMBER_OF_HOURS_FETCH,
-                    labelTransitionProps={"transition": "skew-down", "duration": 150, "timingFunction": "linear"},
-                ),
             ],
         ),
         dmc.Stack(
@@ -195,17 +188,15 @@ fig_forecast_w_obs = dbc.Card(
                         "margin": "1rem",
                     },
                 ),
-                # Dynamic observed datetime slider
                 dcc.RangeSlider(
-                    id="obs_datetime_slider",
-                    min=0,
-                    max=0,
-                    value=[0, 0],
-                    marks={},
+                    id="range_slider_forecast",
+                    min=1,
                     step=1,
-                    allowCross=False,
+                    marks={12: "12", 24: "24", 36: "36", 48: "48"},
+                    max=DEFAULT_NUMBER_OF_HOURS_FETCH,
+                    value=[1, 24, DEFAULT_NUMBER_OF_HOURS_FETCH],
+                    #labelTransitionProps={"transition": "skew-down", "duration": 150, "timingFunction": "linear"},
                 ),
-                obs_wind_store,
             ],
         )
     ],
@@ -326,10 +317,9 @@ def update_area_name(click_data):
     Output("forecast_data_store", "data"),
     [
         Input("map_figure", "clickData"),
-        Input("range_slider_forecast", "value"),
     ]
 )
-def load_forecast_data(click_data, forecast_hours):
+def load_forecast_data(click_data):
     if click_data is None:
         cell_id = start_cell_id
         lon = start_lon
@@ -340,7 +330,7 @@ def load_forecast_data(click_data, forecast_hours):
         lat = click_data["points"][0]["customdata"][2]
 
     wind_forecast_data_from_click = load_wind_forecast_data_to_app(
-        DMI_API_KEY_FORECAST, lon, lat, "wind", use_mock_data=USE_MOCK_DATA, n_hours=forecast_hours
+        DMI_API_KEY_FORECAST, lon, lat, "wind", use_mock_data=USE_MOCK_DATA
     )
     # Return as dict (json-serializable)
     return {
@@ -383,10 +373,13 @@ def load_obs_data(obs_toggle, date, click_data):
         Input("toggle-observational-data", "checked"),
         Input("date_picker", "date"),
         Input("obs_data_store", "data"),
+        Input("range_slider_forecast", "value"),
     ]
 )
-def update_chart_with_obs(forecast_data_store, obs_toggle, date, obs_data):
+def update_chart_with_obs(forecast_data_store, obs_toggle, date, obs_data, forecast_slider):
+
     forecast_data = pd.DataFrame(forecast_data_store["forecast_data"])
+    forecast_data = forecast_data.iloc[forecast_slider[0]:forecast_slider[2]]
     cell_id = forecast_data_store["cell_id"]
     forecast_data = convert_json_to_df(forecast_data)
     # Create base forecast chart
