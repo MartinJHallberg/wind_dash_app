@@ -58,17 +58,23 @@ def fetch_dmi_forecast_data(
     # --- Caching logic ---
     if not os.path.exists(cache_dir):
         os.makedirs(cache_dir)
-    # Use a hash of the query as the cache filename
-    cache_key = hashlib.md5(query_url.encode("utf-8")).hexdigest()
+
+    # Make cache_key date and time sensitive (changes every third hour)
+    now = dt.datetime.now()
+    # Floor hour to nearest lower multiple of 3
+    floored_hour = now.hour - (now.hour % 3)
+    time_str = now.strftime(f"%Y%m%dT{floored_hour:02d}")
+    cache_key = hashlib.md5((query_url + time_str).encode("utf-8")).hexdigest()
     cache_path = os.path.join(cache_dir, f"{cache_key}.json")
 
     if os.path.exists(cache_path):
+        print(f"[fetch_dmi_forecast_data] Loading cached response from {cache_path}")
         with open(cache_path, "r") as f:
-            print(f"Loading cached response from {cache_path}")
             return json.load(f)
 
     # --- Fetch data from API ---
     try:
+        print(f"[fetch_dmi_forecast_data] Fetching data from API: {query_url}")
         response = requests.get(query_url)
 
         response.raise_for_status()
@@ -76,6 +82,7 @@ def fetch_dmi_forecast_data(
         json_response = response.json()
 
         # Save to cache
+        print(f"[fetch_dmi_forecast_data] Saving response to cache: {cache_path}")
         with open(cache_path, "w") as f:
             json.dump(json_response, f)
         return json_response
@@ -133,17 +140,19 @@ def fetch_dmi_observational_data(api_key: str, cell_id: str, date_from: str, n_h
     cache_path = os.path.join(cache_dir, f"{cache_key}.json")
 
     if os.path.exists(cache_path):
+        print(f"[fetch_dmi_observational_data] Loading cached response from {cache_path}")
         with open(cache_path, "r") as f:
-            print(f"Loading cached response from {cache_path}")
             return json.load(f)
 
     try:
+        print(f"[fetch_dmi_observational_data] Fetching data from API: {query_url}")
         response = requests.get(query_url)
 
         response.raise_for_status()
 
         json_response = response.json()
 
+        print(f"[fetch_dmi_observational_data] Saving response to cache: {cache_path}")
         with open(cache_path, "w") as f:
             json.dump(json_response, f)
         return json_response

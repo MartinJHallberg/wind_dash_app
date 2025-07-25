@@ -35,7 +35,7 @@ jobs:
         DMI_API_KEY_OBSERVATION: ${{ secrets.DMI_API_KEY_OBSERVATION }}
         DMI_API_KEY_FORECAST: ${{ secrets.DMI_API_KEY_FORECAST }}
       run: |
-        poetry run pytest
+        poetry run pytest -m "not api_call"
     - name: Lint with Ruff
       run: poetry run ruff check src/
 

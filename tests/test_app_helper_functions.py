@@ -10,7 +10,7 @@ DMI_API_KEY_OBSERVATION = os.getenv("DMI_API_KEY_OBSERVATION")
 DMI_API_KEY_FORECAST = os.getenv("DMI_API_KEY_FORECAST")
 
 
-
+@pytest.mark.api_call()
 def test_load_dmi_observational_data():
     cell_id = "10km_620_44"
     date_from = "2025-06-20"
@@ -25,12 +25,14 @@ def test_load_dmi_observational_data():
     assert min_date == input_date
     assert len(df) == 48
 
-def test_load_dmi_forecast_data():
+
+@pytest.mark.api_call()
+def test_load_dmi_forecast_data(tmp_path):
     lon = 12.5683
     lat = 55.6761
     collection_type = "wind"
 
-    df = f.load_wind_forecast_data_to_app(DMI_API_KEY_FORECAST, lon, lat, collection_type)
+    df = f.load_wind_forecast_data_to_app(DMI_API_KEY_FORECAST, lon, lat, collection_type, cache_dir=tmp_path)
 
     columns = ["wind_speed", "wind_dir", "from_datetime", "longitude", "latitude"]
     assert isinstance(df, pd.DataFrame)
