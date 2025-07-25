@@ -53,6 +53,9 @@ initial_forecast_data_store = {
     "lat": start_lat,
 }
 
+forecast_wind_store = dcc.Store(id="forecast_data_store", data=initial_forecast_data_store)
+obs_wind_store = dcc.Store(id="obs_data_store")
+
 ######## CREATE INITIAL FIGURES ##############
 # Map
 fig_map = graphs.create_map_chart()
@@ -179,6 +182,7 @@ fig_corecast_control_panel = dmc.SimpleGrid(
     ],
 )
 
+
 fig_forecast_w_obs = dbc.Card(
     [
         html.Div(
@@ -191,6 +195,17 @@ fig_forecast_w_obs = dbc.Card(
                         "margin": "1rem",
                     },
                 ),
+                # Dynamic observed datetime slider
+                dcc.RangeSlider(
+                    id="obs_datetime_slider",
+                    min=0,
+                    max=0,
+                    value=[0, 0],
+                    marks={},
+                    step=1,
+                    allowCross=False,
+                ),
+                obs_wind_store,
             ],
         )
     ],
@@ -267,7 +282,9 @@ page_content = dbc.Container(
 
 app.layout = dmc.MantineProvider(
     [
-        dcc.Store(id="forecast_data_store", data=initial_forecast_data_store),
+        forecast_wind_store,
+        obs_wind_store,
+
         html.Div(
             [
                 sidebar,
@@ -333,21 +350,44 @@ def load_forecast_data(click_data, forecast_hours):
         "lat": lat,
     }
 
-# --- Callback 2: Update chart (with or without obs data) ---
+# --- Callback: Load observational data and store in dcc.Store ---
+@app.callback(
+    Output("obs_data_store", "data"),
+    [
+        Input("toggle-observational-data", "checked"),
+        Input("date_picker", "date"),
+        Input("map_figure", "clickData"),
+    ]
+)
+def load_obs_data(obs_toggle, date, click_data):
+    if not obs_toggle or not date:
+        return None
+    
+    if click_data is None:
+        cell_id = start_cell_id
+
+    else:
+        cell_id = click_data["points"][0]["location"]
+
+    wind_obs_data_from_click = load_wind_obs_data_to_app(
+        DMI_API_KEY_OBSERVATION, cell_id, date, use_mock_data=USE_MOCK_DATA
+    )
+    # Convert to dict for storage
+    return wind_obs_data_from_click.to_dict("records")
+
+# --- Callback: Update chart (with or without obs data) ---
 @app.callback(
     [Output("chart_forecast", "figure"), Output("error-no-obs-date", "children")],
     [
         Input("forecast_data_store", "data"),
         Input("toggle-observational-data", "checked"),
         Input("date_picker", "date"),
-        #Input("map_figure", "clickData"),
+        Input("obs_data_store", "data"),
     ]
 )
-def update_chart_with_obs(forecast_data_store, obs_toggle, date):
-
+def update_chart_with_obs(forecast_data_store, obs_toggle, date, obs_data):
     forecast_data = pd.DataFrame(forecast_data_store["forecast_data"])
     cell_id = forecast_data_store["cell_id"]
-
     forecast_data = convert_json_to_df(forecast_data)
     # Create base forecast chart
     chart = graphs.create_forecast_chart(
@@ -358,23 +398,25 @@ def update_chart_with_obs(forecast_data_store, obs_toggle, date):
         col_datetime="from_datetime",
         cell_id=cell_id,
     )
-    # If obs toggle is on and date is given, overlay obs data
+    # If obs toggle is on and date is given, overlay obs data from store
     if obs_toggle:
         if date:
-            wind_obs_data_from_click = load_wind_obs_data_to_app(
-                DMI_API_KEY_OBSERVATION, cell_id, date, use_mock_data=USE_MOCK_DATA
-            )
-            chart = graphs.add_obs_data_to_forecast_chart(
-                forecast_chart=chart,
-                obs_data=wind_obs_data_from_click,
-                col_wind_speed="mean_wind_speed",
-                col_wind_max_speed="max_wind_speed_3sec",
-                col_wind_direction="mean_wind_dir",
-                col_datetime="from_datetime",
-                cell_id=cell_id,
-                obs_date=date,
-            )
-            return chart, "Observational data is shown"
+            if obs_data is not None:
+                wind_obs_data_from_click = pd.DataFrame(obs_data)
+                wind_obs_data_from_click = convert_json_to_df(wind_obs_data_from_click)
+                chart = graphs.add_obs_data_to_forecast_chart(
+                    forecast_chart=chart,
+                    obs_data=wind_obs_data_from_click,
+                    col_wind_speed="mean_wind_speed",
+                    col_wind_max_speed="max_wind_speed_3sec",
+                    col_wind_direction="mean_wind_dir",
+                    col_datetime="from_datetime",
+                    cell_id=cell_id,
+                    obs_date=date,
+                )
+                return chart, "Observational data is shown"
+            else:
+                return chart, "No observational data loaded"
         else:
             return chart, "No date given for observational data"
     else:
@@ -387,6 +429,7 @@ def update_chart_with_obs(forecast_data_store, obs_toggle, date):
 )
 def update_output(value):
     return f"The switch is {value}."
+
 
 
 ###########################################################
