@@ -1,4 +1,4 @@
-from dash import dcc, html, Dash, set_props
+from dash import dcc, html, Dash, set_props, ctx, State
 import dash_bootstrap_components as dbc
 from dash_bootstrap_templates import load_figure_template
 from dash.dependencies import Input, Output
@@ -7,11 +7,14 @@ import os
 from wind_dashapp.helper_functions import app_graph_functions as graphs
 import datetime as dt
 from dotenv import load_dotenv
+import plotly.graph_objs as go
+import pandas as pd
 
 from wind_dashapp.helper_functions.app_helper_functions import (
     load_wind_obs_data_to_app,
     load_wind_forecast_data_to_app,
     DEFAULT_NUMBER_OF_HOURS_FETCH,
+    convert_json_to_df,
 )
 
 load_dotenv()
@@ -39,13 +42,16 @@ start_lat = 56.078
 start_date = "2023-01-02"
 
 ######## READ BASE DATA ######################
-wind_obs_data = load_wind_obs_data_to_app(
-    DMI_API_KEY_OBSERVATION, start_cell_id, start_date, use_mock_data=USE_MOCK_DATA
-)
-
-wind_forecast_data = load_wind_forecast_data_to_app(
+# Compute initial forecast data for dcc.Store initialization
+initial_wind_forecast_data = load_wind_forecast_data_to_app(
     DMI_API_KEY_FORECAST, start_lon, start_lat, "wind", use_mock_data=USE_MOCK_DATA
 )
+initial_forecast_data_store = {
+    "forecast_data": initial_wind_forecast_data.to_dict("records"),
+    "cell_id": start_cell_id,
+    "lon": start_lon,
+    "lat": start_lat,
+}
 
 ######## CREATE INITIAL FIGURES ##############
 # Map
@@ -53,7 +59,7 @@ fig_map = graphs.create_map_chart()
 
 # Forecast chart
 chart_dmi_forecast = graphs.create_forecast_chart(
-    forecast_data=wind_forecast_data,
+    forecast_data=initial_wind_forecast_data,
     col_wind_speed="wind_speed",
     col_wind_max_speed="gust_wind_speed_10m",
     col_wind_direction="wind_dir",
@@ -261,6 +267,7 @@ page_content = dbc.Container(
 
 app.layout = dmc.MantineProvider(
     [
+        dcc.Store(id="forecast_data_store", data=initial_forecast_data_store),
         html.Div(
             [
                 sidebar,
@@ -297,45 +304,66 @@ def update_area_name(click_data):
         return click_data["points"][0]["customdata"][0]
 
 
+# --- Callback 1: Load forecast data and store in dcc.Store ---
 @app.callback(
-    Output("chart_forecast", "figure"),
-    Output("error-no-obs-date", "children"),
-    Input("toggle-observational-data", "checked"),
-    Input("map_figure", "clickData"),
-    Input("date_picker", "date"),
-    Input("range_slider_forecast", "value"),
+    Output("forecast_data_store", "data"),
+    [
+        Input("map_figure", "clickData"),
+        Input("range_slider_forecast", "value"),
+    ]
 )
-def update_wind_forecast_data_with_obs(toggle, click_data, date, forecast_hours):
+def load_forecast_data(click_data, forecast_hours):
     if click_data is None:
         cell_id = start_cell_id
         lon = start_lon
         lat = start_lat
-
     else:
         cell_id = click_data["points"][0]["location"]
-
         lon = click_data["points"][0]["customdata"][1]
         lat = click_data["points"][0]["customdata"][2]
 
     wind_forecast_data_from_click = load_wind_forecast_data_to_app(
         DMI_API_KEY_FORECAST, lon, lat, "wind", use_mock_data=USE_MOCK_DATA, n_hours=forecast_hours
     )
+    # Return as dict (json-serializable)
+    return {
+        "forecast_data": wind_forecast_data_from_click.to_dict("records"),
+        "cell_id": cell_id,
+        "lon": lon,
+        "lat": lat,
+    }
 
+# --- Callback 2: Update chart (with or without obs data) ---
+@app.callback(
+    [Output("chart_forecast", "figure"), Output("error-no-obs-date", "children")],
+    [
+        Input("forecast_data_store", "data"),
+        Input("toggle-observational-data", "checked"),
+        Input("date_picker", "date"),
+        #Input("map_figure", "clickData"),
+    ]
+)
+def update_chart_with_obs(forecast_data_store, obs_toggle, date):
+
+    forecast_data = pd.DataFrame(forecast_data_store["forecast_data"])
+    cell_id = forecast_data_store["cell_id"]
+
+    forecast_data = convert_json_to_df(forecast_data)
+    # Create base forecast chart
     chart = graphs.create_forecast_chart(
-        forecast_data=wind_forecast_data_from_click,
+        forecast_data=forecast_data,
         col_wind_speed="wind_speed",
         col_wind_max_speed="gust_wind_speed_10m",
         col_wind_direction="wind_dir",
         col_datetime="from_datetime",
-        cell_id=start_cell_id,
+        cell_id=cell_id,
     )
-
-    if toggle:
+    # If obs toggle is on and date is given, overlay obs data
+    if obs_toggle:
         if date:
             wind_obs_data_from_click = load_wind_obs_data_to_app(
                 DMI_API_KEY_OBSERVATION, cell_id, date, use_mock_data=USE_MOCK_DATA
             )
-
             chart = graphs.add_obs_data_to_forecast_chart(
                 forecast_chart=chart,
                 obs_data=wind_obs_data_from_click,
@@ -349,8 +377,8 @@ def update_wind_forecast_data_with_obs(toggle, click_data, date, forecast_hours)
             return chart, "Observational data is shown"
         else:
             return chart, "No date given for observational data"
-
-    return chart, "Toggle off"
+    else:
+        return chart, "Forecast only"
 
 
 @app.callback(

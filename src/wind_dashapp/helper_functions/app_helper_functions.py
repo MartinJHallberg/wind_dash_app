@@ -145,3 +145,14 @@ def parse_and_filter_dates(df: pd.DataFrame):
     df_filtered = df_filtered.drop(columns=["from", "to", "has_microseconds"], errors="ignore")
 
     return df_filtered
+
+def convert_json_to_df(stored_json: dict):
+    df = pd.DataFrame(stored_json)
+    df['from_datetime'] = pd.to_datetime(df['from_datetime'])
+
+    return df
+
+
+
+
+
