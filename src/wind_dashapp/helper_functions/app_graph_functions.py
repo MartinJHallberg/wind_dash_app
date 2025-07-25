@@ -327,7 +327,12 @@ def create_forecast_chart_wind(
 
 
 def add_obs_data_to_forecast_chart(forecast_chart, obs_data, **kwargs):
-    obs_data['map_forecast_time'] = pd.to_datetime(forecast_chart.data[0].x).tz_localize("Europe/Copenhagen")
+    # Filter obs data to only include the same number of hours as the forecast chart
+    forecast_hours = forecast_chart.data[0].x
+    n_forecast_hours = len(forecast_hours)
+    obs_data = obs_data.head(n_forecast_hours)
+
+    obs_data['map_forecast_time'] = pd.to_datetime(forecast_hours).tz_localize("Europe/Copenhagen")
 
     chart = go.Figure(forecast_chart)  # needed to create a copy
 
