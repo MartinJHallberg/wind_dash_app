@@ -8,7 +8,11 @@ from wind_dashapp.helper_functions import app_graph_functions as graphs
 import datetime as dt
 from dotenv import load_dotenv
 
-from wind_dashapp.helper_functions.app_helper_functions import load_wind_obs_data_to_app, load_wind_forecast_data_to_app
+from wind_dashapp.helper_functions.app_helper_functions import (
+    load_wind_obs_data_to_app,
+    load_wind_forecast_data_to_app,
+    DEFAULT_NUMBER_OF_HOURS_FETCH
+)
 
 load_dotenv()
 
@@ -142,24 +146,34 @@ right_cards = (
     ),
 )
 
-fig_corecast_control_panel = html.Div(
-    [
+fig_corecast_control_panel = dmc.SimpleGrid(
+    cols=3,
+    spacing="md",
+    children=[
         dmc.Stack([
         html.H6("Forecast hours"),
-        dmc.RangeSlider(
+        dmc.Slider(
             id="range_slider_forecast",
             min=0,
-            max=48,
-            #step=1,
-           # value=24,
-            #labelTransition="skew-down",
-           # labelTransitionDuration=150,
+            max=DEFAULT_NUMBER_OF_HOURS_FETCH,
+            value=DEFAULT_NUMBER_OF_HOURS_FETCH,
+            labelTransitionProps={
+                "transition": "skew-down",
+                "duration": 150,
+                "timingFunction": "linear"
+            }
         ),
         ],
-        style={"width": "33.33%"},
-        )
+        ),
+        dmc.Stack([
+            dmc.Switch(
+                id="toggle-observational-data",
+                checked=False,
+            )
+        ])
 
-    ]
+    ],
+
 )
 
 fig_forecast_w_obs = dbc.Card(
@@ -190,12 +204,12 @@ card_control_fig_corecast = dbc.Card(
                     "Compare forecast with previous date",
                     style={"margin-top": "0.5rem"},
                 ),
-                dmc.Switch(
-                    id="toggle-observational-data",
-                    checked=False,
-                    # color="rgba(41, 96, 214, 1)",
-                    style={"display": "inline-block"},
-                ),
+                #dmc.Switch(
+                #    id="toggle-observational-data",
+               #     checked=False,
+                #    # color="rgba(41, 96, 214, 1)",
+                #    style={"display": "inline-block"},
+                #),
             ],
             className="toggle-control-header",
         ),
@@ -292,19 +306,22 @@ def update_area_name(click_data):
     Input("toggle-observational-data", "checked"),
     Input("map_figure", "clickData"),
     Input("date_picker", "date"),
+    Input("range_slider_forecast", "value"),
 )
-def update_wind_forecast_data_with_obs(toggle, click_data, date):
+def update_wind_forecast_data_with_obs(toggle, click_data, date, forecast_hours):
     if click_data is None:
         cell_id = start_cell_id
+        lon = start_lon
+        lat = start_lat
 
     else:
         cell_id = click_data["points"][0]["location"]
 
-    lon = click_data["points"][0]["customdata"][1]
-    lat = click_data["points"][0]["customdata"][2]
+        lon = click_data["points"][0]["customdata"][1]
+        lat = click_data["points"][0]["customdata"][2]
 
     wind_forecast_data_from_click = load_wind_forecast_data_to_app(
-        DMI_API_KEY_FORECAST, lon, lat, "wind", use_mock_data=USE_MOCK_DATA
+        DMI_API_KEY_FORECAST, lon, lat, "wind", use_mock_data=USE_MOCK_DATA, n_hours=forecast_hours
     )
 
     chart = graphs.create_forecast_chart(
