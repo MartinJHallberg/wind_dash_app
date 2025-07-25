@@ -34,7 +34,6 @@ def fetch_dmi_forecast_data(
     Fetches raw forecast data from the DMI API, with file-based caching.
     Returns the raw JSON response (does not extract values).
     """
-    
 
     base_url = "https://dmigw.govcloud.dk/v1/forecastedr/collections/"
     collections = {"wind": "harmonie_dini_sf", "waves": "wam_dw"}

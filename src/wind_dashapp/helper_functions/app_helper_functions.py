@@ -78,7 +78,6 @@ def load_wind_forecast_data_to_app(
     cache_dir: str = CACHE_DIR,
     use_mock_data: bool = True,
 ):
-
     if use_mock_data:
         json_response = json.load(open("wind_dashapp/mock_data/dmi_wind_forecast_data_mock1.json"))
         print("Using mock data for forecast data")
@@ -110,18 +109,11 @@ def load_wind_obs_data_to_app(
     cache_dir: str = CACHE_DIR,
     use_mock_data: bool = True,
 ):
-
     if use_mock_data:
         json_response = json.load(open("wind_dashapp/mock_data/dmi_wind_obs_data_mock1.json"))
         print("Using mock data for observational data")
     else:
-        json_response = fetch_dmi_observational_data(
-            api_key,
-            cell_id,
-            date_from,
-            n_hours,
-            cache_dir=cache_dir
-        )
+        json_response = fetch_dmi_observational_data(api_key, cell_id, date_from, n_hours, cache_dir=cache_dir)
     df = parse_dmi_observational_data(json_response)
 
     df = parse_and_filter_dates(df)

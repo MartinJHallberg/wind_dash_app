@@ -35,9 +35,13 @@ start_lat = 56.078
 start_date = "2023-01-02"
 
 ######## READ BASE DATA ######################
-wind_obs_data = load_wind_obs_data_to_app(DMI_API_KEY_OBSERVATION, start_cell_id, start_date, use_mock_data=USE_MOCK_DATA)
+wind_obs_data = load_wind_obs_data_to_app(
+    DMI_API_KEY_OBSERVATION, start_cell_id, start_date, use_mock_data=USE_MOCK_DATA
+)
 
-wind_forecast_data = load_wind_forecast_data_to_app(DMI_API_KEY_FORECAST, start_lon, start_lat, "wind", use_mock_data=USE_MOCK_DATA)
+wind_forecast_data = load_wind_forecast_data_to_app(
+    DMI_API_KEY_FORECAST, start_lon, start_lat, "wind", use_mock_data=USE_MOCK_DATA
+)
 
 ######## CREATE INITIAL FIGURES ##############
 # Map
@@ -138,26 +142,40 @@ right_cards = (
     ),
 )
 
+fig_corecast_control_panel = html.Div(
+    [
+        dmc.Stack([
+        html.H6("Forecast hours"),
+        dmc.RangeSlider(
+            id="range_slider_forecast",
+            min=0,
+            max=48,
+            #step=1,
+           # value=24,
+            #labelTransition="skew-down",
+           # labelTransitionDuration=150,
+        ),
+        ],
+        style={"width": "33.33%"},
+        )
+
+    ]
+)
+
 fig_forecast_w_obs = dbc.Card(
     [
         html.Div(
             [
-
-    dcc.Graph(
-        id="chart_forecast",
-        figure=chart_dmi_forecast,
-        style={
-            "margin": "1rem",
-        },
-    ),
-        dmc.RangeSlider(
-            id="range_slider_forecast",
-            min=0,
-            max=100,
-            step=1,
-            value=[0, 100],
-        ),
-       ], )
+                fig_corecast_control_panel,
+                dcc.Graph(
+                    id="chart_forecast",
+                    figure=chart_dmi_forecast,
+                    style={
+                        "margin": "1rem",
+                    },
+                ),
+            ],
+        )
     ],
     class_name="card",
 )
@@ -218,7 +236,6 @@ page_content = dbc.Container(
         [
             html.H1("Header"),
             dbc.Row([dbc.Col(map_card, md=9), dbc.Col(right_cards, md=2)]),
-            html.Br(),
             dbc.Row(
                 [
                     dbc.Col(fig_forecast_w_obs, md=9),
@@ -231,13 +248,16 @@ page_content = dbc.Container(
     fluid=True,
 )
 
-app.layout = html.Div(
+app.layout = dmc.MantineProvider(
     [
-        sidebar,
-        # content_,
-        page_content,
-    ],
-    className="main-div",
+        html.Div(
+            [
+                sidebar,
+                page_content,
+            ],
+            className="main-div",
+        )
+    ]
 )
 
 
@@ -283,7 +303,9 @@ def update_wind_forecast_data_with_obs(toggle, click_data, date):
     lon = click_data["points"][0]["customdata"][1]
     lat = click_data["points"][0]["customdata"][2]
 
-    wind_forecast_data_from_click = load_wind_forecast_data_to_app(DMI_API_KEY_FORECAST, lon, lat, "wind", use_mock_data=USE_MOCK_DATA)
+    wind_forecast_data_from_click = load_wind_forecast_data_to_app(
+        DMI_API_KEY_FORECAST, lon, lat, "wind", use_mock_data=USE_MOCK_DATA
+    )
 
     chart = graphs.create_forecast_chart(
         forecast_data=wind_forecast_data_from_click,
@@ -296,7 +318,9 @@ def update_wind_forecast_data_with_obs(toggle, click_data, date):
 
     if toggle:
         if date:
-            wind_obs_data_from_click = load_wind_obs_data_to_app(DMI_API_KEY_OBSERVATION, cell_id, date, use_mock_data=USE_MOCK_DATA)
+            wind_obs_data_from_click = load_wind_obs_data_to_app(
+                DMI_API_KEY_OBSERVATION, cell_id, date, use_mock_data=USE_MOCK_DATA
+            )
 
             chart = graphs.add_obs_data_to_forecast_chart(
                 forecast_chart=chart,
