@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 from wind_dashapp.helper_functions.app_helper_functions import (
     load_wind_obs_data_to_app,
     load_wind_forecast_data_to_app,
-    DEFAULT_NUMBER_OF_HOURS_FETCH
+    DEFAULT_NUMBER_OF_HOURS_FETCH,
 )
 
 load_dotenv()
@@ -150,30 +150,27 @@ fig_corecast_control_panel = dmc.SimpleGrid(
     cols=3,
     spacing="md",
     children=[
-        dmc.Stack([
-        html.H6("Forecast hours"),
-        dmc.Slider(
-            id="range_slider_forecast",
-            min=0,
-            max=DEFAULT_NUMBER_OF_HOURS_FETCH,
-            value=DEFAULT_NUMBER_OF_HOURS_FETCH,
-            labelTransitionProps={
-                "transition": "skew-down",
-                "duration": 150,
-                "timingFunction": "linear"
-            }
+        dmc.Stack(
+            [
+                html.H6("Forecast hours"),
+                dmc.Slider(
+                    id="range_slider_forecast",
+                    min=0,
+                    max=DEFAULT_NUMBER_OF_HOURS_FETCH,
+                    value=DEFAULT_NUMBER_OF_HOURS_FETCH,
+                    labelTransitionProps={"transition": "skew-down", "duration": 150, "timingFunction": "linear"},
+                ),
+            ],
         ),
-        ],
+        dmc.Stack(
+            [
+                dmc.Switch(
+                    id="toggle-observational-data",
+                    checked=False,
+                )
+            ]
         ),
-        dmc.Stack([
-            dmc.Switch(
-                id="toggle-observational-data",
-                checked=False,
-            )
-        ])
-
     ],
-
 )
 
 fig_forecast_w_obs = dbc.Card(
@@ -204,12 +201,12 @@ card_control_fig_corecast = dbc.Card(
                     "Compare forecast with previous date",
                     style={"margin-top": "0.5rem"},
                 ),
-                #dmc.Switch(
+                # dmc.Switch(
                 #    id="toggle-observational-data",
-               #     checked=False,
+                #     checked=False,
                 #    # color="rgba(41, 96, 214, 1)",
                 #    style={"display": "inline-block"},
-                #),
+                # ),
             ],
             className="toggle-control-header",
         ),
