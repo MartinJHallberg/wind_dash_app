@@ -2609,7 +2609,7 @@ textarea.form-control-lg {
   height: 0.5rem;
   color: transparent;
   cursor: pointer;
-  background-color: rgba(55, 94, 148, 0.15);
+  background-color: var(--bs-primary);
   border-color: transparent;
   border-radius: 1rem;
   box-shadow: var(--bs-box-shadow-inset);

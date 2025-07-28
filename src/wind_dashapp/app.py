@@ -14,6 +14,7 @@ from wind_dashapp.helper_functions.app_helper_functions import (
     load_wind_obs_data_to_app,
     load_wind_forecast_data_to_app,
     DEFAULT_NUMBER_OF_HOURS_FETCH,
+    DEFAULT_HOUR_OBS_DATA,
     convert_json_to_df,
 )
 
@@ -194,8 +195,18 @@ fig_forecast_w_obs = dbc.Card(
                     step=1,
                     marks={12: "12", 24: "24", 36: "36", 48: "48"},
                     max=DEFAULT_NUMBER_OF_HOURS_FETCH,
-                    value=[1, 24, DEFAULT_NUMBER_OF_HOURS_FETCH],
-                    #labelTransitionProps={"transition": "skew-down", "duration": 150, "timingFunction": "linear"},
+                    value=[1, DEFAULT_NUMBER_OF_HOURS_FETCH],
+                    className="form-range",
+                ),
+                dcc.Slider(
+                    id="range_slider_obs",
+                    min=-24,  # Will be set by callback
+                    max=24,  # Will be set by callback
+                    step=1,
+                    marks={12: "12", 24: "24", 36: "36", 48: "48"},
+                    value=DEFAULT_HOUR_OBS_DATA,
+                    included=False,
+                    className="form-range",
                 ),
             ],
         )
@@ -288,6 +299,8 @@ app.layout = dmc.MantineProvider(
 
 
 ############ CALLBAKCKS ################
+
+
 @app.callback(
     Output("control_fig_forecast", "style"),
     Input("toggle-observational-data", "checked"),
@@ -371,15 +384,19 @@ def load_obs_data(obs_toggle, date, click_data):
     [
         Input("forecast_data_store", "data"),
         Input("toggle-observational-data", "checked"),
-        Input("date_picker", "date"),
         Input("obs_data_store", "data"),
         Input("range_slider_forecast", "value"),
+        Input("range_slider_obs", "value"),
+    ],
+    [
+        State("date_picker", "date"),
     ]
 )
-def update_chart_with_obs(forecast_data_store, obs_toggle, date, obs_data, forecast_slider):
+def update_chart_with_obs(forecast_data_store, obs_toggle, obs_data, forecast_slider, obs_slider, date):
 
     forecast_data = pd.DataFrame(forecast_data_store["forecast_data"])
-    forecast_data = forecast_data.iloc[forecast_slider[0]:forecast_slider[2]]
+    forecast_data = forecast_data.iloc[forecast_slider[0]:forecast_slider[1]]
+    mapping_hour = obs_slider
     cell_id = forecast_data_store["cell_id"]
     forecast_data = convert_json_to_df(forecast_data)
     # Create base forecast chart
@@ -400,6 +417,7 @@ def update_chart_with_obs(forecast_data_store, obs_toggle, date, obs_data, forec
                 chart = graphs.add_obs_data_to_forecast_chart(
                     forecast_chart=chart,
                     obs_data=wind_obs_data_from_click,
+                    mapping_hour=mapping_hour,
                     col_wind_speed="mean_wind_speed",
                     col_wind_max_speed="max_wind_speed_3sec",
                     col_wind_direction="mean_wind_dir",

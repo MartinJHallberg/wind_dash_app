@@ -12,6 +12,7 @@ from wind_dashapp.data_processing.dmi import (
 )
 
 DEFAULT_NUMBER_OF_HOURS_FETCH = 48
+DEFAULT_HOUR_OBS_DATA = 12
 
 
 def get_map(
@@ -122,6 +123,8 @@ def load_wind_obs_data_to_app(
 
     if use_mock_data:
         df_pivot["mean_wind_speed"] = df_pivot["mean_wind_speed"].apply(lambda x: x * np.random.uniform(0.5, 1.5))
+        date_only = pd.to_datetime(date_from).date()
+        df_pivot['from_datetime'] = df_pivot['from_datetime'].apply(lambda dt: dt.replace(year=date_only.year, month=date_only.month, day=date_only.day))
 
     return df_pivot
 

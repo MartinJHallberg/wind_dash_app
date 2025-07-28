@@ -1,3 +1,4 @@
+from pandas.core.algorithms import _reconstruct_data
 from wind_dashapp.helper_functions.app_helper_functions import filter_dmi_obs_data, get_map
 import plotly.graph_objects as go
 import numpy as np
@@ -187,22 +188,64 @@ def create_obs_chart(dmi_data, cell_id, obs_date):
     return chart
 
 
+def add_background_rectangle_to_chart(chart, data, opacity=0.1):
+    is_hour_0 = data['from_datetime'].dt.hour == 0
+    is_first_row = data.index == data.index[0]
+    is_last_row = data.index == data.index[-1]
+
+    rectangle_data = data.loc[is_hour_0 | is_first_row | is_last_row]['from_datetime'].to_list()
+
+    for i in range(len(rectangle_data)):
+        if i % 2 == 0 and i < len(rectangle_data) - 1:
+            chart.add_vrect(
+                x0=rectangle_data[i],
+                x1=rectangle_data[i+1],
+                fillcolor=layout_colors["primary"],
+                opacity=opacity,
+                layer="below",
+                line_width=0,
+            )
+
+    return chart
+
+def add_background_vlines_to_chart(chart, data, opacity=0.1):
+    is_hour_0 = data['from_datetime'].dt.hour == 0
+    is_first_row = data.index == data.index[0]
+    is_last_row = data.index == data.index[-1]
+
+    vline_data = data.loc[is_hour_0 | is_first_row | is_last_row]['map_forecast_time'].to_list()
+
+    
+    for i in range(len(vline_data)):
+        if i < len(vline_data) - 1:
+            chart.add_vline(
+                x=vline_data[i],
+                fillcolor=layout_colors["orange"],
+                opacity=opacity,
+                layer="below",
+                line_width=1,
+                line_dash="dash",
+            )
+
+    return chart
+
+
 def create_forecast_chart(
     forecast_data,
     cell_id=None,  # for later use
     **kwargs,
 ):
-    # Filter forecast data
-    forecast_data_filter = forecast_data.copy()
 
     chart = create_full_wind_chart(
-        df=forecast_data_filter,
+        df=forecast_data,
         col_wind_speed="wind_speed",
         col_wind_max_speed="gust_wind_speed_10m",
         col_wind_direction="wind_dir",
         col_datetime="from_datetime",
         marker_opacity=1,
     )
+
+    chart = add_background_rectangle_to_chart(chart, forecast_data)
 
     return chart
 
@@ -326,7 +369,7 @@ def create_forecast_chart_wind(
     return chart
 
 
-def add_obs_data_to_forecast_chart(forecast_chart, obs_data, **kwargs):
+def add_obs_data_to_forecast_chart(forecast_chart, obs_data, mapping_hour, **kwargs):
     # Filter obs data to only include the same number of hours as the forecast chart
     forecast_hours = forecast_chart.data[0].x
     n_forecast_hours = len(forecast_hours)
@@ -340,18 +383,34 @@ def add_obs_data_to_forecast_chart(forecast_chart, obs_data, **kwargs):
 
     color = layout_colors["orange"]
 
-    chart = create_wind_speed_chart(obs_data, marker_opacity=0.6, marker_color=color, chart=chart, **kwargs)
+    chart = create_wind_speed_chart(obs_data, marker_opacity=0.4, marker_color=color, chart=chart, **kwargs)
 
-    chart = add_direction_arrows(df=obs_data, chart=chart, marker_opacity=0.6, marker_color=color, **kwargs)
+    chart = add_direction_arrows(df=obs_data, chart=chart, marker_opacity=0.7, marker_color=color, **kwargs)
 
-    chart = add_max_wind_chart(df=obs_data, chart=chart, marker_opacity=0.7, marker_color=color, **kwargs)
+    chart = add_max_wind_chart(df=obs_data, chart=chart, marker_opacity=0.5, marker_color=color, **kwargs)
+
+    chart = add_background_vlines_to_chart(chart, obs_data, opacity=0.5)
+
+    obs_date = pd.to_datetime(kwargs['obs_date'])
+    obs_datetime = obs_date.replace(hour=mapping_hour, minute=0, second=0, microsecond=0).tz_localize("Europe/Copenhagen")
+
+    chart = add_mapping_hour_line_to_chart(chart, obs_data, obs_datetime, opacity=0.6)
 
     chart.update_layout(barmode="overlay")
 
     return chart
 
 
-# def map_observational_datetime_to_forecast(
-#         obs_data,
-#         forecast_data
-# ):
+def add_mapping_hour_line_to_chart(chart, obs_data, obs_datetime, opacity=0.5):
+
+    obs_datetime_mapped = obs_data.loc[obs_data['from_datetime'] == obs_datetime]['map_forecast_time'].to_list()[0]
+
+    chart.add_vline(
+        x=obs_datetime_mapped,
+        fillcolor=layout_colors["orange"],
+        opacity=0.6,
+        layer="below",
+        line_width=4,
+        line_dash="dash",
+    )
+    return chart
