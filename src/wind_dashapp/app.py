@@ -4,6 +4,8 @@ from dash_bootstrap_templates import load_figure_template
 from dash.dependencies import Input, Output
 import dash_mantine_components as dmc
 import os
+
+from numpy import False_
 from wind_dashapp.helper_functions import app_graph_functions as graphs
 import datetime as dt
 from dotenv import load_dotenv
@@ -13,9 +15,11 @@ import pandas as pd
 from wind_dashapp.helper_functions.app_helper_functions import (
     load_wind_obs_data_to_app,
     load_wind_forecast_data_to_app,
-    DEFAULT_NUMBER_OF_HOURS_FETCH,
+    DEFAULT_NUMBER_OF_HOURS_FETCH_FORECAST,
+    DEFAULT_NUMBER_OF_HOURS_FETCH_OBS,
     DEFAULT_HOUR_OBS_DATA,
     convert_json_to_df,
+    map_slider_to_date,
 )
 
 load_dotenv()
@@ -56,6 +60,11 @@ initial_forecast_data_store = {
 
 forecast_wind_store = dcc.Store(id="forecast_data_store", data=initial_forecast_data_store)
 obs_wind_store = dcc.Store(id="obs_data_store")
+
+
+forecast_slider_date_map = map_slider_to_date(initial_wind_forecast_data)
+forecast_slider_date_map_store = dcc.Store(id="forecast_slider_date_map_store", data=forecast_slider_date_map)
+obs_slider_date_map_store = dcc.Store(id="obs_slider_date_map_store", data={})
 
 ######## CREATE INITIAL FIGURES ##############
 # Map
@@ -194,8 +203,8 @@ fig_forecast_w_obs = dbc.Card(
                     min=1,
                     step=1,
                     marks={12: "12", 24: "24", 36: "36", 48: "48"},
-                    max=DEFAULT_NUMBER_OF_HOURS_FETCH,
-                    value=[1, DEFAULT_NUMBER_OF_HOURS_FETCH],
+                    max=DEFAULT_NUMBER_OF_HOURS_FETCH_FORECAST,
+                    value=[1, DEFAULT_NUMBER_OF_HOURS_FETCH_FORECAST],
                     className="form-range",
                 ),
                 dcc.Slider(
@@ -203,8 +212,8 @@ fig_forecast_w_obs = dbc.Card(
                     min=-24,  # Will be set by callback
                     max=24,  # Will be set by callback
                     step=1,
-                    marks={12: "12", 24: "24", 36: "36", 48: "48"},
-                    value=DEFAULT_HOUR_OBS_DATA,
+                    marks={-24: "24", -12: "-12", 0: "0", 12: "12", 24: "24"},
+                    value=0,
                     included=False,
                     className="form-range",
                 ),
@@ -254,6 +263,15 @@ card_control_fig_corecast = dbc.Card(
                             # date=dt.date.fromisoformat(start_date),
                             display_format="YYYY-MM-DD",
                         ),
+                        dmc.TimePicker(
+                            id="time_picker",
+                            label="Enter hour",
+                            withSeconds=False,
+                            withDropdown=True,
+                            value="12:00"
+                        ),
+                        
+
                     ],
                     style={"display": "none"},
                 )
@@ -286,7 +304,8 @@ app.layout = dmc.MantineProvider(
     [
         forecast_wind_store,
         obs_wind_store,
-
+        forecast_slider_date_map_store,
+        obs_slider_date_map_store,
         html.Div(
             [
                 sidebar,
@@ -355,7 +374,10 @@ def load_forecast_data(click_data):
 
 # --- Callback: Load observational data and store in dcc.Store ---
 @app.callback(
-    Output("obs_data_store", "data"),
+    [
+        Output("obs_data_store", "data"),
+        Output("obs_slider_date_map_store", "data"),
+    ],
     [
         Input("toggle-observational-data", "checked"),
         Input("date_picker", "date"),
@@ -364,7 +386,7 @@ def load_forecast_data(click_data):
 )
 def load_obs_data(obs_toggle, date, click_data):
     if not obs_toggle or not date:
-        return None
+        return None, {}
     
     if click_data is None:
         cell_id = start_cell_id
@@ -373,10 +395,10 @@ def load_obs_data(obs_toggle, date, click_data):
         cell_id = click_data["points"][0]["location"]
 
     wind_obs_data_from_click = load_wind_obs_data_to_app(
-        DMI_API_KEY_OBSERVATION, cell_id, date, use_mock_data=USE_MOCK_DATA
+        DMI_API_KEY_OBSERVATION, cell_id, date, use_mock_data=USE_MOCK_DATA, 
     )
     # Convert to dict for storage
-    return wind_obs_data_from_click.to_dict("records")
+    return wind_obs_data_from_click.to_dict("records"), map_slider_to_date(wind_obs_data_from_click)
 
 # --- Callback: Update chart (with or without obs data) ---
 @app.callback(
@@ -390,13 +412,27 @@ def load_obs_data(obs_toggle, date, click_data):
     ],
     [
         State("date_picker", "date"),
+        State("forecast_slider_date_map_store", "data"),
+        State("obs_slider_date_map_store", "data"),
+        State("time_picker", "value"),
     ]
 )
-def update_chart_with_obs(forecast_data_store, obs_toggle, obs_data, forecast_slider, obs_slider, date):
+def update_chart_with_obs(
+    forecast_data_store,
+    obs_toggle,
+    obs_data,
+    forecast_slider,
+    obs_slider,
+    date,
+    forecast_slider_date_map_store,
+    obs_slider_date_map_store,
+    time_picker,
+):
 
     forecast_data = pd.DataFrame(forecast_data_store["forecast_data"])
-    forecast_data = forecast_data.iloc[forecast_slider[0]:forecast_slider[1]]
-    mapping_hour = obs_slider
+    forecast_slider_datetime_min = forecast_slider[0]
+    forecast_slider_datetime_max = forecast_slider[1]
+    forecast_data = forecast_data.iloc[forecast_slider_datetime_min:forecast_slider_datetime_max]
     cell_id = forecast_data_store["cell_id"]
     forecast_data = convert_json_to_df(forecast_data)
     # Create base forecast chart
@@ -414,16 +450,19 @@ def update_chart_with_obs(forecast_data_store, obs_toggle, obs_data, forecast_sl
             if obs_data is not None:
                 wind_obs_data_from_click = pd.DataFrame(obs_data)
                 wind_obs_data_from_click = convert_json_to_df(wind_obs_data_from_click)
+
                 chart = graphs.add_obs_data_to_forecast_chart(
                     forecast_chart=chart,
                     obs_data=wind_obs_data_from_click,
-                    mapping_hour=mapping_hour,
+                    obs_ref_position=obs_slider,
                     col_wind_speed="mean_wind_speed",
                     col_wind_max_speed="max_wind_speed_3sec",
                     col_wind_direction="mean_wind_dir",
                     col_datetime="from_datetime",
                     cell_id=cell_id,
                     obs_date=date,
+                    reference_hour=time_picker,
+                    n_obs_hours=forecast_slider_datetime_max - forecast_slider_datetime_min,
                 )
                 return chart, "Observational data is shown"
             else:

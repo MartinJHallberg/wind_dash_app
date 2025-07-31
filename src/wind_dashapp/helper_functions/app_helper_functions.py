@@ -11,7 +11,8 @@ from wind_dashapp.data_processing.dmi import (
     CACHE_DIR,
 )
 
-DEFAULT_NUMBER_OF_HOURS_FETCH = 48
+DEFAULT_NUMBER_OF_HOURS_FETCH_FORECAST = 48
+DEFAULT_NUMBER_OF_HOURS_FETCH_OBS = 60
 DEFAULT_HOUR_OBS_DATA = 12
 
 
@@ -75,7 +76,7 @@ def load_wind_forecast_data_to_app(
     lon: float,
     lat: float,
     collection_type: str,
-    n_hours: int = DEFAULT_NUMBER_OF_HOURS_FETCH,
+    n_hours: int = DEFAULT_NUMBER_OF_HOURS_FETCH_FORECAST,
     cache_dir: str = CACHE_DIR,
     use_mock_data: bool = True,
 ):
@@ -106,15 +107,16 @@ def load_wind_obs_data_to_app(
     api_key: str,
     cell_id: str,
     date_from: str,
-    n_hours=DEFAULT_NUMBER_OF_HOURS_FETCH,
+    n_hours=DEFAULT_NUMBER_OF_HOURS_FETCH_OBS,
     cache_dir: str = CACHE_DIR,
     use_mock_data: bool = True,
 ):
+    date_before = pd.to_datetime(date_from) - dt.timedelta(days=1)
     if use_mock_data:
-        json_response = json.load(open("wind_dashapp/mock_data/dmi_wind_obs_data_mock1.json"))
+        json_response = json.load(open("wind_dashapp/mock_data/dmi_wind_obs_data_mock4.json"))
         print("Using mock data for observational data")
     else:
-        json_response = fetch_dmi_observational_data(api_key, cell_id, date_from, n_hours, cache_dir=cache_dir)
+        json_response = fetch_dmi_observational_data(api_key, cell_id, date_before, n_hours, cache_dir=cache_dir)
     df = parse_dmi_observational_data(json_response)
 
     df = parse_and_filter_dates(df)
@@ -123,8 +125,8 @@ def load_wind_obs_data_to_app(
 
     if use_mock_data:
         df_pivot["mean_wind_speed"] = df_pivot["mean_wind_speed"].apply(lambda x: x * np.random.uniform(0.5, 1.5))
-        date_only = pd.to_datetime(date_from).date()
-        df_pivot['from_datetime'] = df_pivot['from_datetime'].apply(lambda dt: dt.replace(year=date_only.year, month=date_only.month, day=date_only.day))
+        start_datetime = pd.Timestamp(date_before.date()).replace(tzinfo=pd.Timestamp(df_pivot['from_datetime'].iloc[0]).tzinfo)
+        df_pivot['from_datetime'] = [start_datetime + pd.Timedelta(hours=i) for i in range(len(df_pivot))]
 
     return df_pivot
 
@@ -155,6 +157,12 @@ def convert_json_to_df(stored_json: dict):
 
     return df
 
+def map_slider_to_date(df):
+    slider_to_date = {
+        i + 1: dt for i, dt in enumerate(df["from_datetime"])
+    }
+
+    return slider_to_date
 
 
 

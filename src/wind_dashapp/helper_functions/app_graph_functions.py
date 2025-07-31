@@ -369,17 +369,16 @@ def create_forecast_chart_wind(
     return chart
 
 
-def add_obs_data_to_forecast_chart(forecast_chart, obs_data, mapping_hour, **kwargs):
+def add_obs_data_to_forecast_chart(forecast_chart, obs_data, obs_ref_position, reference_hour, n_obs_hours, **kwargs):
     # Filter obs data to only include the same number of hours as the forecast chart
+    reference_hour = int(reference_hour.split(":")[0])
     forecast_hours = forecast_chart.data[0].x
-    n_forecast_hours = len(forecast_hours)
-    obs_data = obs_data.head(n_forecast_hours)
 
     obs_data['map_forecast_time'] = pd.to_datetime(forecast_hours).tz_localize("Europe/Copenhagen")
+    obs_data['map_forecast_time'] = obs_data['map_forecast_time'] + pd.Timedelta(hours=obs_ref_position)
+    kwargs["col_datetime"] = "map_forecast_time"
 
     chart = go.Figure(forecast_chart)  # needed to create a copy
-
-    kwargs["col_datetime"] = "map_forecast_time"
 
     color = layout_colors["orange"]
 
@@ -392,7 +391,8 @@ def add_obs_data_to_forecast_chart(forecast_chart, obs_data, mapping_hour, **kwa
     chart = add_background_vlines_to_chart(chart, obs_data, opacity=0.5)
 
     obs_date = pd.to_datetime(kwargs['obs_date'])
-    obs_datetime = obs_date.replace(hour=mapping_hour, minute=0, second=0, microsecond=0).tz_localize("Europe/Copenhagen")
+    obs_datetime = obs_date.replace(hour=reference_hour, minute=0, second=0, microsecond=0).tz_localize("Europe/Copenhagen")
+    obs_datetime = obs_datetime + pd.Timedelta(hours=obs_ref_position)
 
     chart = add_mapping_hour_line_to_chart(chart, obs_data, obs_datetime, opacity=0.6)
 
