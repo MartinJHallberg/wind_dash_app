@@ -462,7 +462,7 @@ def update_chart_with_obs(
                     cell_id=cell_id,
                     obs_date=date,
                     reference_hour=time_picker,
-                    n_obs_hours=forecast_slider_datetime_max - forecast_slider_datetime_min,
+                    n_hours=forecast_slider_datetime_max - forecast_slider_datetime_min,
                 )
                 return chart, "Observational data is shown"
             else:

@@ -113,7 +113,7 @@ def load_wind_obs_data_to_app(
 ):
     date_before = pd.to_datetime(date_from) - dt.timedelta(days=1)
     if use_mock_data:
-        json_response = json.load(open("wind_dashapp/mock_data/dmi_wind_obs_data_mock4.json"))
+        json_response = json.load(open("wind_dashapp/mock_data/dmi_wind_obs_data_mock5.json"))
         print("Using mock data for observational data")
     else:
         json_response = fetch_dmi_observational_data(api_key, cell_id, date_before, n_hours, cache_dir=cache_dir)

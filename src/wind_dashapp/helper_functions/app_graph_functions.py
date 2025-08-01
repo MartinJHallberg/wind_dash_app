@@ -368,14 +368,76 @@ def create_forecast_chart_wind(
 
     return chart
 
+def filter_and_center_obs_data(obs_data, obs_datetime, n_hours):
+    
+    obs_data_before = obs_data.loc[
+        (obs_data['from_datetime']>= (obs_datetime - pd.Timedelta(hours=n_hours/2))) & 
+        (obs_data['from_datetime']<= (obs_datetime))
+     ]
+    obs_data_after = obs_data.loc[
+        (obs_data['from_datetime']<= (obs_datetime + pd.Timedelta(hours=n_hours/2))) &
+        (obs_data['from_datetime']> (obs_datetime))
+        ]
 
-def add_obs_data_to_forecast_chart(forecast_chart, obs_data, obs_ref_position, reference_hour, n_obs_hours, **kwargs):
+    if not round(n_hours/2) == len(obs_data_before):
+        pad_hours = round(n_hours/2) - len(obs_data_before)
+        obs_data_before = pad_obs_data(obs_data_before, pad_hours, True)
+
+    if not int(n_hours/2) == len(obs_data_after):
+        pad_hours = int(n_hours/2) - len(obs_data_after)
+        obs_data_after = pad_obs_data(obs_data_after, pad_hours, False)
+
+    obs_data_concat = pd.concat([obs_data_before, obs_data_after]).reset_index(drop=True)
+
+    return obs_data_concat
+
+def move_obs_data_with_ref_position(obs_data, obs_ref_position):
+
+    obs_data['from_datetime'] = obs_data['from_datetime'] + pd.Timedelta(hours=obs_ref_position)
+        
+    return obs_data
+
+def pad_obs_data(obs_data, n_hours, is_before_obs_datetime):
+    len_obs = len(obs_data)
+
+    if is_before_obs_datetime:
+        edge_datetime = obs_data['from_datetime'].min()
+    else:
+        edge_datetime = obs_data['from_datetime'].max()
+
+    padding = pd.DataFrame(index=range(n_hours), columns=obs_data.columns)
+    padding['from_datetime'] = pd.date_range(start=edge_datetime + pd.Timedelta(hours=1), periods=n_hours, freq='h')
+    padding['max_wind_speed_3sec'] = 0
+    padding['max_wind_speed_10min'] = 0
+    padding['mean_wind_speed'] = 0
+    padding['mean_wind_dir'] = 0
+    padding['mean_pressure'] = 0
+    padding['mean_temp'] = 0
+        
+    obs_data = pd.concat([padding, obs_data], ignore_index=True)
+
+    obs_data = obs_data.sort_values(by='from_datetime')
+
+    return obs_data
+
+
+def add_obs_data_to_forecast_chart(forecast_chart, obs_data, obs_ref_position, reference_hour, n_hours, **kwargs):
     # Filter obs data to only include the same number of hours as the forecast chart
     reference_hour = int(reference_hour.split(":")[0])
     forecast_hours = forecast_chart.data[0].x
 
-    obs_data['map_forecast_time'] = pd.to_datetime(forecast_hours).tz_localize("Europe/Copenhagen")
-    obs_data['map_forecast_time'] = obs_data['map_forecast_time'] + pd.Timedelta(hours=obs_ref_position)
+    obs_date = pd.to_datetime(kwargs['obs_date'])
+    obs_datetime = obs_date.replace(hour=reference_hour, minute=0, second=0, microsecond=0).tz_localize("Europe/Copenhagen")
+
+    obs_data = move_obs_data_with_ref_position(obs_data, obs_ref_position)
+
+    obs_data = filter_and_center_obs_data(obs_data, obs_datetime, n_hours)
+
+    #if len(obs_data) < len(forecast_hours):
+    #    obs_data = pad_obs_data(obs_data, forecast_hours, obs_ref_position)
+
+    obs_data['map_forecast_time'] = forecast_hours
+
     kwargs["col_datetime"] = "map_forecast_time"
 
     chart = go.Figure(forecast_chart)  # needed to create a copy
@@ -390,8 +452,6 @@ def add_obs_data_to_forecast_chart(forecast_chart, obs_data, obs_ref_position, r
 
     chart = add_background_vlines_to_chart(chart, obs_data, opacity=0.5)
 
-    obs_date = pd.to_datetime(kwargs['obs_date'])
-    obs_datetime = obs_date.replace(hour=reference_hour, minute=0, second=0, microsecond=0).tz_localize("Europe/Copenhagen")
     obs_datetime = obs_datetime + pd.Timedelta(hours=obs_ref_position)
 
     chart = add_mapping_hour_line_to_chart(chart, obs_data, obs_datetime, opacity=0.6)
