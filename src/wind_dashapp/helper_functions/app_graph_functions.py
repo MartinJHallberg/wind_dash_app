@@ -152,6 +152,32 @@ def create_full_wind_chart(df, **kwargs):
         zerolinewidth=3,
     )
 
+    
+    # Group by date and get min/max time for each date
+    unique_dates = df["from_datetime"].dt.date.unique()
+    date_time_ranges = {}
+    for date in unique_dates:
+        times = df[df["from_datetime"].dt.date == date]["from_datetime"]
+        min_time = min(times)
+        max_time = max(times)
+        mid_time = max_time - (max_time - min_time)/2
+        date_time_ranges[date] = mid_time
+
+    for date, mid_time in date_time_ranges.items():
+        chart.add_annotation(
+            x=mid_time,
+            y=-1.5,
+            text=str(date),
+            showarrow=False,
+            font=dict(size=12, color=layout_colors["white"]),
+            xanchor="center",
+            yanchor="top",
+            bgcolor=add_transparency_to_color(layout_colors["primary"], 0.7),
+            opacity=0.8,
+        )
+
+    
+
     x_axes = dict(linewidth=0.1, showgrid=False, fixedrange=True, tickfont_size=12)
 
     chart.update_layout(
