@@ -409,12 +409,13 @@ def load_obs_data(obs_toggle, date, click_data):
         Input("obs_data_store", "data"),
         Input("range_slider_forecast", "value"),
         Input("range_slider_obs", "value"),
+        Input("time_picker", "value"),
     ],
     [
         State("date_picker", "date"),
         State("forecast_slider_date_map_store", "data"),
         State("obs_slider_date_map_store", "data"),
-        State("time_picker", "value"),
+        
     ]
 )
 def update_chart_with_obs(
@@ -423,10 +424,10 @@ def update_chart_with_obs(
     obs_data,
     forecast_slider,
     obs_slider,
+    time_picker,
     date,
     forecast_slider_date_map_store,
     obs_slider_date_map_store,
-    time_picker,
 ):
 
     forecast_data = pd.DataFrame(forecast_data_store["forecast_data"])
@@ -462,7 +463,8 @@ def update_chart_with_obs(
                     cell_id=cell_id,
                     obs_date=date,
                     reference_hour=time_picker,
-                    n_hours=forecast_slider_datetime_max - forecast_slider_datetime_min,
+                    start_hour=forecast_slider_datetime_min,
+                    end_hour=forecast_slider_datetime_max,
                 )
                 return chart, "Observational data is shown"
             else:

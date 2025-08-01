@@ -85,8 +85,8 @@ def test_get_dmi_observational_data_integration():
 @pytest.mark.api_call()
 def test_get_dmi_observational_data_integration_with_mock_data():
     cell_id = "10km_622_71"
-    date_from = "2025-07-16"
+    date_from = "2025-07-05"
 
-    json_response = fetch_dmi_observational_data(DMI_API_KEY_OBSERVATION, cell_id, date_from, n_hours=72)
+    json_response = fetch_dmi_observational_data(DMI_API_KEY_OBSERVATION, cell_id, date_from, n_hours=130)
 
     assert json_response is not None
