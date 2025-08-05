@@ -247,11 +247,12 @@
   background-color: var(--bs-light);
 }
 
-.header-cards-data {
-  text-align: center;
-  width: 100%;
-  font-weight: 600; /* semi-bold */
-  margin-top: 1rem;
+.header-card-data {
+  margin-left: clamp(1rem, 5vw, 3rem);
+}
+
+.header-card-text {
+  font-weight: 600;
 }
   
 
