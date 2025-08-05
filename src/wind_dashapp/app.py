@@ -1,23 +1,19 @@
-from dash import dcc, html, Dash, set_props, ctx, State
+from dash import dcc, html, Dash, set_props, State
 import dash_bootstrap_components as dbc
 from dash_bootstrap_templates import load_figure_template
 from dash.dependencies import Input, Output
 import dash_mantine_components as dmc
 import os
 
-from numpy import False_
 from wind_dashapp.helper_functions import app_graph_functions as graphs
 import datetime as dt
 from dotenv import load_dotenv
-import plotly.graph_objs as go
 import pandas as pd
 
 from wind_dashapp.helper_functions.app_helper_functions import (
     load_wind_obs_data_to_app,
     load_wind_forecast_data_to_app,
     DEFAULT_NUMBER_OF_HOURS_FETCH_FORECAST,
-    DEFAULT_NUMBER_OF_HOURS_FETCH_OBS,
-    DEFAULT_HOUR_OBS_DATA,
     convert_json_to_df,
     map_slider_to_date,
 )
@@ -167,58 +163,56 @@ right_cards = (
 
 fig_corecast_control_panel = dbc.Card(
     dbc.CardBody(
-    [
-    html.H2("Observational data"),
-        dmc.Group(
-            [
-                dmc.Stack(
-                    [
-                        html.Div("Date"),
-                        dmc.DatePickerInput(
-                        id="date_picker",
-                        #label="Select date",
-                        minDate=dt.date(2019, 1, 1),
-                        value=dt.date(2019, 1, 1),  # This sets the default value
-                        maxDate=dt.date.today(),
-                        valueFormat="YYYY-MM-DD",
-                        size="md",
-                        w=200
-                ),
-                    ]
-                ),
-
-                dmc.Stack(
-                    [
-                        html.Div("Time"),
-                        dmc.TimePicker(
-                            id="time_picker",
-                            #label="Enter hour",
-                            withSeconds=False,
-                            withDropdown=True,
-                            value="12:00",
-                            size="md",
-                            w=200
-                        ),
-                    ]
-                ),
-
-                dmc.Stack(
-                    [
-                        html.Div("Show observational data"),
-                dmc.Switch(
-                    id="toggle-observational-data",
-                    checked=False,
-                    size="lg",
-                ),
-                    ]
-                )
-            ],
-            justify="left",
-            gap="xl",
-            style={"width": "100%"},
-        ),
-    ],
-    class_name="card-body",
+        [
+            html.H2("Observational data"),
+            dmc.Group(
+                [
+                    dmc.Stack(
+                        [
+                            html.Div("Date"),
+                            dmc.DatePickerInput(
+                                id="date_picker",
+                                # label="Select date",
+                                minDate=dt.date(2019, 1, 1),
+                                value=dt.date(2019, 1, 1),  # This sets the default value
+                                maxDate=dt.date.today(),
+                                valueFormat="YYYY-MM-DD",
+                                size="md",
+                                w=200,
+                            ),
+                        ]
+                    ),
+                    dmc.Stack(
+                        [
+                            html.Div("Time"),
+                            dmc.TimePicker(
+                                id="time_picker",
+                                # label="Enter hour",
+                                withSeconds=False,
+                                withDropdown=True,
+                                value="12:00",
+                                size="md",
+                                w=200,
+                            ),
+                        ]
+                    ),
+                    dmc.Stack(
+                        [
+                            html.Div("Show observational data"),
+                            dmc.Switch(
+                                id="toggle-observational-data",
+                                checked=False,
+                                size="lg",
+                            ),
+                        ]
+                    ),
+                ],
+                justify="left",
+                gap="xl",
+                style={"width": "100%"},
+            ),
+        ],
+        class_name="card-body",
     ),
     class_name="card bg-light mb-3",
 )
@@ -288,7 +282,7 @@ app.layout = dmc.MantineProvider(
                 page_content,
             ],
             className="main-div",
-        )
+        ),
     ]
 )
 
@@ -311,7 +305,7 @@ def update_area_name(click_data):
     Output("forecast_data_store", "data"),
     [
         Input("map_figure", "clickData"),
-    ]
+    ],
 )
 def load_forecast_data(click_data):
     if click_data is None:
@@ -334,6 +328,7 @@ def load_forecast_data(click_data):
         "lat": lat,
     }
 
+
 # --- Callback: Load observational data and store in dcc.Store ---
 @app.callback(
     [
@@ -344,12 +339,12 @@ def load_forecast_data(click_data):
         Input("toggle-observational-data", "checked"),
         Input("date_picker", "value"),
         Input("map_figure", "clickData"),
-    ]
+    ],
 )
 def load_obs_data(obs_toggle, date, click_data):
     if not obs_toggle or not date:
         return None, {}
-    
+
     if click_data is None:
         cell_id = start_cell_id
 
@@ -357,10 +352,14 @@ def load_obs_data(obs_toggle, date, click_data):
         cell_id = click_data["points"][0]["location"]
 
     wind_obs_data_from_click = load_wind_obs_data_to_app(
-        DMI_API_KEY_OBSERVATION, cell_id, date, use_mock_data=USE_MOCK_DATA, 
+        DMI_API_KEY_OBSERVATION,
+        cell_id,
+        date,
+        use_mock_data=USE_MOCK_DATA,
     )
     # Convert to dict for storage
     return wind_obs_data_from_click.to_dict("records"), map_slider_to_date(wind_obs_data_from_click)
+
 
 # --- Callback: Update chart (with or without obs data) ---
 @app.callback(
@@ -377,8 +376,7 @@ def load_obs_data(obs_toggle, date, click_data):
         State("date_picker", "value"),
         State("forecast_slider_date_map_store", "data"),
         State("obs_slider_date_map_store", "data"),
-        
-    ]
+    ],
 )
 def update_chart_with_obs(
     forecast_data_store,
@@ -391,7 +389,6 @@ def update_chart_with_obs(
     forecast_slider_date_map_store,
     obs_slider_date_map_store,
 ):
-
     forecast_data = pd.DataFrame(forecast_data_store["forecast_data"])
     forecast_slider_datetime_min = forecast_slider[0]
     forecast_slider_datetime_max = forecast_slider[1]
@@ -435,8 +432,6 @@ def update_chart_with_obs(
             return chart
     else:
         return chart
-
-
 
 
 ###########################################################

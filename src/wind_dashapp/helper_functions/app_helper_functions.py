@@ -125,8 +125,10 @@ def load_wind_obs_data_to_app(
 
     if use_mock_data:
         df_pivot["mean_wind_speed"] = df_pivot["mean_wind_speed"].apply(lambda x: x * np.random.uniform(0.5, 1.5))
-        start_datetime = pd.Timestamp(date_before.date()).replace(tzinfo=pd.Timestamp(df_pivot['from_datetime'].iloc[0]).tzinfo)
-        df_pivot['from_datetime'] = [start_datetime + pd.Timedelta(hours=i) for i in range(len(df_pivot))]
+        start_datetime = pd.Timestamp(date_before.date()).replace(
+            tzinfo=pd.Timestamp(df_pivot["from_datetime"].iloc[0]).tzinfo
+        )
+        df_pivot["from_datetime"] = [start_datetime + pd.Timedelta(hours=i) for i in range(len(df_pivot))]
 
     return df_pivot
 
@@ -151,19 +153,15 @@ def parse_and_filter_dates(df: pd.DataFrame):
 
     return df_filtered
 
+
 def convert_json_to_df(stored_json: dict):
     df = pd.DataFrame(stored_json)
-    df['from_datetime'] = pd.to_datetime(df['from_datetime'])
+    df["from_datetime"] = pd.to_datetime(df["from_datetime"])
 
     return df
 
+
 def map_slider_to_date(df):
-    slider_to_date = {
-        i + 1: dt for i, dt in enumerate(df["from_datetime"])
-    }
+    slider_to_date = {i + 1: dt for i, dt in enumerate(df["from_datetime"])}
 
     return slider_to_date
-
-
-
-
