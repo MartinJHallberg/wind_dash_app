@@ -247,6 +247,14 @@
   background-color: var(--bs-light);
 }
 
+.header-cards-data {
+  text-align: center;
+  width: 100%;
+  font-weight: 600; /* semi-bold */
+  margin-top: 1rem;
+}
+  
+
 body {
   margin: 0;
   font-family: var(--bs-body-font-family);

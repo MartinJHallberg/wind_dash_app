@@ -128,38 +128,67 @@ map_card = dbc.Card(
     class_name="card",
 )
 
-right_cards = (
-    html.Div(
-        [
+header_cards = dmc.Grid(
+    [
+        dmc.GridCol(
             dbc.Card(
                 dbc.CardBody(
                     [
                         html.Div(
                             "Area",
                         ),
-                        html.H5(
+                        html.H4(
                             id="area_name_card",
                             children="Gilleleje",
+                            className="header-cards-data",
                         ),
                     ],
                     class_name="card-body",
                 ),
                 class_name="card bg-light mb-3",
             ),
+            span=4
+        ),
+        dmc.GridCol(
             dbc.Card(
                 dbc.CardBody(
                     [
                         html.Div(
                             "Wind speed",
                         ),
-                        html.H5(id="wind_speed_card", children="7 m/s"),
+                        html.H4(
+                            id="wind_speed_card",
+                            children="7 m/s",
+                            className="header-cards-data"),
                     ]
                 ),
                 class_name="card bg-light mb-3",
             ),
-        ],
-    ),
+            span=4,
+        ),
+        dmc.GridCol(
+            dbc.Card(
+                dbc.CardBody(
+                    [
+                        html.Div(
+                            "Temperature",
+                        ),
+                        html.H4(
+                            id="temperature_card",
+                            children="10",
+                            className="header-cards-data"
+                        ),
+                    ]
+                ),
+                class_name="card bg-light mb-3",
+            ),
+            span=4
+        )
+
+    ],
+    gutter="xl"
 )
+
 
 fig_corecast_control_panel = dbc.Card(
     dbc.CardBody(
@@ -259,7 +288,8 @@ page_content = dbc.Container(
     html.Div(
         [
             html.H1("Header"),
-            dbc.Row([dbc.Col(map_card, md=9), dbc.Col(right_cards, md=2)]),
+            dbc.Row([dbc.Col(header_cards, md=9)]),
+            dbc.Row([dbc.Col(map_card, md=9)]),
             html.Br(),
             dbc.Row(dbc.Col(fig_forecast_w_obs, md=9)),
             html.Br(),
