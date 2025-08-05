@@ -148,7 +148,7 @@ def create_full_wind_chart(df, **kwargs):
         fixedrange=True,
         tickfont_size=12,
         zerolinecolor=layout_colors["white"],
-        gridcolor=layout_colors["white"],
+        gridcolor=layout_colors["white"], 
         zerolinewidth=3,
     )
 
@@ -166,7 +166,7 @@ def create_full_wind_chart(df, **kwargs):
     for date, mid_time in date_time_ranges.items():
         chart.add_annotation(
             x=mid_time,
-            y=-1.5,
+            y=y_max-2,
             text=str(date),
             showarrow=False,
             font=dict(size=12, color=layout_colors["white"]),

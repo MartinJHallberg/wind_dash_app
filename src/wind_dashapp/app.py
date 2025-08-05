@@ -165,24 +165,62 @@ right_cards = (
     ),
 )
 
-fig_corecast_control_panel = dmc.SimpleGrid(
-    cols=3,
-    spacing="md",
-    children=[
-        dmc.Stack(
+fig_corecast_control_panel = dbc.Card(
+    dbc.CardBody(
+    [
+    html.H2("Observational data"),
+        dmc.Group(
             [
-                html.H6("Forecast hours"),
-            ],
-        ),
-        dmc.Stack(
-            [
+                dmc.Stack(
+                    [
+                        html.Div("Date"),
+                        dmc.DatePickerInput(
+                        id="date_picker",
+                        #label="Select date",
+                        minDate=dt.date(2019, 1, 1),
+                        value=dt.date(2019, 1, 1),  # This sets the default value
+                        maxDate=dt.date.today(),
+                        valueFormat="YYYY-MM-DD",
+                        size="md",
+                        w=200
+                ),
+                    ]
+                ),
+
+                dmc.Stack(
+                    [
+                        html.Div("Time"),
+                        dmc.TimePicker(
+                            id="time_picker",
+                            #label="Enter hour",
+                            withSeconds=False,
+                            withDropdown=True,
+                            value="12:00",
+                            size="md",
+                            w=200
+                        ),
+                    ]
+                ),
+
+                dmc.Stack(
+                    [
+                        html.Div("Show observational data"),
                 dmc.Switch(
                     id="toggle-observational-data",
                     checked=False,
+                    size="lg",
+                ),
+                    ]
                 )
-            ]
+            ],
+            justify="center",
+            gap="xl",
+            style={"width": "100%"},
         ),
     ],
+    class_name="card-body",
+    ),
+    class_name="card bg-light mb-3",
 )
 
 
@@ -190,7 +228,6 @@ fig_forecast_w_obs = dbc.Card(
     [
         html.Div(
             [
-                fig_corecast_control_panel,
                 dcc.Graph(
                     id="chart_forecast",
                     figure=chart_dmi_forecast,
@@ -223,77 +260,16 @@ fig_forecast_w_obs = dbc.Card(
     class_name="card",
 )
 
-control_fig_forecast = html.Div(children=[])
-
-card_control_fig_corecast = dbc.Card(
-    [
-        html.Div(
-            [
-                html.H6(
-                    "Compare forecast with previous date",
-                    style={"margin-top": "0.5rem"},
-                ),
-                # dmc.Switch(
-                #    id="toggle-observational-data",
-                #     checked=False,
-                #    # color="rgba(41, 96, 214, 1)",
-                #    style={"display": "inline-block"},
-                # ),
-            ],
-            className="toggle-control-header",
-        ),
-        dbc.CardBody(
-            [
-                html.Div(
-                    id="control_fig_forecast",
-                    children=[
-                        html.Div(id="toggle-switch-result"),
-                        html.Div(id="error-no-obs-date"),
-                        dmc.Select(
-                            # label="Select previous session",
-                            data=["Session1", "Session2"],
-                            searchable=True,
-                            # checkIconPosition="right",
-                        ),
-                        dcc.DatePickerSingle(
-                            id="date_picker",
-                            min_date_allowed=dt.date(2019, 1, 1),
-                            max_date_allowed=dt.date.today(),
-                            first_day_of_week=1,
-                            # date=dt.date.fromisoformat(start_date),
-                            display_format="YYYY-MM-DD",
-                        ),
-                        dmc.TimePicker(
-                            id="time_picker",
-                            label="Enter hour",
-                            withSeconds=False,
-                            withDropdown=True,
-                            value="12:00"
-                        ),
-                        
-
-                    ],
-                    style={"display": "none"},
-                )
-            ],
-            class_name="card-body",
-        ),
-    ],
-    class_name="card bg-light mb-3",
-)
-
 ########### APP LAYOUT ##############################
 page_content = dbc.Container(
     html.Div(
         [
             html.H1("Header"),
             dbc.Row([dbc.Col(map_card, md=9), dbc.Col(right_cards, md=2)]),
-            dbc.Row(
-                [
-                    dbc.Col(fig_forecast_w_obs, md=9),
-                    dbc.Col(card_control_fig_corecast, md=2),
-                ]
-            ),
+            html.Br(),
+            dbc.Row(dbc.Col(fig_forecast_w_obs, md=9)),
+            html.Br(),
+            dbc.Row([dbc.Col(fig_corecast_control_panel, md=9)]),
         ],
         className="content",
     ),
@@ -318,20 +294,6 @@ app.layout = dmc.MantineProvider(
 
 
 ############ CALLBAKCKS ################
-
-
-@app.callback(
-    Output("control_fig_forecast", "style"),
-    Input("toggle-observational-data", "checked"),
-)
-def show_forecast_control(toggle):
-    if toggle:
-        return {"display": "block"}
-
-    else:
-        return {"display": "none"}
-
-
 @app.callback(
     Output("area_name_card", "children"),
     Input("map_figure", "clickData"),
@@ -380,7 +342,7 @@ def load_forecast_data(click_data):
     ],
     [
         Input("toggle-observational-data", "checked"),
-        Input("date_picker", "date"),
+        Input("date_picker", "value"),
         Input("map_figure", "clickData"),
     ]
 )
@@ -402,7 +364,7 @@ def load_obs_data(obs_toggle, date, click_data):
 
 # --- Callback: Update chart (with or without obs data) ---
 @app.callback(
-    [Output("chart_forecast", "figure"), Output("error-no-obs-date", "children")],
+    Output("chart_forecast", "figure"),
     [
         Input("forecast_data_store", "data"),
         Input("toggle-observational-data", "checked"),
@@ -412,7 +374,7 @@ def load_obs_data(obs_toggle, date, click_data):
         Input("time_picker", "value"),
     ],
     [
-        State("date_picker", "date"),
+        State("date_picker", "value"),
         State("forecast_slider_date_map_store", "data"),
         State("obs_slider_date_map_store", "data"),
         
@@ -466,21 +428,14 @@ def update_chart_with_obs(
                     start_hour=forecast_slider_datetime_min,
                     end_hour=forecast_slider_datetime_max,
                 )
-                return chart, "Observational data is shown"
+                return chart
             else:
-                return chart, "No observational data loaded"
+                return chart
         else:
-            return chart, "No date given for observational data"
+            return chart
     else:
-        return chart, "Forecast only"
+        return chart
 
-
-@app.callback(
-    Output("toggle-switch-result", "children"),
-    Input("toggle-observational-data", "value"),
-)
-def update_output(value):
-    return f"The switch is {value}."
 
 
 
