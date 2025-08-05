@@ -213,7 +213,7 @@ fig_corecast_control_panel = dbc.Card(
                     ]
                 )
             ],
-            justify="center",
+            justify="left",
             gap="xl",
             style={"width": "100%"},
         ),
