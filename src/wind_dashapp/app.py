@@ -9,6 +9,7 @@ from wind_dashapp.helper_functions import app_graph_functions as graphs
 import datetime as dt
 from dotenv import load_dotenv
 import pandas as pd
+from dash_iconify import DashIconify
 
 from wind_dashapp.helper_functions.app_helper_functions import (
     load_wind_obs_data_to_app,
@@ -22,7 +23,7 @@ load_dotenv()
 
 DMI_API_KEY_OBSERVATION = os.getenv("DMI_API_KEY_OBSERVATION")
 DMI_API_KEY_FORECAST = os.getenv("DMI_API_KEY_FORECAST")
-USE_MOCK_DATA = os.getenv("USE_MOCK_DATA")
+USE_MOCK_DATA = os.getenv("USE_MOCK_DATA", "True").lower() in ("true", "1", "yes", "on")
 
 
 ######## INITIALIZE APP ####################
@@ -128,38 +129,77 @@ map_card = dbc.Card(
     class_name="card",
 )
 
-right_cards = (
-    html.Div(
-        [
+header_cards = dmc.Grid(
+    [
+        dmc.GridCol(
             dbc.Card(
                 dbc.CardBody(
                     [
-                        html.Div(
-                            "Area",
-                        ),
-                        html.H5(
-                            id="area_name_card",
-                            children="Gilleleje",
+                        html.Div("Area", className="header-card-text"),
+                        dmc.Group(
+                            [
+                                DashIconify(icon="famicons:location-sharp", width=35),
+                                dmc.Title(
+                                    id="area_name_card",
+                                    children="Gilleleje",
+                                    order=2,
+                                ),
+                            ],
+                            gap="xs",
+                            justify="left",
+                            className="header-card-data",
                         ),
                     ],
                     class_name="card-body",
                 ),
                 class_name="card bg-light mb-3",
             ),
+            span=4,
+        ),
+        dmc.GridCol(
             dbc.Card(
                 dbc.CardBody(
                     [
-                        html.Div(
-                            "Wind speed",
+                        html.Div("Wind speed", className="header-card-text"),
+                        dmc.Group(
+                            [
+                                DashIconify(icon="solar:wind-bold-duotone", width=35),
+                                dmc.Title(id="wind_speed_card", children="6 m/s", order=2),
+                            ],
+                            gap="xs",
+                            justify="left",
+                            className="header-card-data",
                         ),
-                        html.H5(id="wind_speed_card", children="7 m/s"),
                     ]
                 ),
                 class_name="card bg-light mb-3",
             ),
-        ],
-    ),
+            span=4,
+        ),
+        dmc.GridCol(
+            dbc.Card(
+                dbc.CardBody(
+                    [
+                        html.Div("Wind Direction", className="header-card-text"),
+                        dmc.Group(
+                            [
+                                DashIconify(icon="mage:direction-up-fill", width=35),
+                                dmc.Title(id="wind_direction_card", children="NW", order=2),
+                            ],
+                            gap="xs",
+                            justify="left",
+                            className="header-card-data",
+                        ),
+                    ]
+                ),
+                class_name="card bg-light mb-3",
+            ),
+            span=4,
+        ),
+    ],
+    gutter="xl",
 )
+
 
 fig_corecast_control_panel = dbc.Card(
     dbc.CardBody(
@@ -259,7 +299,8 @@ page_content = dbc.Container(
     html.Div(
         [
             html.H1("Header"),
-            dbc.Row([dbc.Col(map_card, md=9), dbc.Col(right_cards, md=2)]),
+            dbc.Row([dbc.Col(header_cards, md=9)]),
+            dbc.Row([dbc.Col(map_card, md=9)]),
             html.Br(),
             dbc.Row(dbc.Col(fig_forecast_w_obs, md=9)),
             html.Br(),
@@ -287,17 +328,22 @@ app.layout = dmc.MantineProvider(
 )
 
 
-############ CALLBAKCKS ################
+############ CALLBAKCKS ###############
+# def get_area_data(click_data)
+
+
 @app.callback(
     Output("area_name_card", "children"),
+    Output("wind_speed_card", "children"),
+    Output("wind_direction_card", "children"),
     Input("map_figure", "clickData"),
 )
 def update_area_name(click_data):
     if click_data is None:
-        return "Gilleleje"
+        return "Gilleleje", "10 m/s", "10 °C"
 
     else:
-        return click_data["points"][0]["customdata"][0]
+        return click_data["points"][0]["customdata"][0], "11 m/s", "10 °C"
 
 
 # --- Callback 1: Load forecast data and store in dcc.Store ---

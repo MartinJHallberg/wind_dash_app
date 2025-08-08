@@ -247,6 +247,15 @@
   background-color: var(--bs-light);
 }
 
+.header-card-data {
+  margin-left: clamp(1rem, 5vw, 3rem);
+}
+
+.header-card-text {
+  font-weight: 600;
+}
+  
+
 body {
   margin: 0;
   font-family: var(--bs-body-font-family);
