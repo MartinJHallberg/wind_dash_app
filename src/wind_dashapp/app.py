@@ -138,7 +138,7 @@ header_cards = dmc.Grid(
                         html.Div("Area", className="header-card-text"),
                         dmc.Group(
                             [
-                                DashIconify(icon="proicons:location", width=35),
+                                DashIconify(icon="famicons:location-sharp", width=35),
                                 dmc.Title(
                                     id="area_name_card",
                                     children="Gilleleje",

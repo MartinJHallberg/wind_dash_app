@@ -116,7 +116,8 @@ def load_wind_obs_data_to_app(
         json_response = json.load(open("wind_dashapp/mock_data/dmi_wind_obs_data_mock6.json"))
         print("Using mock data for observational data")
     else:
-        json_response = fetch_dmi_observational_data(api_key, cell_id, date_before, n_hours, cache_dir=cache_dir)
+        date_before_string = date_before.date().isoformat()
+        json_response = fetch_dmi_observational_data(api_key, cell_id, date_before_string, n_hours, cache_dir=cache_dir)
     df = parse_dmi_observational_data(json_response)
 
     df = parse_and_filter_dates(df)
