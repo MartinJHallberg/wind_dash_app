@@ -340,7 +340,6 @@ app.layout = dmc.MantineProvider(
 )
 def update_area_name(click_data):
     if click_data is None:
-        cell_id = start_cell_id
         return "Gilleleje", "10 m/s", "10 °C"
 
     else:
