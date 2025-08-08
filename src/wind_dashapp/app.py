@@ -23,7 +23,7 @@ load_dotenv()
 
 DMI_API_KEY_OBSERVATION = os.getenv("DMI_API_KEY_OBSERVATION")
 DMI_API_KEY_FORECAST = os.getenv("DMI_API_KEY_FORECAST")
-USE_MOCK_DATA = os.getenv("USE_MOCK_DATA", "True").lower() in ('true', '1', 'yes', 'on')
+USE_MOCK_DATA = os.getenv("USE_MOCK_DATA", "True").lower() in ("true", "1", "yes", "on")
 
 
 ######## INITIALIZE APP ####################
